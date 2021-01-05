@@ -185,6 +185,20 @@ footer {
 
 /* --------------------- */
 
+fieldset {
+  border-radius: 5px;
+}
+
+.click {
+  font-style: italic;
+}
+
+.dotted {
+  border-bottom: 2px dotted #e495e4;
+}
+
+/* --------------------- */
+
 .showBlock {
   display: block;
 }

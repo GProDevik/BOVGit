@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <title>Player ratings on chess sites</title>
   <link rel="stylesheet" href="css/chess.css">
-  <link href='https://fonts.googleapis.com/css?family=Rock+Salt' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/css?family=Rock+Salt" rel="stylesheet" type="text/css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -84,7 +84,7 @@
   <section class="sectionSettingsArea hiddenBlock">
     <form>
       <fieldset>
-        <legend>Settings</legend>
+        <legend><em><strong>Settings</strong></em></legend>
         <label for="elemAutoRefreshInterval">
           AutoRefresh Interval in minutes (0 - not AutoRefresh):
           <input type="text" size=10 id="elemAutoRefreshInterval" name="elemAutoRefreshInterval"
@@ -96,13 +96,20 @@
             Dark theme
           </label>
         </p>
+      </fieldset>
+      <fieldset>
+        <legend><em><strong>Tips</strong></em></legend>
         <ul>
-          <em><strong>Tips:</strong></em>
-          <li>Click on the text "Player ratings on chess sites" to refresh all tables</li>
-          <li>Click on the heading "Lichess" to refresh the Lichess table and sort by player list</li>
-          <li>Click on the heading "Chess.com" to refresh the Chess.com table and sort by player list</li>
-          <li>Click on any other heading to sort by rating</li>
-          <li>Click on the "↑↓" button to change the order of tables</li>
+          <li><span class="click">Click</span> on the <span class="dotted">text "Player ratings on chess sites"</span>
+            to refresh all tables
+          </li>
+          <li><span class="click">Click</span> on the <span class="dotted">heading "Lichess"</span> to refresh the
+            Lichess table and sort by player list</li>
+          <li><span class="click">Click</span> on the <span class="dotted">heading "Chess.com"</span> to refresh the
+            Chess.com table and sort by player list</li>
+          <li><span class="click">Click</span> on <span class="dotted">any other heading</span> to sort by rating</li>
+          <li><span class="click">Click</span> on the <span class="dotted">"↑↓" button</span> to change the order of
+            tables</li>
         </ul>
       </fieldset>
     </form>
