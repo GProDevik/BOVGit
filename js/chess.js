@@ -14,11 +14,18 @@ let mapTimeControl = new Map([
 let sortSymbolAtHead = '↑'; //&#8593
 let lastSortSelectorLichess = '', lastSortSelectorChessCom = '';
 let lastSortTimeControlLichess = '', lastSortTimeControlChessCom = '';
+let isMobileDevice = is_mobile_device();
 
 inputNode1 = InputOrder1;
 inputNode2 = InputOrder2;
 tableNode1 = TableOrder1;
 tableNode2 = TableOrder2;
+
+//MobileStyle
+if (isMobileDevice) {
+  bodyStyle.setAttribute("class", "mobileSyle");
+  document.querySelector('.projectName').setAttribute("class", "projectName projectNameDifMobile");
+}
 
 // ------------- On-Click ---------------
 document.querySelector('.projectName').onclick = () => refresh(); //refresh by click on projectName
@@ -87,8 +94,9 @@ window.addEventListener("orientationchange", function () {
 function replaceSomeHeads(windowOrientation) {
   let b, p, useLongWords = false;
   if (windowOrientation === undefined) {
-    const mediaQuery = window.matchMedia('(min-width: 768px), (orientation: landscape)'); //PC or landscape
-    useLongWords = mediaQuery.matches;
+    // const mediaQuery = window.matchMedia('(min-width: 768px), (orientation: landscape)'); //PC or landscape
+    const mediaQuery = window.matchMedia('(orientation: landscape)'); //PC or landscape
+    useLongWords = !isMobileDevice || mediaQuery.matches;
   } else {
     useLongWords = (windowOrientation === 90 || windowOrientation === -90); //landscape
   }
@@ -713,23 +721,6 @@ function setAutoRefresh() {
   }
 }
 
-function setTheme() {
-  const isDarkTheme = document.getElementById('elemCheckDarkTheme').checked;
-
-  const black = 'black';
-  const white = 'white';
-  if (isDarkTheme) {
-    document.body.style.backgroundColor = black;
-    document.body.style.color = white;
-  } else {
-    document.body.style.backgroundColor = white;
-    document.body.style.color = black;
-  }
-
-  v = isDarkTheme ? '1' : '0';
-  localStorage.setItem('DarkThemeChecked', v);
-}
-
 function changeTablesOrder() {
   let t;
 
@@ -780,4 +771,29 @@ function getDateYYYYMMDD(date) {
   dayOfMonth = dayOfMonth < 10 ? '0' + dayOfMonth : dayOfMonth;
 
   return `${year}-${month}-${dayOfMonth}`
+}
+
+function setTheme() {
+  const isDarkTheme = document.getElementById('elemCheckDarkTheme').checked;
+
+  const black = 'black';
+  const white = 'white';
+  if (isDarkTheme) {
+    document.body.style.backgroundColor = black;
+    document.body.style.color = white;
+  } else {
+    document.body.style.backgroundColor = white;
+    document.body.style.color = black;
+  }
+
+  v = isDarkTheme ? '1' : '0';
+  localStorage.setItem('DarkThemeChecked', v);
+}
+
+function is_mobile_device() {
+  const s = 'ipad|iphone|android|pocket|palm|windows ce|windowsce|cellphone|opera mobi|'
+    + 'ipod|small|sharp|sonyericsson|symbian|opera mini|nokia|htc_|samsung|motorola|smartphone|'
+    + 'blackberry|playstation portable|tablet browser|webOS|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk';
+  const devices = new RegExp(s, "i");
+  return devices.test(navigator.userAgent) ? true : false;
 }
