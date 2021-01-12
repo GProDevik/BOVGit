@@ -4,13 +4,12 @@ html {
   font-family: 'helvetica neue', helvetica, arial, sans-serif;
 }
 
-/* mobile devices < 768px- begin */
-
 .mobileSyle {
   margin-left: 0;
   width: 100vw;
   font-size: 90%;
 }
+
 .PCStyle {
   margin-left: 30vw;
   width: 40vw;
@@ -19,45 +18,11 @@ html {
 
 .projectNameDifMobile {
   font-size: small;
-  /* font-weight: bold;
-  font-style: italic;
-  text-align: center;
-  width: 60%;
-  margin-left: 20%;
-  cursor: url('NeonCursor04-Blue.cur'), pointer;
-  text-shadow: 1px 1px 1px #e495e4;
-  border: 2px solid #e495e4;
-  border-radius: 6px; */
 }
+
 .projectNameDifPC {
   font-size: large;
-  /* font-weight: bold;
-  font-style: italic;
-  text-align: center;
-  width: 60%;
-  margin-left: 20%;
-  cursor: url('NeonCursor04-Blue.cur'), pointer;
-  text-shadow: 1px 1px 1px #e495e4;
-  border: 2px solid #e495e4;
-  border-radius: 6px; */
 }
-
-/* mobile devices - end */
-
-/* PC & notebooks >= 768px - begin */
-
-/* @media (min-width: 768px) {
-  body {
-    margin-left: 30vw;
-    width: 40vw;
-    font-size: 100%;
-  }
-  .projectNameDif {
-    font-size: large;
-  }
-} */
-
-/* PC & notebooks >= 768px - end */
 
 .projectName {
   font-weight: bold;
@@ -86,13 +51,11 @@ html {
 
 .inputCheck {
   margin-left: 2vw;
-  transform: scale(1.5);
-  /* zoom */
+  transform: scale(1.5); /* zoom */
 }
 
 .inputCheckSettings {
-  transform: scale(1.5);
-  /* zoom */
+  transform: scale(1.5); /* zoom */
 }
 
 .buttonRefresh {
@@ -209,7 +172,7 @@ footer {
   /* width: 100%; */
 }
 
-/* --------------------- */
+/* ------- Settings -------------- */
 
 fieldset {
   border-radius: 5px;

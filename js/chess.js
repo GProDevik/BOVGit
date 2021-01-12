@@ -82,27 +82,20 @@ window.addEventListener("orientationchange", function () {
   replaceSomeHeads(window.orientation);
 }, false);
 
-////////// T E S T //////////
-
-// elemButtonTest.onclick = () => Test();
-// function Test() {
-// }
-
 /////////////////////////////////////////////////////////////////////////////
 
 //replace some heads for mobile / PC
 function replaceSomeHeads(windowOrientation) {
   let b, p, useLongWords = false;
   if (windowOrientation === undefined) {
-    // const mediaQuery = window.matchMedia('(min-width: 768px), (orientation: landscape)'); //PC or landscape
-    const mediaQuery = window.matchMedia('(orientation: landscape)'); //PC or landscape
-    useLongWords = !isMobileDevice || mediaQuery.matches;
+    const mediaQuery = window.matchMedia('(orientation: landscape)');
+    useLongWords = !isMobileDevice || mediaQuery.matches; //PC or landscape
   } else {
     useLongWords = (windowOrientation === 90 || windowOrientation === -90); //landscape
   }
 
   if (useLongWords) {
-    //for PC or landscape: 'bullet', 'puzzle'
+    //for PC or landscape
     b = 'bullet';
     p = 'puzzle';
   } else {
