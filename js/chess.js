@@ -1,4 +1,4 @@
-//v1.0.24 2021-02-03
+//v1.0.25 2021-02-08
 let urlHttpServiceLichess = 'https://lichess.org/api/user/';
 let urlHttpServiceChessCom = 'https://api.chess.com/pub/player/';
 let intervalID;
@@ -52,12 +52,15 @@ document.querySelector('.THeadrapidChessCom').onclick = () => sortRapidChessCom(
 document.querySelector('.THeadpuzzleChessCom').onclick = () => sortPuzzleChessCom();
 document.querySelector('.THeadrushChessCom').onclick = () => sortRushChessCom();
 
-buttonSettings.onclick = () => goSetMode();
 buttonChangeTables.onclick = () => buttonChangeTablesFunction();
+
+//settings
+buttonSettings.onclick = () => goSetMode();
 elemCheckDarkTheme.onclick = () => setTheme();
+buttonClearSettings.onclick = () => clearSettings();
 buttonReturnToMain.onclick = () => goMainMode();
 
-// hot keys
+//hot keys
 document.addEventListener('keydown', function (event) {
   if (event.key === 'Enter') { //Enter
     refresh();
@@ -700,6 +703,25 @@ function setFirstChessComToStorage() {
   localStorage.setItem('isFirstChessCom', v);
 }
 
+function clearSettings() {
+  if (confirm('All parameters such as Player names, AutoRefresh interval, Tables order, etc. will be cleared.')) {
+    localStorage.clear();
+
+    document.getElementById('elemAutoRefreshInterval').value = "";
+    document.getElementById('elemCheckDarkTheme').checked = false;
+    document.getElementById('elemTextLichessOrgPlayerNames').value = "";
+    document.getElementById('elemTextChessComPlayerNames').value = "";
+
+    if (isFirstChessCom) {
+      isFirstChessCom = false;
+      changeTablesOrder();
+    }
+
+    refresh();
+    setAutoRefresh();
+    setTheme();
+  }
+}
 ///////////////////////////////////////////////////////////
 
 function setAutoRefresh() {
@@ -711,6 +733,8 @@ function setAutoRefresh() {
       let milliSeconds = n * 60 * 1000;
       intervalID = setInterval(refresh, milliSeconds);
     }
+  } else {
+    intervalID = undefined;
   }
 }
 
