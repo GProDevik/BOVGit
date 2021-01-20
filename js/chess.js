@@ -704,24 +704,27 @@ function setFirstChessComToStorage() {
 }
 
 function clearSettings() {
-  if (confirm('All parameters such as Player names, AutoRefresh interval, Tables order, etc. will be cleared.')) {
-    localStorage.clear();
+  // if (confirm('All parameters such as Player names, AutoRefresh interval, Tables order, etc. will be cleared.')) {
+  localStorage.clear();
 
-    document.getElementById('elemAutoRefreshInterval').value = "";
-    document.getElementById('elemCheckDarkTheme').checked = false;
-    document.getElementById('elemTextLichessOrgPlayerNames').value = "";
-    document.getElementById('elemTextChessComPlayerNames').value = "";
+  document.getElementById('elemAutoRefreshInterval').value = "";
+  document.getElementById('elemCheckDarkTheme').checked = false;
+  document.getElementById('elemTextLichessOrgPlayerNames').value = "";
+  document.getElementById('elemTextChessComPlayerNames').value = "";
 
-    if (isFirstChessCom) {
-      isFirstChessCom = false;
-      changeTablesOrder();
-    }
-
-    refresh();
-    setAutoRefresh();
-    setTheme();
+  if (isFirstChessCom) {
+    isFirstChessCom = false;
+    changeTablesOrder();
   }
+
+  refresh();
+  setAutoRefresh();
+  setTheme();
+
+  alert('All settings are cleared.');
+  // }
 }
+
 ///////////////////////////////////////////////////////////
 
 function setAutoRefresh() {
