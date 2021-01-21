@@ -1,4 +1,4 @@
-/* v1.0.23  2021-02-03 */
+/* v1.0.24  2021-02-09 */
 
 html {
   font-family: 'helvetica neue', helvetica, arial, sans-serif;
@@ -6,7 +6,7 @@ html {
 
 .mobileSyle {
   margin-left: 0;
-  width: 100vw;
+  width: 100%;
   font-size: 90%;
 }
 
@@ -51,11 +51,13 @@ html {
 
 .inputCheck {
   margin-left: 2vw;
-  transform: scale(1.5); /* zoom */
+  transform: scale(1.5);
+  /* zoom */
 }
 
 .inputCheckSettings {
-  transform: scale(1.5); /* zoom */
+  transform: scale(1.5);
+  /* zoom */
 }
 
 .buttonRefresh {

@@ -1,4 +1,4 @@
-//v1.0.25 2021-02-08
+//v1.0.26 2021-02-09
 let urlHttpServiceLichess = 'https://lichess.org/api/user/';
 let urlHttpServiceChessCom = 'https://api.chess.com/pub/player/';
 let intervalID;
@@ -62,7 +62,7 @@ buttonReturnToMain.onclick = () => goMainMode();
 
 //hot keys
 document.addEventListener('keydown', function (event) {
-  if (event.key === 'Enter') { //Enter
+  if (event.key === 'Enter') {
     refresh();
   }
 });
@@ -87,7 +87,7 @@ window.addEventListener("orientationchange", function () {
 
 /////////////////////////////////////////////////////////////////////////////
 
-//replace some heads for mobile / PC
+//replace some heads for 'mobile portrait'
 function replaceSomeHeads(windowOrientation) {
   let b, p, useLongWords = false;
   if (windowOrientation === undefined) {
@@ -202,7 +202,7 @@ function sortTable(thisIsLichess, timeControl) {
       s = (c === 0) ? cells[c].innerHTML : cells[c].textContent;
       s = s.trim(); //cell value
 
-      //playerName ---> to string
+      //playerName
       if (c === 0) a[r][c] = s;
 
       //bullet, blitz, rapid, puzzle, rush ---> to number
@@ -385,7 +385,7 @@ function fillTableFromServer(thisIsLichess) {
   let elem, playerNames, arPlayerNames, rowNum;
   elem = getElementInputPlayers(thisIsLichess);
   playerNames = elem.value.trim(); //delete begin and end spaces
-  arPlayerNames = playerNames.split(' '); //get array of Player's names
+  arPlayerNames = playerNames.split(' '); //get array of Players names
   rowNum = 0;
   for (let step = 0; step < arPlayerNames.length; step++) {
     playerName = arPlayerNames[step];
@@ -637,7 +637,7 @@ function goMainMode() {
     let n = parseInt(s, 10);
     if (isNaN(n) || !(Number.isInteger(n) && n >= 0 && n <= 9999)) {
       alert('Interval must be between 0 and 9999 !');
-      return; //not correct
+      return; //AutoRefreshInterval is not correct
     }
     s = n.toString(10);
   }
@@ -704,7 +704,6 @@ function setFirstChessComToStorage() {
 }
 
 function clearSettings() {
-  // if (confirm('All parameters such as Player names, AutoRefresh interval, Tables order, etc. will be cleared.')) {
   localStorage.clear();
 
   document.getElementById('elemAutoRefreshInterval').value = "";
@@ -722,7 +721,6 @@ function clearSettings() {
   setTheme();
 
   alert('All settings are cleared.');
-  // }
 }
 
 ///////////////////////////////////////////////////////////
@@ -757,6 +755,30 @@ function changeTablesOrder() {
 
 ///////////////////////////////////////////////////////////
 
+function setTheme() {
+  const isDarkTheme = document.getElementById('elemCheckDarkTheme').checked;
+
+  const black = 'black';
+  const white = 'white';
+  if (isDarkTheme) {
+    document.body.style.backgroundColor = black;
+    document.body.style.color = white;
+  } else {
+    document.body.style.backgroundColor = white;
+    document.body.style.color = black;
+  }
+
+  v = isDarkTheme ? '1' : '0';
+  localStorage.setItem('DarkThemeChecked', v);
+}
+
+function is_mobile_device() {
+  const s = 'ipad|iphone|android|pocket|palm|windows ce|windowsce|cellphone|opera mobi|'
+    + 'ipod|small|sharp|sonyericsson|symbian|opera mini|nokia|htc_|samsung|motorola|smartphone|'
+    + 'blackberry|playstation portable|tablet browser|webOS|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk';
+  const devices = new RegExp(s, "i");
+  return devices.test(navigator.userAgent) ? true : false;
+}
 //get date & time in: YYYY-MM-DD HH:MM:SS
 function getDateTime(date) {
   let year = date.getFullYear();
@@ -791,29 +813,4 @@ function getDateYYYYMMDD(date) {
   dayOfMonth = dayOfMonth < 10 ? '0' + dayOfMonth : dayOfMonth;
 
   return `${year}-${month}-${dayOfMonth}`
-}
-
-function setTheme() {
-  const isDarkTheme = document.getElementById('elemCheckDarkTheme').checked;
-
-  const black = 'black';
-  const white = 'white';
-  if (isDarkTheme) {
-    document.body.style.backgroundColor = black;
-    document.body.style.color = white;
-  } else {
-    document.body.style.backgroundColor = white;
-    document.body.style.color = black;
-  }
-
-  v = isDarkTheme ? '1' : '0';
-  localStorage.setItem('DarkThemeChecked', v);
-}
-
-function is_mobile_device() {
-  const s = 'ipad|iphone|android|pocket|palm|windows ce|windowsce|cellphone|opera mobi|'
-    + 'ipod|small|sharp|sonyericsson|symbian|opera mini|nokia|htc_|samsung|motorola|smartphone|'
-    + 'blackberry|playstation portable|tablet browser|webOS|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk';
-  const devices = new RegExp(s, "i");
-  return devices.test(navigator.userAgent) ? true : false;
 }
