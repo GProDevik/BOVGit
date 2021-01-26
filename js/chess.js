@@ -779,6 +779,7 @@ function is_mobile_device() {
   const devices = new RegExp(s, "i");
   return devices.test(navigator.userAgent) ? true : false;
 }
+
 //get date & time in: YYYY-MM-DD HH:MM:SS
 function getDateTime(date) {
   let year = date.getFullYear();
