@@ -16,24 +16,24 @@ let lastSortSelectorLichess = '', lastSortSelectorChessCom = '';
 let lastSortTimeControlLichess = '', lastSortTimeControlChessCom = '';
 let isMobileDevice = is_mobile_device();
 
-inputNode1 = InputOrder1;
-inputNode2 = InputOrder2;
-tableNode1 = TableOrder1;
-tableNode2 = TableOrder2;
+inputNode1 = document.querySelector('#InputOrder1');
+inputNode2 = document.querySelector('#InputOrder2');
+tableNode1 = document.querySelector('#TableOrder1');
+tableNode2 = document.querySelector('#TableOrder2');
 
 //MobileStyle
 if (isMobileDevice) {
-  bodyStyle.setAttribute("class", "mobileSyle");
+  document.querySelector('#bodyStyle').setAttribute("class", "mobileSyle");
   document.querySelector('.projectName').setAttribute("class", "projectName projectNameDifMobile");
 }
 
 // ------------- On-Click ---------------
 document.querySelector('.projectName').onclick = () => refresh(); //refresh by click on projectName
 
-buttonLichessRefresh.onclick = () => refreshLichess(); //refresh Lichess Table by click button
-buttonChessComRefresh.onclick = () => refreshChessCom(); //refresh ChessCom Table by click button
-elemCheckLichess.onclick = () => refreshLichess(); //refresh by click on checkBox of Lichess
-elemCheckChessCom.onclick = () => refreshChessCom(); //refresh by click on checkBox of ChessCom
+document.querySelector('#buttonLichessRefresh').onclick = () => refreshLichess(); //refresh Lichess Table by click button
+document.querySelector('#buttonChessComRefresh').onclick = () => refreshChessCom(); //refresh ChessCom Table by click button
+document.querySelector('#elemCheckLichess').onclick = () => refreshLichess(); //refresh by click on checkBox of Lichess
+document.querySelector('#elemCheckChessCom').onclick = () => refreshChessCom(); //refresh by click on checkBox of ChessCom
 
 document.querySelector('.THeadPlayerLichess').onclick = () => refreshLichess(); //refresh by click on 1-st Head of Lichess Table
 document.querySelector('.THeadPlayerChessCom').onclick = () => refreshChessCom(); //refresh by click on 1-st Head of ChessCom Table
@@ -52,13 +52,13 @@ document.querySelector('.THeadrapidChessCom').onclick = () => sortRapidChessCom(
 document.querySelector('.THeadpuzzleChessCom').onclick = () => sortPuzzleChessCom();
 document.querySelector('.THeadrushChessCom').onclick = () => sortRushChessCom();
 
-buttonChangeTables.onclick = () => buttonChangeTablesFunction();
+document.querySelector('#buttonChangeTables').onclick = () => buttonChangeTablesFunction();
 
 //settings
-buttonSettings.onclick = () => goSetMode();
-elemCheckDarkTheme.onclick = () => setTheme();
-buttonClearSettings.onclick = () => clearSettings();
-buttonReturnToMain.onclick = () => goMainMode();
+document.querySelector('#buttonSettings').onclick = () => goSetMode();
+document.querySelector('#elemCheckDarkTheme').onclick = () => setTheme();
+document.querySelector('#buttonClearSettings').onclick = () => clearSettings();
+document.querySelector('#buttonReturnToMain').onclick = () => goMainMode();
 
 //hot keys
 document.addEventListener('keydown', function (event) {
@@ -185,7 +185,7 @@ function sortTable(thisIsLichess, timeControl) {
   let tableRef = getChessTableRef(thisIsLichess);
   let r, rowCount = tableRef.rows.length;
   let c, cellcount, cells;
-  let s, n;
+  let s, n, selector, lastSymbol;
 
   if (rowCount === 0) {
     return;
@@ -264,7 +264,7 @@ function sortTable(thisIsLichess, timeControl) {
 
 //delete sortSymbolAtHead from previous sorted column
 function delSortSymbolAtHeadFromPreviousSortedColumn(thisIsLichess) {
-  selectorPrev = thisIsLichess ? lastSortSelectorLichess : lastSortSelectorChessCom;
+  let selectorPrev = thisIsLichess ? lastSortSelectorLichess : lastSortSelectorChessCom;
   if (selectorPrev !== '') {
     let s = document.querySelector(selectorPrev).textContent;
     let lastSymbol = s.slice(-1);
@@ -349,7 +349,7 @@ function clearAllTables() {
 
 function clearTable(thisIsLichess) {
   const pref = thisIsLichess ? '.l' : '.c';
-  n = getTableRowsNumber(thisIsLichess);
+  const n = getTableRowsNumber(thisIsLichess);
   for (let step = 0; step < n; step++) {
     const rowNum = step + 1;
     document.querySelector(pref + 'player' + rowNum).innerHTML = ''; //innerHTML (because 'href')
@@ -388,7 +388,7 @@ function fillTableFromServer(thisIsLichess) {
   arPlayerNames = playerNames.split(' '); //get array of Players names
   rowNum = 0;
   for (let step = 0; step < arPlayerNames.length; step++) {
-    playerName = arPlayerNames[step];
+    const playerName = arPlayerNames[step];
     if (playerName !== '') {
       if (++rowNum > getTableRowsNumber(thisIsLichess)) {
         addRowToTable(thisIsLichess, rowNum);
@@ -406,7 +406,7 @@ function fillTableFromServer(thisIsLichess) {
 }
 
 function getElementInputPlayers(thisIsLichess) {
-  elem = thisIsLichess ? document.getElementById('elemTextLichessOrgPlayerNames') :
+  const elem = thisIsLichess ? document.getElementById('elemTextLichessOrgPlayerNames') :
     document.getElementById('elemTextChessComPlayerNames');
   return elem;
 }
@@ -501,7 +501,7 @@ async function fetchGetLichessOrg(rowNum, playerName) {
 
     //title (GM, IM, FM, ...)
     let title = getJsonValue1(playerName, jsonObj, 'title');
-    title = (title == undefined) ? '' : title + ' ';
+    title = (title === undefined) ? '' : title + ' ';
 
     //player (href !)
     const playerURL = getJsonValue1(playerName, jsonObj, 'url');
@@ -558,7 +558,7 @@ async function fetchGetChessCom(rowNum, playerName) {
       playerURL = getJsonValue1(playerName, jsonObj, 'url');
       //title (GM, IM, FM, ...)
       title = getJsonValue1(playerName, jsonObj, 'title');
-      title = (title == undefined) ? '' : title + ' ';
+      title = (title === undefined) ? '' : title + ' ';
     } else {
       console.log(playerName + ' - chess.com, playerURL, response-error: ' + response.status);
     };
@@ -597,7 +597,7 @@ async function fetchGetChessCom(rowNum, playerName) {
 }
 
 function getJsonValue1(playerName, jsonObj, field1) {
-  value = '';
+  let value = '';
   try {
     value = jsonObj[field1];
   }
@@ -608,7 +608,7 @@ function getJsonValue1(playerName, jsonObj, field1) {
 }
 
 function getJsonValue3(playerName, jsonObj, field1, field2, field3) {
-  value = '';
+  let value = '';
   try {
     value = jsonObj[field1][field2][field3];
   }
@@ -768,7 +768,7 @@ function setTheme() {
     document.body.style.color = black;
   }
 
-  v = isDarkTheme ? '1' : '0';
+  const v = isDarkTheme ? '1' : '0';
   localStorage.setItem('DarkThemeChecked', v);
 }
 
