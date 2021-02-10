@@ -3,25 +3,36 @@
 
 // ------------------- V U E ------------------------
 
+// // Create a Vue application
+// const app = Vue.createApp({})
+// // Define a new global component called button-counter
+// app.component('vue-component-form', {
+//   data() {
+//     return {
+//       count: 0,
+//       helloText: 'Hello, world !',
+//     }
+//   },
+//   template: `
+//     {{helloText}}
+//     <br>
+//     <button @click="count++">
+//       button counter: {{ count }}
+//     </button>
+//     `
+// })
+// app.mount('#vue-mount')
+
 // Create a Vue application
-const app = Vue.createApp({})
-// Define a new global component called button-counter
-app.component('vue-component-form', {
+const Counter = {
   data() {
     return {
       count: 0,
       helloText: 'Hello, world !',
     }
   },
-  template: `
-    {{helloText}}
-    <br>
-    <button @click="count++">
-      button counter: {{ count }}
-    </button>
-    `
-})
-app.mount('#vue-mount')
+}
+Vue.createApp(Counter).mount('#vue-mount')
 
 let urlHttpServiceLichess = 'https://lichess.org/api/user/';
 let urlHttpServiceChessCom = 'https://api.chess.com/pub/player/';

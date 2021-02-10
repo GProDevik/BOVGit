@@ -31,7 +31,12 @@
 <body>
 
   <div id="vue-mount">
-    <vue-component-form></vue-component-form>
+    <!-- <vue-component-form></vue-component-form> -->
+
+    <button @click="count++">
+      {{helloText}}
+      button counter: {{ count }}
+    </button>
 
     <div id="bodyStyle" class="PCStyle">
 
