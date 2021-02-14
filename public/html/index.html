@@ -43,27 +43,42 @@
       <header>
         <div class="oneLineUser">
           <img src="usericon.png" id="usericon">
-          <input type="button" value="User" name="buttonUser" id="buttonUser" title="User">
-          <span class="currentUsername"></span>
+          <!-- <input type="button" value="User" name="buttonUser" id="buttonUser" title="User"> -->
+          <input type="button" @click="vueGoUserMode" value="User" name="buttonUser" id="buttonUser" title="User">
+          <!-- <span class="currentUsername"></span> -->
+          <span class="currentUsername">{{vueCurrentUsername}}</span>
         </div>
 
-        <div class="projectName projectNameDifPC" title="Refresh all tables">Player ratings</div>
+        <!-- <div class="projectName projectNameDifPC" title="Refresh all tables">Player ratings</div> -->
+        <div @click="vueRefresh" class="projectName projectNameDifPC" title="Refresh all tables">Player ratings</div>
+
       </header>
 
       <main>
 
         <form>
           <label id="InputOrder1" class="oneLine" for="elemTextLichessOrgPlayerNames">
-            <input class="inputCheck" type="checkbox" id="elemCheckLichess" name="elemCheckLichess" checked>
-            <input class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
+            <!-- <input class="inputCheck" type="checkbox" id="elemCheckLichess" name="elemCheckLichess" checked> -->
+            <input @click="vueRefreshLichess" class="inputCheck" type="checkbox" id="elemCheckLichess"
+              name="elemCheckLichess" checked>
+            <!-- <input class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh" title="Refresh Lichess table"> -->
+            <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
               title="Refresh Lichess table">
-            <input class="inputText" type="text" id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames"
+            <!-- <input class="inputText" type="text" id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames"
               maxlength="250" title="Enter names of players on Lichess.org, separated by spaces"
+              placeholder="Player names on Lichess, separated by spaces"> -->
+            <input v-model="vueLichessOrgPlayerNames" class="inputText" type="text" id="elemTextLichessOrgPlayerNames"
+              name="elemTextLichessOrgPlayerNames" maxlength="250"
+              title="1Enter names of players on Lichess.org, separated by spaces"
               placeholder="Player names on Lichess, separated by spaces">
           </label>
+
           <label id="InputOrder2" class="oneLine" for="elemTextChessComPlayerNames">
-            <input class="inputCheck" type="checkbox" id="elemCheckChessCom" name="elemCheckChessCom" checked>
-            <input class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh"
+            <!-- <input class="inputCheck" type="checkbox" id="elemCheckChessCom" name="elemCheckChessCom" checked> -->
+            <input @click="vueRefreshChessCom" class="inputCheck" type="checkbox" id="elemCheckChessCom"
+              name="elemCheckChessCom" checked>
+            <!-- <input class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh" title="Refresh Chess.com table"> -->
+            <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh"
               title="Refresh Chess.com table">
             <input class="inputText" type="text" id="elemTextChessComPlayerNames" name="elemTextChessComPlayerNames"
               maxlength="250" title="Enter names of players on Chess.com, separated by spaces"

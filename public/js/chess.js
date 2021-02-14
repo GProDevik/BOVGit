@@ -1,38 +1,34 @@
 //v1.1.6 2021-09-17
 'use strict';
 
-// ------------------- V U E ------------------------
+// ------------------- V U E  (start) ------------------------
 
-// // Create a Vue application
-// const app = Vue.createApp({})
-// // Define a new global component called button-counter
-// app.component('vue-component-form', {
-//   data() {
-//     return {
-//       count: 0,
-//       helloText: 'Hello, world !',
-//     }
-//   },
-//   template: `
-//     {{helloText}}
-//     <br>
-//     <button @click="count++">
-//       button counter: {{ count }}
-//     </button>
-//     `
-// })
-// app.mount('#vue-mount')
-
-// Create a Vue application
-const Counter = {
+const root = {
   data() {
     return {
       count: 0,
       helloText: 'Hello, world !',
+      vueCurrentUsername: '',
+      // vueLichessOrgPlayerNames: '',
+      // vueChessComPlayerNames: '',
     }
   },
+  methods: {
+    vueGoUserMode() { goUserMode() },
+    vueRefresh() { refresh() },
+    vueRefreshLichess() { refreshLichess() },
+    vueRefreshChessCom() { refreshChessCom() },
+  },
+  // computed: {
+  //   vueComputedGoUserMode() {
+  //     return goUserMode()
+  //   }
+  // },
 }
-Vue.createApp(Counter).mount('#vue-mount')
+const app = Vue.createApp(root)
+const vm = app.mount('#vue-mount')
+
+// ------------------- V U E  (end) ------------------------
 
 let urlHttpServiceLichess = 'https://lichess.org/api/user/';
 let urlHttpServiceChessCom = 'https://api.chess.com/pub/player/';
@@ -67,12 +63,12 @@ if (isMobileDevice) {
 }
 
 // ------------- On-Click ---------------
-document.querySelector('.projectName').onclick = () => refresh();
+// document.querySelector('.projectName').onclick = () => refresh();
 
-document.querySelector('#buttonLichessRefresh').onclick = () => refreshLichess();
-document.querySelector('#buttonChessComRefresh').onclick = () => refreshChessCom();
-document.querySelector('#elemCheckLichess').onclick = () => refreshLichess();
-document.querySelector('#elemCheckChessCom').onclick = () => refreshChessCom();
+// document.querySelector('#buttonLichessRefresh').onclick = () => refreshLichess();
+// document.querySelector('#buttonChessComRefresh').onclick = () => refreshChessCom();
+// document.querySelector('#elemCheckLichess').onclick = () => refreshLichess();
+// document.querySelector('#elemCheckChessCom').onclick = () => refreshChessCom();
 document.querySelector('#elemTextLichessOrgPlayerNames').onchange = () => onchangeLichess();
 document.querySelector('#elemTextChessComPlayerNames').onchange = () => onchangeChessCom();
 document.querySelector('#elemAutoRefreshInterval').onchange = () => onchangeAutoRefreshInterval();
@@ -103,7 +99,7 @@ document.querySelector('#buttonClearSettings').onclick = () => clearSettings();
 document.querySelector('#buttonReturnToMainFromSettings').onclick = () => goMainModeFromSettings();
 
 //login
-document.querySelector('#buttonUser').onclick = () => goUserMode();
+// document.querySelector('#buttonUser').onclick = () => goUserMode();
 document.querySelector('#buttonPostRegistration').onclick = () => postRegistration();
 document.querySelector('#buttonPostLogin').onclick = () => postLogin();
 document.querySelector('#buttonPostLogout').onclick = () => postLogout();
@@ -228,7 +224,8 @@ async function postLoginAjax() {
       //PlayerNamesAfterLogin, isDarkThemeAfterLogin, ...AfterLogin
       v1 = jsonObj.LichessOrgPlayerNamesAfterLogin;
       if (v1) {
-        document.getElementById('elemTextLichessOrgPlayerNames').value = v1;
+        // document.getElementById('elemTextLichessOrgPlayerNames').value = v1;
+        setLichessOrgPlayerNames(v1);
         localStorage.setItem('LichessOrgPlayerNames', v1);
       }
 
@@ -349,7 +346,8 @@ async function postSettingsAJAX() {
   let data = {
     username: (isUserLogged() ? usernameLocal : ''),
     regtype: regtype,
-    LichessOrgPlayerNames: document.getElementById('elemTextLichessOrgPlayerNames').value.trim(),
+    // LichessOrgPlayerNames: document.getElementById('elemTextLichessOrgPlayerNames').value.trim(),
+    LichessOrgPlayerNames: getLichessOrgPlayerNames().trim(),
     ChessComPlayerNames: document.getElementById('elemTextChessComPlayerNames').value.trim(),
     AutoRefreshInterval: document.getElementById('elemAutoRefreshInterval').value.trim(),
     CheckLichess: (document.getElementById('elemCheckLichess').checked ? '1' : '0'),
@@ -481,7 +479,8 @@ function processUrlParams() {
     //PlayerNamesAfterLogin, isDarkThemeAfterLogin, ...AfterLogin
     v1 = urlParams.get('LichessOrgPlayerNamesAfterLogin');
     if (v1) {
-      document.getElementById('elemTextLichessOrgPlayerNames').value = v1;
+      // document.getElementById('elemTextLichessOrgPlayerNames').value = v1;
+      setLichessOrgPlayerNames(v1);
       localStorage.setItem('LichessOrgPlayerNames', v1);
     }
 
@@ -638,7 +637,8 @@ function postSettings() {
   form.method = 'POST';
   form.innerHTML = '<input name="username" value="' + usernameLocal + '">'
     + '<input name="regtype" value="' + regtype + '">'
-    + '<input name="LichessOrgPlayerNames" value="' + document.getElementById('elemTextLichessOrgPlayerNames').value.trim() + '">'
+    // + '<input name="LichessOrgPlayerNames" value="' + document.getElementById('elemTextLichessOrgPlayerNames').value.trim() + '">'
+    + '<input name="LichessOrgPlayerNames" value="' + getLichessOrgPlayerNames().trim() + '">'
     + '<input name="ChessComPlayerNames" value="' + document.getElementById('elemTextChessComPlayerNames').value.trim() + '">'
     + '<input name="CheckLichess" value="' + (document.getElementById('elemCheckLichess').checked ? '1' : '0') + '">'
     + '<input name="CheckChessCom" value="' + (document.getElementById('elemCheckChessCom').checked ? '1' : '0') + '">'
@@ -657,20 +657,24 @@ function setUsernameAndRegtype(user, type) {
   username = (user ? user : '');
   regtype = (type ? type : '');
   regtype = (regtype === 'userpass' ? '' : regtype);
-  document.querySelector('.currentUsername').textContent = username;
+  // document.querySelector('.currentUsername').textContent = username;
+  vm.$data.vueCurrentUsername = username;
 }
 
 function isUserLogged() {
-  const v1 = document.querySelector('.currentUsername').textContent;
+  // const v1 = document.querySelector('.currentUsername').textContent;
+  const v1 = vm.$data.vueCurrentUsername;
   return (username) && (v1.indexOf(DISCONNECTED_TEXT) === -1);
 }
 
 function markUserAsDisconnected() {
-  document.querySelector('.currentUsername').textContent = username + DISCONNECTED_TEXT;
+  // document.querySelector('.currentUsername').textContent = username + DISCONNECTED_TEXT;
+  vm.$data.vueCurrentUsername = username + DISCONNECTED_TEXT;
 }
 
 function isUserMarkedAsDisconnected() {
-  const v = document.querySelector('.currentUsername').textContent;
+  // const v = document.querySelector('.currentUsername').textContent;
+  const v = vm.$data.vueCurrentUsername;
   return (v.indexOf(DISCONNECTED_TEXT) >= 0);
 }
 
@@ -678,9 +682,11 @@ function isUserMarkedAsDisconnected() {
 
 //trim() for PlayerNames
 function onchangeLichess() {
-  let v = document.getElementById('elemTextLichessOrgPlayerNames').value;
+  // let v = document.getElementById('elemTextLichessOrgPlayerNames').value;
+  let v = getLichessOrgPlayerNames();
   v = (v === undefined ? '' : v);
-  document.getElementById('elemTextLichessOrgPlayerNames').value = v.trim();
+  //document.getElementById('elemTextLichessOrgPlayerNames').value = v.trim();
+  setLichessOrgPlayerNames(v.trim());
 }
 function onchangeChessCom() {
   let v = document.getElementById('elemTextChessComPlayerNames').value;
@@ -1006,8 +1012,7 @@ function fillTableFromServer(thisIsLichess) {
 }
 
 function getElementInputPlayers(thisIsLichess) {
-  const elem = thisIsLichess ? document.getElementById('elemTextLichessOrgPlayerNames') :
-    document.getElementById('elemTextChessComPlayerNames');
+  const elem = thisIsLichess ? document.getElementById('elemTextLichessOrgPlayerNames') : document.getElementById('elemTextChessComPlayerNames');
   return elem;
 }
 
@@ -1249,8 +1254,8 @@ function goUserMode() {
     setElementVisible('#buttonPostLogout');
     setElementNonVisible('#buttonPostLogin');
     setElementNonVisible('#buttonPostRegistration');
-    setElementNonVisible('.referToGithub');
-    setElementNonVisible('.referToGoogle');
+    // setElementNonVisible('.referToGithub');
+    // setElementNonVisible('.referToGoogle');
     setElementNonVisible('.referToLichess');
   } else {
     document.getElementById('username').removeAttribute("disabled");
@@ -1258,8 +1263,8 @@ function goUserMode() {
     setElementNonVisible('#buttonPostLogout');
     setElementVisible('#buttonPostLogin');
     setElementVisible('#buttonPostRegistration');
-    setElementVisible('.referToGithub');
-    setElementVisible('.referToGoogle');
+    // setElementVisible('.referToGithub');
+    // setElementVisible('.referToGoogle');
     setElementVisible('.referToLichess');
   }
 }
@@ -1314,7 +1319,8 @@ function setElementNonVisible(elem) {
 function getDataFromStorage() {
   let v = localStorage.getItem('LichessOrgPlayerNames');
   if (v !== '') {
-    document.getElementById('elemTextLichessOrgPlayerNames').value = v;
+    // document.getElementById('elemTextLichessOrgPlayerNames').value = v;
+    setLichessOrgPlayerNames(v);
   }
 
   v = localStorage.getItem('ChessComPlayerNames');
@@ -1341,7 +1347,8 @@ function getDataFromStorage() {
 function setDataToStorage() {
   let v, isDiff, vs;
 
-  v = document.getElementById('elemTextLichessOrgPlayerNames').value;
+  // v = document.getElementById('elemTextLichessOrgPlayerNames').value;
+  v = getLichessOrgPlayerNames();
   vs = localStorage.getItem('LichessOrgPlayerNames');
   vs = (vs === null ? "" : vs);
   isDiff = (v.trim() !== vs.trim());
@@ -1382,7 +1389,8 @@ function clearSettings() {
 
   document.getElementById('elemAutoRefreshInterval').value = '';
   document.getElementById('elemCheckDarkTheme').checked = false;
-  document.getElementById('elemTextLichessOrgPlayerNames').value = '';
+  // document.getElementById('elemTextLichessOrgPlayerNames').value = '';
+  setLichessOrgPlayerNames('');
   document.getElementById('elemTextChessComPlayerNames').value = '';
 
   if (isFirstChessCom) {
@@ -1425,6 +1433,16 @@ function changeTablesOrder() {
   t = tableNode1;
   tableNode1 = tableNode2;
   tableNode2 = t;
+}
+
+///////////////////////////////////////////////////////////
+
+function getLichessOrgPlayerNames() {
+  return document.getElementById('elemTextLichessOrgPlayerNames').value;
+}
+
+function setLichessOrgPlayerNames(v) {
+  document.getElementById('elemTextLichessOrgPlayerNames').value = v;
 }
 
 ///////////////////////////////////////////////////////////
