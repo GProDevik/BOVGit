@@ -29,27 +29,17 @@
 </head>
 
 <body>
-
   <div id="vue-mount">
-    <!-- <vue-component-form></vue-component-form> -->
-
-    <button @click="count++">
-      {{helloText}}
-      button counter: {{ count }}
-    </button>
 
     <div id="bodyStyle" class="PCStyle">
 
       <header>
         <div class="oneLineUser">
           <img src="usericon.png" id="usericon">
-          <!-- <input type="button" value="User" name="buttonUser" id="buttonUser" title="User"> -->
-          <input type="button" @click="vueGoUserMode" value="User" name="buttonUser" id="buttonUser" title="User">
-          <!-- <span class="currentUsername"></span> -->
+          <input @click="vueGoUserMode" type="button" value="User" name="buttonUser" id="buttonUser" title="User">
           <span class="currentUsername">{{vueCurrentUsername}}</span>
         </div>
 
-        <!-- <div class="projectName projectNameDifPC" title="Refresh all tables">Player ratings</div> -->
         <div @click="vueRefresh" class="projectName projectNameDifPC" title="Refresh all tables">Player ratings</div>
 
       </header>
@@ -58,30 +48,24 @@
 
         <form>
           <label id="InputOrder1" class="oneLine" for="elemTextLichessOrgPlayerNames">
-            <!-- <input class="inputCheck" type="checkbox" id="elemCheckLichess" name="elemCheckLichess" checked> -->
             <input @click="vueRefreshLichess" class="inputCheck" type="checkbox" id="elemCheckLichess"
               name="elemCheckLichess" checked>
-            <!-- <input class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh" title="Refresh Lichess table"> -->
             <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
               title="Refresh Lichess table">
-            <!-- <input class="inputText" type="text" id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames"
-              maxlength="250" title="Enter names of players on Lichess.org, separated by spaces"
-              placeholder="Player names on Lichess, separated by spaces"> -->
-            <input v-model="vueLichessOrgPlayerNames" class="inputText" type="text" id="elemTextLichessOrgPlayerNames"
-              name="elemTextLichessOrgPlayerNames" maxlength="250"
+            <input @change="vueOnchangeLichess" v-model="vueLichessOrgPlayerNames" class="inputText" type="text"
+              id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames" maxlength="250"
               title="1Enter names of players on Lichess.org, separated by spaces"
               placeholder="Player names on Lichess, separated by spaces">
           </label>
 
           <label id="InputOrder2" class="oneLine" for="elemTextChessComPlayerNames">
-            <!-- <input class="inputCheck" type="checkbox" id="elemCheckChessCom" name="elemCheckChessCom" checked> -->
             <input @click="vueRefreshChessCom" class="inputCheck" type="checkbox" id="elemCheckChessCom"
               name="elemCheckChessCom" checked>
-            <!-- <input class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh" title="Refresh Chess.com table"> -->
             <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh"
               title="Refresh Chess.com table">
-            <input class="inputText" type="text" id="elemTextChessComPlayerNames" name="elemTextChessComPlayerNames"
-              maxlength="250" title="Enter names of players on Chess.com, separated by spaces"
+            <input @change="vueOnchangeChessCom" v-model="vueChessComPlayerNames" class="inputText" type="text"
+              id="elemTextChessComPlayerNames" name="elemTextChessComPlayerNames" maxlength="250"
+              title="Enter names of players on Chess.com, separated by spaces"
               placeholder="Player names on Chess.com, separated by spaces">
           </label>
         </form>
@@ -90,12 +74,12 @@
           <table>
             <thead class="THeadLichess">
               <tr>
-                <th class="THeadPlayerLichess leftTopOfTable">Lichess</th>
-                <th class="THeadbulletLichess">bullet</th>
-                <th class="THeadblitzLichess">blitz</th>
-                <th class="THeadrapidLichess">rapid</th>
-                <th class="THeadpuzzleLichess">puzzle</th>
-                <th class="THeadrushLichess">storm</th>
+                <th @click="vueRefreshLichess" class="THeadPlayerLichess leftTopOfTable">Lichess</th>
+                <th @click="vueSortBulletLichess" class="THeadbulletLichess">bullet</th>
+                <th @click="vueSortBlitzLichess" class="THeadblitzLichess">blitz</th>
+                <th @click="vueSortRapidLichess" class="THeadrapidLichess">rapid</th>
+                <th @click="vueSortPuzzleLichess" class="THeadpuzzleLichess">puzzle</th>
+                <th @click="vueSortRushLichess" class="THeadrushLichess">storm</th>
               </tr>
             </thead>
             <tbody class="TBodyLichess">
@@ -107,12 +91,12 @@
           <table>
             <thead class="THeadChessCom">
               <tr>
-                <th class="THeadPlayerChessCom leftTopOfTable">Chess.com</th>
-                <th class="THeadbulletChessCom">bullet</th>
-                <th class="THeadblitzChessCom">blitz</th>
-                <th class="THeadrapidChessCom">rapid</th>
-                <th class="THeadpuzzleChessCom">puzzle</th>
-                <th class="THeadrushChessCom">rush</th>
+                <th @click="vueRefreshChessCom" class="THeadPlayerChessCom leftTopOfTable">Chess.com</th>
+                <th @click="vueSortBulletChessCom" class="THeadbulletChessCom">bullet</th>
+                <th @click="vueSortBlitzChessCom" class="THeadblitzChessCom">blitz</th>
+                <th @click="vueSortRapidChessCom" class="THeadrapidChessCom">rapid</th>
+                <th @click="vueSortPuzzleChessCom" class="THeadpuzzleChessCom">puzzle</th>
+                <th @click="vueSortRushChessCom" class="THeadrushChessCom">rush</th>
               </tr>
             </thead>
             <tbody class="TBodyChessCom">
@@ -122,9 +106,10 @@
 
         <section class="sectionSettingsButtons">
           <br>
-          <input class="buttonSettings" type="button" value="⚙ Settings" id="buttonSettings" title="Settings">
-          <input class="buttonChangeTables" type="button" value="↑↓" id="buttonChangeTables"
-            title="Change tables order">
+          <input @click="vueGoSetMode" class="buttonSettings" type="button" value="⚙ Settings" id="buttonSettings"
+            title="Settings">
+          <input @click="vueButtonChangeTables" class="buttonChangeTables" type="button" value="↑↓"
+            id="buttonChangeTables" title="Change tables order">
         </section>
 
       </main>
@@ -135,20 +120,23 @@
             <legend><em><strong>Settings</strong></em></legend>
             <label for="elemAutoRefreshInterval">
               AutoRefresh Interval in minutes (0 - not AutoRefresh):
-              <input type="text" size="10" id="elemAutoRefreshInterval" name="elemAutoRefreshInterval"
+              <input @change="vueOnchangeAutoRefreshInterval" v-model="vueAutoRefreshInterval" type="text" size="10"
+                id="elemAutoRefreshInterval" name="elemAutoRefreshInterval"
                 title="Enter AutoRefresh Interval in minutes">
             </label>
             <p>
               <label for="elemCheckDarkTheme">
-                <input class="inputCheckSettings" type="checkbox" id="elemCheckDarkTheme" name="elemCheckDarkTheme">
+                <input @click="vueOnClickSetTheme" class="inputCheckSettings" type="checkbox" id="elemCheckDarkTheme"
+                  name="elemCheckDarkTheme">
                 Dark theme
               </label>
             </p>
           </fieldset>
 
           <p>
-            <input class="buttonClearSettings" type="button" value="Clear all settings and player names"
-              id="buttonClearSettings" title="Clear all settings and player names">
+            <input @click="vueClearSettings" class="buttonClearSettings" type="button"
+              value="Clear all settings and player names" id="buttonClearSettings"
+              title="Clear all settings and player names">
           </p>
 
           <fieldset>
@@ -178,8 +166,8 @@
           </fieldset>
         </form>
         <br>
-        <input class="buttonSettings" type="button" value="Go to main page" id="buttonReturnToMainFromSettings"
-          title="Return to main page">
+        <input @click="vueGoMainModeFromSettings" class="buttonSettings" type="button" value="Go to main page"
+          id="buttonReturnToMainFromSettings" title="Return to main page">
       </section>
 
       <section class="sectionLoginArea hiddenBlock">
@@ -210,8 +198,8 @@
           </fieldset>
         </form>
         <br>
-        <input class="buttonSettings" type="button" value="Go to main page" id="buttonReturnToMainFromUser"
-          title="Return to main page">
+        <input @click="vueGoMainModeFromUser" class="buttonSettings" type="button" value="Go to main page"
+          id="buttonReturnToMainFromUser" title="Return to main page">
       </section>
 
       <footer>
@@ -221,12 +209,6 @@
       </footer>
 
     </div>
-
-    <button @click="count++">
-      {{helloText}}
-      <br>
-      !!! button counter 2: {{ count }}
-    </button>
 
   </div>
 
@@ -240,7 +222,6 @@
   <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.prod.js"></script>
 
   <script src="js/chess.js"></script>
-
 </body>
 
 </html>
