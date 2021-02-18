@@ -1,4 +1,4 @@
-//v1.1.6 2021-09-17
+//v2.0.0 2021-11-04
 'use strict'
 
 // ------------------- V U E  (start) ------------------------
@@ -7,18 +7,29 @@ const root = {
   data() {
     return {
       vueCurrentUsername: '',
+      vueCheckLichess: false,
       vueLichessOrgPlayerNames: '',
+      vueCheckChessCom: false,
       vueChessComPlayerNames: '',
       vueAutoRefreshInterval: '',
+      vueCheckDarkTheme: false,
     }
   },
   methods: {
     vueGoUserMode() { goUserMode() },
     vueRefresh() { refresh() },
+    vueOnClickCheckLichess() {
+      setCheckLichess(!isCheckLichess()) //inversion checkbox
+      refreshLichess()
+    },
+    vueOnClickCheckChessCom() {
+      setCheckChessCom(!isCheckChessCom()) //inversion checkbox
+      refreshChessCom()
+    },
     vueRefreshLichess() { refreshLichess() },
     vueRefreshChessCom() { refreshChessCom() },
-    vueOnchangeLichess() { onchangeLichess() },
-    vueOnchangeChessCom() { onchangeChessCom() },
+    vueOnchangeLichessPlayerNames() { onchangeLichessPlayerNames() },
+    vueOnchangeChessComPlayerNames() { onchangeChessComPlayerNames() },
     vueGoSetMode() { goSetMode() },
 
     vueSortBulletLichess() { sortBulletLichess() },
@@ -37,14 +48,13 @@ const root = {
     vueOnClickSetTheme() { onClickSetTheme() },
     vueClearSettings() { clearSettings() },
     vueGoMainModeFromSettings() { goMainModeFromSettings() },
-    vueButtonChangeTables() { buttonChangeTables() },
+    vueButtonChangeTables() {
+      changeTablesOrder()
+      setFirstChessComToStorage()
+    },
+    vueGoMainModeFromUser() { goMainModeFromUser() },
 
   },
-  // computed: {
-  //   vueComputedGoUserMode() {
-  //     return goUserMode()
-  //   }
-  // },
 }
 const app = Vue.createApp(root)
 const vm = app.mount('#vue-mount')
@@ -54,8 +64,11 @@ const vm = app.mount('#vue-mount')
 const isMobileDevice = is_mobile_device()
 const urlHttpServiceLichess = 'https://lichess.org/api/user/'
 const urlHttpServiceChessCom = 'https://api.chess.com/pub/player/'
+const useAJAX = true //for exchange data between server & client
 const DISCONNECTED_TEXT = '  (disconnected)'
 const sortSymbolAtHead = '↑' //&#8593
+const onlineSymbolAtPlayer = '&#10004;' //check
+
 const mapTimeControl = new Map([
   ['player', 0],
   ['bullet', 1],
@@ -69,7 +82,6 @@ let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
 let lastSortSelectorLichess = '', lastSortSelectorChessCom = ''
 let lastSortTimeControlLichess = '', lastSortTimeControlChessCom = ''
 let username = '', regtype = ''
-let useAJAX = true //for exchange data between server & client
 
 inputNode1 = document.querySelector('#InputOrder1')
 inputNode2 = document.querySelector('#InputOrder2')
@@ -83,47 +95,11 @@ if (isMobileDevice) {
 }
 
 // ------------- On-Click ---------------
-// document.querySelector('.projectName').onclick = () => refresh()
-
-// document.querySelector('#buttonLichessRefresh').onclick = () => refreshLichess()
-// document.querySelector('#buttonChessComRefresh').onclick = () => refreshChessCom()
-// document.querySelector('#elemCheckLichess').onclick = () => refreshLichess()
-// document.querySelector('#elemCheckChessCom').onclick = () => refreshChessCom()
-// document.querySelector('#elemTextLichessOrgPlayerNames').onchange = () => onchangeLichess()
-// document.querySelector('#elemTextChessComPlayerNames').onchange = () => onchangeChessCom()
-// document.querySelector('#elemAutoRefreshInterval').onchange = () => onchangeAutoRefreshInterval()
-
-// document.querySelector('.THeadPlayerLichess').onclick = () => refreshLichess() //refresh by click on 1-st Head of Lichess Table
-// document.querySelector('.THeadPlayerChessCom').onclick = () => refreshChessCom() //refresh by click on 1-st Head of ChessCom Table
-
-//sort columns in Lichess
-// document.querySelector('.THeadbulletLichess').onclick = () => sortBulletLichess()
-// document.querySelector('.THeadblitzLichess').onclick = () => sortBlitzLichess()
-// document.querySelector('.THeadrapidLichess').onclick = () => sortRapidLichess()
-// document.querySelector('.THeadpuzzleLichess').onclick = () => sortPuzzleLichess()
-// document.querySelector('.THeadrushLichess').onclick = () => sortRushLichess()
-
-// //sort columns in Chess.com
-// document.querySelector('.THeadbulletChessCom').onclick = () => sortBulletChessCom()
-// document.querySelector('.THeadblitzChessCom').onclick = () => sortBlitzChessCom()
-// document.querySelector('.THeadrapidChessCom').onclick = () => sortRapidChessCom()
-// document.querySelector('.THeadpuzzleChessCom').onclick = () => sortPuzzleChessCom()
-// document.querySelector('.THeadrushChessCom').onclick = () => sortRushChessCom()
-
-// document.querySelector('#buttonChangeTables').onclick = () => buttonChangeTables()
-
-//settings
-// document.querySelector('#buttonSettings').onclick = () => goSetMode()
-// document.querySelector('#elemCheckDarkTheme').onclick = () => onClickSetTheme()
-// document.querySelector('#buttonClearSettings').onclick = () => clearSettings()
-// document.querySelector('#buttonReturnToMainFromSettings').onclick = () => goMainModeFromSettings()
 
 //login
-// document.querySelector('#buttonUser').onclick = () => goUserMode()
 document.querySelector('#buttonPostRegistration').onclick = () => postRegistration()
 document.querySelector('#buttonPostLogin').onclick = () => postLogin()
 document.querySelector('#buttonPostLogout').onclick = () => postLogout()
-document.querySelector('#buttonReturnToMainFromUser').onclick = () => goMainModeFromUser()
 
 //hot keys
 document.addEventListener('keydown', function (event) {
@@ -134,9 +110,8 @@ document.addEventListener('keydown', function (event) {
 
 getDataFromStorage()
 
-//set first chess.com
 if (isFirstChessCom) {
-  changeTablesOrder()
+  changeTablesOrder() //set first chess.com
 }
 
 setAutoRefresh()
@@ -244,14 +219,12 @@ async function postLoginAjax() {
       //PlayerNamesAfterLogin, isDarkThemeAfterLogin, ...AfterLogin
       v1 = jsonObj.LichessOrgPlayerNamesAfterLogin
       if (v1) {
-        // document.getElementById('elemTextLichessOrgPlayerNames').value = v1
         setLichessOrgPlayerNames(v1)
         localStorage.setItem('LichessOrgPlayerNames', v1)
       }
 
       v2 = jsonObj.ChessComPlayerNamesAfterLogin
       if (v2) {
-        // document.getElementById('elemTextChessComPlayerNames').value = v2
         setChessComPlayerNames(v2)
         localStorage.setItem('ChessComPlayerNames', v2)
       }
@@ -260,7 +233,7 @@ async function postLoginAjax() {
       v = jsonObj.isDarkThemeAfterLogin
       if (v) {
         v3 = (v === '1' ? true : false)
-        document.getElementById('elemCheckDarkTheme').checked = v3
+        setCheckDarkTheme(v3)
         localStorage.setItem('DarkThemeChecked', v3 ? '1' : '0')
         setTheme()
       }
@@ -269,7 +242,7 @@ async function postLoginAjax() {
       v = jsonObj.CheckLichessAfterLogin
       if (v) {
         v4 = (v === '1' ? true : false)
-        document.getElementById('elemCheckLichess').checked = v4
+        setCheckLichess(v4)
         localStorage.setItem('LichessChecked', v4 ? '1' : '0')
       }
 
@@ -277,7 +250,7 @@ async function postLoginAjax() {
       v = jsonObj.CheckChessComAfterLogin
       if (v) {
         v5 = (v === '1' ? true : false)
-        document.getElementById('elemCheckChessCom').checked = v5
+        setCheckChessCom(v5)
         localStorage.setItem('ChessComChecked', v5 ? '1' : '0')
       }
 
@@ -294,7 +267,6 @@ async function postLoginAjax() {
 
       v7 = jsonObj.autoRefreshIntervalAfterLogin
       if (v7) {
-        // document.getElementById('elemAutoRefreshInterval').value = v7
         setAutoRefreshInterval(v7)
         localStorage.setItem('AutoRefreshInterval', v7)
       }
@@ -368,15 +340,12 @@ async function postSettingsAJAX() {
   let data = {
     username: (isUserLogged() ? usernameLocal : ''),
     regtype: regtype,
-    // LichessOrgPlayerNames: document.getElementById('elemTextLichessOrgPlayerNames').value.trim(),
     LichessOrgPlayerNames: getLichessOrgPlayerNames(),
-    // ChessComPlayerNames: document.getElementById('elemTextChessComPlayerNames').value.trim(),
     ChessComPlayerNames: getChessComPlayerNames(),
-    // AutoRefreshInterval: document.getElementById('elemAutoRefreshInterval').value.trim(),
     AutoRefreshInterval: getAutoRefreshInterval(),
-    CheckLichess: (document.getElementById('elemCheckLichess').checked ? '1' : '0'),
-    CheckChessCom: (document.getElementById('elemCheckChessCom').checked ? '1' : '0'),
-    isDarkTheme: (document.getElementById('elemCheckDarkTheme').checked ? '1' : '0'),
+    CheckLichess: (isCheckLichess() ? '1' : '0'),
+    CheckChessCom: (isCheckChessCom() ? '1' : '0'),
+    isDarkTheme: (isCheckDarkTheme() ? '1' : '0'),
     isFirstChessCom: (isFirstChessCom ? '1' : '0')
   }
   try {
@@ -503,14 +472,12 @@ function processUrlParams() {
     //PlayerNamesAfterLogin, isDarkThemeAfterLogin, ...AfterLogin
     v1 = urlParams.get('LichessOrgPlayerNamesAfterLogin')
     if (v1) {
-      // document.getElementById('elemTextLichessOrgPlayerNames').value = v1
       setLichessOrgPlayerNames(v1)
       localStorage.setItem('LichessOrgPlayerNames', v1)
     }
 
     v2 = urlParams.get('ChessComPlayerNamesAfterLogin')
     if (v2) {
-      // document.getElementById('elemTextChessComPlayerNames').value = v2
       setChessComPlayerNames(v2)
       localStorage.setItem('ChessComPlayerNames', v2)
     }
@@ -519,7 +486,7 @@ function processUrlParams() {
     v = urlParams.get('isDarkThemeAfterLogin')
     if (v) {
       v3 = (v === '1' ? true : false)
-      document.getElementById('elemCheckDarkTheme').checked = v3
+      setCheckDarkTheme(v3)
       localStorage.setItem('DarkThemeChecked', v3 ? '1' : '0')
       setTheme()
     }
@@ -528,7 +495,7 @@ function processUrlParams() {
     v = urlParams.get('CheckLichessAfterLogin')
     if (v) {
       v4 = (v === '1' ? true : false)
-      document.getElementById('elemCheckLichess').checked = v4
+      setCheckLichess(v4)
       localStorage.setItem('LichessChecked', v4 ? '1' : '0')
     }
 
@@ -536,7 +503,7 @@ function processUrlParams() {
     v = urlParams.get('CheckChessComAfterLogin')
     if (v) {
       v5 = (v === '1' ? true : false)
-      document.getElementById('elemCheckChessCom').checked = v5
+      setCheckChessCom(v5)
       localStorage.setItem('ChessComChecked', v5 ? '1' : '0')
     }
 
@@ -553,7 +520,6 @@ function processUrlParams() {
 
     v7 = urlParams.get('autoRefreshIntervalAfterLogin')
     if (v7) {
-      // document.getElementById('elemAutoRefreshInterval').value = v7
       setAutoRefreshInterval(v7)
       localStorage.setItem('AutoRefreshInterval', v7)
     }
@@ -663,15 +629,12 @@ function postSettings() {
   form.method = 'POST'
   form.innerHTML = '<input name="username" value="' + usernameLocal + '">'
     + '<input name="regtype" value="' + regtype + '">'
-    // + '<input name="LichessOrgPlayerNames" value="' + document.getElementById('elemTextLichessOrgPlayerNames').value.trim() + '">'
     + '<input name="LichessOrgPlayerNames" value="' + getLichessOrgPlayerNames() + '">'
-    // + '<input name="ChessComPlayerNames" value="' + document.getElementById('elemTextChessComPlayerNames').value.trim() + '">'
     + '<input name="ChessComPlayerNames" value="' + getChessComPlayerNames() + '">'
-    + '<input name="CheckLichess" value="' + (document.getElementById('elemCheckLichess').checked ? '1' : '0') + '">'
-    + '<input name="CheckChessCom" value="' + (document.getElementById('elemCheckChessCom').checked ? '1' : '0') + '">'
-    // + '<input name="AutoRefreshInterval" value="' + document.getElementById('elemAutoRefreshInterval').value.trim() + '">'
+    + '<input name="CheckLichess" value="' + (isCheckLichess() ? '1' : '0') + '">'
+    + '<input name="CheckChessCom" value="' + (isCheckChessCom() ? '1' : '0') + '">'
     + '<input name="AutoRefreshInterval" value="' + getAutoRefreshInterval() + '">'
-    + '<input name="isDarkTheme" value="' + (document.getElementById('elemCheckDarkTheme').checked ? '1' : '0') + '">'
+    + '<input name="isDarkTheme" value="' + (isCheckDarkTheme() ? '1' : '0') + '">'
     + '<input name="isFirstChessCom" value="' + (isFirstChessCom ? '1' : '0') + '">'
 
   document.body.append(form)
@@ -685,23 +648,19 @@ function setUsernameAndRegtype(user, type) {
   username = (user ? user : '')
   regtype = (type ? type : '')
   regtype = (regtype === 'userpass' ? '' : regtype)
-  // document.querySelector('.currentUsername').textContent = username
   vm.vueCurrentUsername = username
 }
 
 function isUserLogged() {
-  // const v1 = document.querySelector('.currentUsername').textContent
   const v1 = vm.vueCurrentUsername
   return (username) && (v1.indexOf(DISCONNECTED_TEXT) === -1)
 }
 
 function markUserAsDisconnected() {
-  // document.querySelector('.currentUsername').textContent = username + DISCONNECTED_TEXT
   vm.vueCurrentUsername = username + DISCONNECTED_TEXT
 }
 
 function isUserMarkedAsDisconnected() {
-  // const v = document.querySelector('.currentUsername').textContent
   const v = vm.vueCurrentUsername
   return (v.indexOf(DISCONNECTED_TEXT) >= 0)
 }
@@ -709,33 +668,25 @@ function isUserMarkedAsDisconnected() {
 /////////////////////////////////////////////////////////////////////////////
 
 //trim() for PlayerNames
-function onchangeLichess() {
-  // let v = document.getElementById('elemTextLichessOrgPlayerNames').value
+function onchangeLichessPlayerNames() {
   let v = getLichessOrgPlayerNames()
   v = (v === undefined ? '' : v)
-  // document.getElementById('elemTextLichessOrgPlayerNames').value = v.trim()
   setLichessOrgPlayerNames(v)
 }
-function onchangeChessCom() {
-  // let v = document.getElementById('elemTextChessComPlayerNames').value
+function onchangeChessComPlayerNames() {
   let v = getChessComPlayerNames()
   v = (v === undefined ? '' : v)
-  // document.getElementById('elemTextChessComPlayerNames').value = v.trim()
   setChessComPlayerNames(v)
 }
 function onchangeAutoRefreshInterval() {
-  // let v = document.getElementById('elemAutoRefreshInterval').value
   let v = getAutoRefreshInterval()
-
   v = (v === undefined ? '' : v)
-
-  // document.getElementById('elemAutoRefreshInterval').value = v.trim()
   setAutoRefreshInterval(v.trim())
-
   useAJAX ? postSettingsAJAX() : postSettings()
 }
 
 function onClickSetTheme() {
+  setCheckDarkTheme(!isCheckDarkTheme()) //inversion checkbox
   setDataToStorage()
   setTheme()
 }
@@ -967,10 +918,9 @@ function refreshOne(thisIsLichess) {
 function refreshOneTable(thisIsLichess) {
   replaceSomeHeads()
 
-  let selectorTable = thisIsLichess ? '.TableLichess' : '.TableChessCom'
-  let selectorCheck = thisIsLichess ? 'elemCheckLichess' : 'elemCheckChessCom'
-  let elem = document.querySelector(selectorTable)
-  if (document.getElementById(selectorCheck).checked) {
+  const selectorTable = thisIsLichess ? '.TableLichess' : '.TableChessCom'
+  const elem = document.querySelector(selectorTable)
+  if (isCheckOfTable(thisIsLichess)) {
     if (elem.style.display !== 'block') {
       elem.style.display = 'block' //table is visible
     }
@@ -1024,8 +974,6 @@ function clearRowChessCom(rowNum) {
 
 function fillTableFromServer(thisIsLichess) {
   let elem, playerNames, arPlayerNames, rowNum
-  // elem = getElementInputPlayers(thisIsLichess)
-  // playerNames = elem.value.trim() //delete begin and end spaces
   playerNames = getPlayerNames(thisIsLichess)
   arPlayerNames = playerNames.split(' ') //get array of Players names
   rowNum = 0
@@ -1046,13 +994,6 @@ function fillTableFromServer(thisIsLichess) {
     deleteLastRowFromTable(thisIsLichess)
   }
 }
-
-// function getElementInputPlayers(thisIsLichess) {
-//   const elem = thisIsLichess ?
-//     document.getElementById('elemTextLichessOrgPlayerNames') :
-//     document.getElementById('elemTextChessComPlayerNames')
-//   return elem
-// }
 
 function fetchTable(thisIsLichess, rowNum, playerName) {
   thisIsLichess ? fetchGetLichessOrg(rowNum, playerName) :
@@ -1140,7 +1081,7 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const jsonObj = await response.json() // read answer in JSON
 
     const isOnline = getJsonValue1(playerName, jsonObj, 'online')
-    const onlineSymbol = isOnline ? getOnlineSymbol() + ' ' : ''
+    const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
 
     //title (GM, IM, FM, ...)
     let title = getJsonValue1(playerName, jsonObj, 'title')
@@ -1148,7 +1089,8 @@ async function fetchGetLichessOrg(rowNum, playerName) {
 
     //player (href !)
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
-    document.querySelector('.lplayer' + rowNum).innerHTML = '<a href="' + playerURL + '">' + onlineSymbol + title + playerName + '</a>'
+    document.querySelector('.lplayer' + rowNum).innerHTML =
+      '<a href="' + playerURL + '" target="_blank">' + onlineSymbol + title + playerName + '</a>'
 
     //bullet
     document.querySelector('.lbullet' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1184,7 +1126,7 @@ async function fetchGetChessCom(rowNum, playerName) {
     if (response.ok) { // HTTP-state in 200-299
       let jsonObj = await response.json() // read answer in JSON
       let isOnline = getJsonValue1(playerName, jsonObj, 'online')
-      onlineSymbol = isOnline ? getOnlineSymbol() + ' ' : ''
+      onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
     } else {
       console.log(playerName + ' - chess.com, is-online, response-error: ' + response.status)
     }
@@ -1215,7 +1157,7 @@ async function fetchGetChessCom(rowNum, playerName) {
       cell.innerHTML = '? ' + playerName //player not found
     }
     else {
-      cell.innerHTML = '<a href="' + playerURL + '">' + onlineSymbol + title + playerName + '</a>'
+      cell.innerHTML = '<a href="' + playerURL + '" target="_blank">' + onlineSymbol + title + playerName + '</a>'
     }
   }
 
@@ -1259,10 +1201,6 @@ function getJsonValue3(playerName, jsonObj, field1, field2, field3) {
     console.log('Error in getJsonValue3(): playerName=' + playerName + ' ' + field1 + '.' + field2 + '.' + field3 + ': ' + err)
   }
   return value
-}
-
-function getOnlineSymbol() {
-  return '&#10004;' //check
 }
 
 ///////////////////////////////////////////////////////////
@@ -1322,9 +1260,7 @@ function goSetMode() {
 function goMainModeFromSettings() {
 
   //AutoRefreshInterval is correct ?
-  // let s = document.getElementById('elemAutoRefreshInterval').value.trim()
   let s = getAutoRefreshInterval()
-
   if (s !== '') {
     let n = parseInt(s, 10)
     if (isNaN(n) || !(Number.isInteger(n) && n >= 0 && n <= 9999)) {
@@ -1334,8 +1270,7 @@ function goMainModeFromSettings() {
     s = n.toString(10)
   }
 
-  // document.getElementById('elemAutoRefreshInterval').value = s //correct
-  setAutoRefreshInterval(s)
+  setAutoRefreshInterval(s) //yes, it's correct
 
   localStorage.setItem('AutoRefreshInterval', s)
   setAutoRefresh()
@@ -1345,10 +1280,6 @@ function goMainModeFromSettings() {
   setElementVisible('#buttonUser')
 }
 
-function buttonChangeTables() {
-  changeTablesOrder()
-  setFirstChessComToStorage()
-}
 function setElementVisible(elem) {
   document.querySelector(elem).style.display = 'block'
 }
@@ -1362,59 +1293,54 @@ function setElementNonVisible(elem) {
 function getDataFromStorage() {
   let v = localStorage.getItem('LichessOrgPlayerNames')
   if (v !== '') {
-    // document.getElementById('elemTextLichessOrgPlayerNames').value = v
     setLichessOrgPlayerNames(v)
   }
 
   v = localStorage.getItem('ChessComPlayerNames')
   if (v !== '') {
-    // document.getElementById('elemTextChessComPlayerNames').value = v
     setChessComPlayerNames(v)
   }
 
   v = localStorage.getItem('LichessChecked')
-  document.getElementById('elemCheckLichess').checked = (v === '1' ? true : false)
+  setCheckLichess(v === '1' ? true : false)
 
   v = localStorage.getItem('ChessComChecked')
-  document.getElementById('elemCheckChessCom').checked = (v === '1' ? true : false)
+  setCheckChessCom(v === '1' ? true : false)
 
   v = localStorage.getItem('isFirstChessCom')
   isFirstChessCom = (v === '1' ? true : false)
 
   v = localStorage.getItem('AutoRefreshInterval')
-  // document.getElementById('elemAutoRefreshInterval').value = v
   setAutoRefreshInterval(v)
 
   v = localStorage.getItem('DarkThemeChecked')
-  document.getElementById('elemCheckDarkTheme').checked = (v === '1' ? true : false)
+  setCheckDarkTheme(v === '1' ? true : false)
 }
 
 function setDataToStorage() {
   let v, isDiff, vs
 
-  // v = document.getElementById('elemTextLichessOrgPlayerNames').value
   v = getLichessOrgPlayerNames()
   vs = localStorage.getItem('LichessOrgPlayerNames')
   vs = (vs === null ? "" : vs)
   isDiff = (v.trim() !== vs.trim())
   localStorage.setItem('LichessOrgPlayerNames', v)
 
-  // v = document.getElementById('elemTextChessComPlayerNames').value
   v = getChessComPlayerNames()
   vs = localStorage.getItem('ChessComPlayerNames')
   vs = (vs === null ? "" : vs)
   isDiff = isDiff || (v.trim() !== vs.trim())
   localStorage.setItem('ChessComPlayerNames', v)
 
-  v = document.getElementById('elemCheckLichess').checked ? '1' : '0'
+  v = isCheckLichess() ? '1' : '0'
   isDiff = isDiff || (v !== localStorage.getItem('LichessChecked'))
   localStorage.setItem('LichessChecked', v)
 
-  v = document.getElementById('elemCheckChessCom').checked ? '1' : '0'
+  v = isCheckChessCom() ? '1' : '0'
   isDiff = isDiff || (v !== localStorage.getItem('ChessComChecked'))
   localStorage.setItem('ChessComChecked', v)
 
-  v = document.getElementById('elemCheckDarkTheme').checked ? '1' : '0'
+  v = isCheckDarkTheme() ? '1' : '0'
   isDiff = isDiff || (v !== localStorage.getItem('DarkThemeChecked'))
   localStorage.setItem('DarkThemeChecked', v)
 
@@ -1433,13 +1359,9 @@ function setFirstChessComToStorage() {
 function clearSettings() {
   localStorage.clear()
 
-  // document.getElementById('elemAutoRefreshInterval').value = ''
   setAutoRefreshInterval('')
-
-  document.getElementById('elemCheckDarkTheme').checked = false
-  // document.getElementById('elemTextLichessOrgPlayerNames').value = ''
+  setCheckDarkTheme(false)
   setLichessOrgPlayerNames('')
-  // document.getElementById('elemTextChessComPlayerNames').value = ''
   setChessComPlayerNames('')
 
   if (isFirstChessCom) {
@@ -1458,7 +1380,6 @@ function clearSettings() {
 
 function setAutoRefresh() {
   clearInterval(intervalID)
-  // let s = document.getElementById('elemAutoRefreshInterval').value.trim()
   let s = getAutoRefreshInterval()
 
   if (s !== '') {
@@ -1486,7 +1407,7 @@ function changeTablesOrder() {
   tableNode2 = t
 }
 
-///////////////////////////////////////////////////////////
+///////////////// Getters & Setters //////////////////////////////////////////
 
 function getLichessOrgPlayerNames() {
   // return document.getElementById('elemTextLichessOrgPlayerNames').value.trim()
@@ -1522,10 +1443,45 @@ function setAutoRefreshInterval(v) {
   vm.vueAutoRefreshInterval = v.trim()
 }
 
+function isCheckDarkTheme() {
+  //return document.getElementById('elemCheckDarkTheme').checked
+  return vm.vueCheckDarkTheme
+}
+
+function setCheckDarkTheme(booleanValue) {
+  // document.getElementById('elemCheckDarkTheme').checked = booleanValue
+  vm.vueCheckDarkTheme = booleanValue
+}
+
+function isCheckLichess() {
+  // return document.getElementById('elemCheckLichess').checked
+  return vm.vueCheckLichess
+}
+
+function setCheckLichess(booleanValue) {
+  // document.getElementById('elemCheckLichess').checked = booleanValue
+  vm.vueCheckLichess = booleanValue
+}
+
+function isCheckChessCom() {
+  // return document.getElementById('elemCheckChessCom').checked
+  return vm.vueCheckChessCom
+}
+
+function setCheckChessCom(booleanValue) {
+  // document.getElementById('elemCheckChessCom').checked = booleanValue
+  vm.vueCheckChessCom = booleanValue
+}
+
+function isCheckOfTable(thisIsLichess) {
+  return thisIsLichess ? isCheckLichess() : isCheckChessCom()
+}
+
+
 ///////////////////////////////////////////////////////////
 
 function setTheme() {
-  const isDarkTheme = document.getElementById('elemCheckDarkTheme').checked
+  const isDarkTheme = isCheckDarkTheme()
 
   const black = 'black'
   const white = 'white'
