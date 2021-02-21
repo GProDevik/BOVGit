@@ -68,7 +68,6 @@ const useAJAX = true //for exchange data between server & client
 const DISCONNECTED_TEXT = '  (disconnected)'
 const sortSymbolAtHead = '↑' //&#8593
 const onlineSymbolAtPlayer = '&#10004;' //check
-
 const mapTimeControl = new Map([
   ['player', 0],
   ['bullet', 1],
@@ -77,6 +76,26 @@ const mapTimeControl = new Map([
   ['puzzle', 4],
   ['rush', 5]
 ])
+const mapDefaultLichessPlayers = new Map([
+  ['Thibault', 'Creator of Lichess.org'],
+  ['DrNykterstein', 'World champion - Magnus Carlsen'],
+  ['Crest64', 'Russian streamer - Sergey Shipov'],
+  ['Challenger_Spy', 'Belarus streamer - Dmitry Filimonov'],
+  ['ShahMatKanal', 'Russian streamer - Evgenij Novikov'],
+  ['Chess-Network', 'USA streamer - Jerry'],
+])
+const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
+const mapDefaultChessComPlayers = new Map([
+  ['erik', 'Creator of Chess.com'],
+  ['magnuscarlsen', 'World champion - Magnus Carlsen'],
+  ['hikaru', 'Top player in the world - Hikaru Nakamura'],
+  ['lachesisq', 'Top player in the world  - Ian Nepomniachtchi'],
+  ['GM_Crest', 'Russian streamer - Sergey Shipov'],
+  ['Challenger_Spy', 'Belarus streamer - Dmitry Filimonov'],
+  ['ShahMatKanal', 'Russian streamer - Evgenij Novikov'],
+])
+const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
+
 let intervalID, needRefresh
 let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
 let lastSortSelectorLichess = '', lastSortSelectorChessCom = ''
@@ -152,11 +171,16 @@ async function postRegistrationAjax() {
     console.log('jsonObj: ' + new Date())
     console.log(jsonObj)
     if (jsonObj['errorMsg']) {
-      const v = jsonObj['errorMsg']['message']
+      let v = jsonObj['errorMsg']['message']
       if (v) {
         outputErrorMessage(`Registration error: ${v}`)
       } else {
-        outputErrorMessage('Registration unknown error')
+        v = jsonObj['errorMsg']
+        if (v) {
+          outputErrorMessage(`Reg.error: ${v}`)
+        } else {
+          outputErrorMessage(`Registration unknown error`)
+        }
       }
       return
     }
@@ -1083,14 +1107,17 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const isOnline = getJsonValue1(playerName, jsonObj, 'online')
     const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
 
-    //title (GM, IM, FM, ...)
-    let title = getJsonValue1(playerName, jsonObj, 'title')
-    title = (title === undefined) ? '' : title + ' '
+    //title of player (GM, IM, FM, ...)
+    let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
+    playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
 
     //player (href !)
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
+    const v = mapDefaultLichessPlayers.get(playerName)
+    const playerHint = v ? v : ''
     document.querySelector('.lplayer' + rowNum).innerHTML =
-      '<a href="' + playerURL + '" target="_blank">' + onlineSymbol + title + playerName + '</a>'
+      '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+      + onlineSymbol + playerTitle + playerName + '</a>'
 
     //bullet
     document.querySelector('.lbullet' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1115,7 +1142,7 @@ async function fetchGetLichessOrg(rowNum, playerName) {
 async function fetchGetChessCom(rowNum, playerName) {
 
   let url, response, cell, last_online
-  let playerURL = '', onlineSymbol = '', title = ''
+  let playerURL = '', onlineSymbol = '', playerTitle = ''
 
   clearRowChessCom(rowNum)
 
@@ -1135,6 +1162,8 @@ async function fetchGetChessCom(rowNum, playerName) {
   }
 
   //player, playerURL
+  const v = mapDefaultChessComPlayers.get(playerName)
+  const playerHint = v ? v : ''
   url = urlHttpServiceChessCom + playerName
   try {
     response = await fetch(url)
@@ -1142,8 +1171,8 @@ async function fetchGetChessCom(rowNum, playerName) {
       let jsonObj = await response.json() // read answer in JSON
       playerURL = getJsonValue1(playerName, jsonObj, 'url')
       //title (GM, IM, FM, ...)
-      title = getJsonValue1(playerName, jsonObj, 'title')
-      title = (title === undefined) ? '' : title + ' '
+      playerTitle = getJsonValue1(playerName, jsonObj, 'title')
+      playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
     } else {
       console.log(playerName + ' - chess.com, playerURL, response-error: ' + response.status)
     }
@@ -1157,7 +1186,9 @@ async function fetchGetChessCom(rowNum, playerName) {
       cell.innerHTML = '? ' + playerName //player not found
     }
     else {
-      cell.innerHTML = '<a href="' + playerURL + '" target="_blank">' + onlineSymbol + title + playerName + '</a>'
+      cell.innerHTML = '<a href="' + playerURL
+        + '" target="_blank" title="' + playerHint + '">'
+        + onlineSymbol + playerTitle + playerName + '</a>'
     }
   }
 
@@ -1292,11 +1323,17 @@ function setElementNonVisible(elem) {
 
 function getDataFromStorage() {
   let v = localStorage.getItem('LichessOrgPlayerNames')
+  if (!v) {
+    v = lichessDefaultPlayers
+  }
   if (v !== '') {
     setLichessOrgPlayerNames(v)
   }
 
   v = localStorage.getItem('ChessComPlayerNames')
+  if (!v) {
+    v = chessComDefaultPlayers
+  }
   if (v !== '') {
     setChessComPlayerNames(v)
   }
@@ -1477,6 +1514,13 @@ function isCheckOfTable(thisIsLichess) {
   return thisIsLichess ? isCheckLichess() : isCheckChessCom()
 }
 
+function getDefaultPlayersFromMap(mapPlayers) {
+  let s = ''
+  for (let key of mapPlayers.keys()) {
+    s += ' ' + key
+  }
+  return s.trim()
+}
 
 ///////////////////////////////////////////////////////////
 

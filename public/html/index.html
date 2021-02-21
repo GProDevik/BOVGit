@@ -34,14 +34,13 @@
     <div id="bodyStyle" class="PCStyle">
 
       <header>
-        <div class="oneLineUser">
+        <!-- <div class="oneLineUser">
           <img src="usericon.png" id="usericon">
           <input @click="vueGoUserMode" type="button" value="User" name="buttonUser" id="buttonUser" title="User">
           <span class="currentUsername">{{vueCurrentUsername}}</span>
-        </div>
+        </div> -->
 
         <div @click="vueRefresh" class="projectName projectNameDifPC" title="Refresh all tables">Player ratings</div>
-
       </header>
 
       <main>
@@ -54,7 +53,7 @@
               title="Refresh Lichess table">
             <input @change="vueOnchangeLichessPlayerNames" v-model="vueLichessOrgPlayerNames" class="inputText"
               type="text" id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames" maxlength="250"
-              title="1Enter names of players on Lichess.org, separated by spaces"
+              title="Enter names of players on Lichess.org, separated by spaces"
               placeholder="Player names on Lichess, separated by spaces">
           </label>
 

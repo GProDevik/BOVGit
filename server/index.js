@@ -400,7 +400,7 @@ app.post('/registrationAJAX', (req, res, next) => {
         return next(err);
       }
       if (user) {
-        res.send({ errorMsg: 'This account (${req.body.username}) already exist !' });
+        res.send({ errorMsg: `This account (${req.body.username}) already exist !` });
         return;
       }
       objUserInfo.register({ username: req.body.username, active: false }, req.body.password); //+fill createDate
