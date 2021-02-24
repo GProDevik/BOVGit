@@ -87,9 +87,9 @@ const mapDefaultLichessPlayers = new Map([
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['erik', 'Creator of Chess.com'],
-  ['magnuscarlsen', 'World champion - Magnus Carlsen'],
-  ['hikaru', 'Top player in the world - Hikaru Nakamura'],
-  ['lachesisq', 'Top player in the world  - Ian Nepomniachtchi'],
+  ['MagnusCarlsen', 'World champion - Magnus Carlsen'],
+  ['Hikaru', 'Top player in the world - Hikaru Nakamura'],
+  ['lachesisQ', 'Top player in the world  - Ian Nepomniachtchi'],
   ['GM_Crest', 'Russian streamer - Sergey Shipov'],
   ['Challenger_Spy', 'Belarus streamer - Dmitry Filimonov'],
   ['ShahMatKanal', 'Russian streamer - Evgenij Novikov'],
