@@ -13,6 +13,8 @@ const root = {
       vueChessComPlayerNames: '',
       vueAutoRefreshInterval: '',
       vueCheckDarkTheme: false,
+      vueArLichessPlayers: [], //временно
+      vueArChessComPlayers: [], //временно
     }
   },
   methods: {
@@ -79,20 +81,18 @@ const mapTimeControl = new Map([
 const mapDefaultLichessPlayers = new Map([
   ['Thibault', 'Creator of Lichess.org'],
   ['DrNykterstein', 'World champion - Magnus Carlsen'],
-  ['Crest64', 'Russian streamer - Sergey Shipov'],
-  ['Challenger_Spy', 'Belarus streamer - Dmitry Filimonov'],
-  ['ShahMatKanal', 'Russian streamer - Evgenij Novikov'],
-  ['Chess-Network', 'USA streamer - Jerry'],
+  ['Crest64', 'Streamer - Sergey Shipov'],
+  ['Challenger_Spy', 'Streamer - Dmitry Filimonov'],
+  ['Chess-Network', 'Streamer - Jerry'],
 ])
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
-  ['erik', 'Creator of Chess.com'],
+  ['Erik', 'Creator of Chess.com'],
   ['MagnusCarlsen', 'World champion - Magnus Carlsen'],
-  ['Hikaru', 'Top player in the world - Hikaru Nakamura'],
-  ['lachesisQ', 'Top player in the world  - Ian Nepomniachtchi'],
-  ['GM_Crest', 'Russian streamer - Sergey Shipov'],
-  ['Challenger_Spy', 'Belarus streamer - Dmitry Filimonov'],
-  ['ShahMatKanal', 'Russian streamer - Evgenij Novikov'],
+  ['Hikaru', 'Top player - Hikaru Nakamura'],
+  ['LachesisQ', 'Top player - Ian Nepomniachtchi'],
+  ['GM_Crest', 'Streamer - Sergey Shipov'],
+  ['Challenger_Spy', 'Streamer - Dmitry Filimonov'],
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
 
@@ -867,16 +867,36 @@ function sortTable(thisIsLichess, timeControl) {
     lastSortTimeControlChessCom = timeControl
   }
 
-  //fill table from array
-  const pref = thisIsLichess ? '.l' : '.c'
+  //временно закомментарено
+  // //fill table from array
+  // const pref = thisIsLichess ? '.l' : '.c'
+  // for (r = 0; r < rowCount; r++) {
+  //   const rowNum = r + 1
+  //   document.querySelector(pref + 'player' + rowNum).innerHTML = a[r][0] //innerHTML (because 'href')
+  //   document.querySelector(pref + 'bullet' + rowNum).textContent = a[r][1] === 0 ? '' : a[r][1]
+  //   document.querySelector(pref + 'blitz' + rowNum).textContent = a[r][2] === 0 ? '' : a[r][2]
+  //   document.querySelector(pref + 'rapid' + rowNum).textContent = a[r][3] === 0 ? '' : a[r][3]
+  //   document.querySelector(pref + 'puzzle' + rowNum).textContent = a[r][4] === 0 ? '' : a[r][4]
+  //   document.querySelector(pref + 'rush' + rowNum).textContent = a[r][5] === 0 ? '' : a[r][5]
+  // }
+  const arTmp = []
+  let r1, playerHTML
   for (r = 0; r < rowCount; r++) {
-    const rowNum = r + 1
-    document.querySelector(pref + 'player' + rowNum).innerHTML = a[r][0] //innerHTML (because 'href')
-    document.querySelector(pref + 'bullet' + rowNum).textContent = a[r][1] === 0 ? '' : a[r][1]
-    document.querySelector(pref + 'blitz' + rowNum).textContent = a[r][2] === 0 ? '' : a[r][2]
-    document.querySelector(pref + 'rapid' + rowNum).textContent = a[r][3] === 0 ? '' : a[r][3]
-    document.querySelector(pref + 'puzzle' + rowNum).textContent = (a[r][4] === 0 ? '' : a[r][4])
-    document.querySelector(pref + 'rush' + rowNum).textContent = (a[r][5] === 0 ? '' : a[r][5])
+    for (r1 = 0; r1 < rowCount; r1++) {
+      playerHTML = thisIsLichess ? vm.vueArLichessPlayers[r1].playerHTML : vm.vueArChessComPlayers[r1].playerHTML
+      playerHTML = playerHTML.replace(onlineSymbolAtPlayer, '✔')
+      if (a[r][0] === playerHTML) {
+        arTmp.push(thisIsLichess ? vm.vueArLichessPlayers[r1] : vm.vueArChessComPlayers[r1])
+        break
+      }
+    }
+  }
+  for (r = 0; r < rowCount; r++) {
+    if (thisIsLichess) {
+      vm.vueArLichessPlayers[r] = arTmp[r]
+    } else {
+      vm.vueArChessComPlayers[r] = arTmp[r]
+    }
   }
 }
 
@@ -963,6 +983,7 @@ function clearAllTables() {
 }
 
 function clearTable(thisIsLichess) {
+  return //временно
   const pref = thisIsLichess ? '.l' : '.c'
   const n = getTableRowsNumber(thisIsLichess)
   for (let step = 0; step < n; step++) {
@@ -997,26 +1018,33 @@ function clearRowChessCom(rowNum) {
 }
 
 function fillTableFromServer(thisIsLichess) {
-  let elem, playerNames, arPlayerNames, rowNum
+  let playerNames, arPlayerNames, rowNum
   playerNames = getPlayerNames(thisIsLichess)
   arPlayerNames = playerNames.split(' ') //get array of Players names
   rowNum = 0
+
+  //временно
+  if (thisIsLichess) { vm.vueArLichessPlayers.length = 0 }
+  else { vm.vueArChessComPlayers.length = 0 }
+
   for (let step = 0; step < arPlayerNames.length; step++) {
     const playerName = arPlayerNames[step]
     if (playerName !== '') {
       if (++rowNum > getTableRowsNumber(thisIsLichess)) {
-        addRowToTable(thisIsLichess, rowNum)
+        // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
       }
       fetchTable(thisIsLichess, rowNum, playerName)
     }
   }
-  //delete unnecessary last rows (if number of players less than number of rows)
-  for (let j = 0; j < 100; j++) {
-    if (rowNum++ >= getTableRowsNumber(thisIsLichess)) {
-      break
-    }
-    deleteLastRowFromTable(thisIsLichess)
-  }
+
+  //временно закомментарено
+  // //delete unnecessary last rows (if number of players less than number of rows)
+  // for (let j = 0; j < 100; j++) {
+  //   if (rowNum++ >= getTableRowsNumber(thisIsLichess)) {
+  //     break
+  //   }
+  //   deleteLastRowFromTable(thisIsLichess)
+  // }
 }
 
 function fetchTable(thisIsLichess, rowNum, playerName) {
@@ -1097,7 +1125,7 @@ function addRowToTable(thisIsLichess, rowNum) {
 //fill table's row for player on Lichess.org
 async function fetchGetLichessOrg(rowNum, playerName) {
 
-  clearRowLichess(rowNum)
+  //clearRowLichess(rowNum) //временно закомментарено
 
   const url = urlHttpServiceLichess + playerName
   const response = await fetch(url)
@@ -1115,25 +1143,30 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
     const v = mapDefaultLichessPlayers.get(playerName)
     const playerHint = v ? v : ''
-    document.querySelector('.lplayer' + rowNum).innerHTML =
-      '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-      + onlineSymbol + playerTitle + playerName + '</a>'
+    const playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+      + onlineSymbol + playerTitle + playerName + '</a></strong>'
+    // document.querySelector('.lplayer' + rowNum).innerHTML = playerHTML
 
-    //bullet
-    document.querySelector('.lbullet' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
-    //blitz
-    document.querySelector('.lblitz' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
-    //rapid
-    document.querySelector('.lrapid' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'perfs', 'rapid', 'rating')
-    //puzzle
-    document.querySelector('.lpuzzle' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'perfs', 'puzzle', 'rating')
-    //rush (max)
-    document.querySelector('.lrush' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'perfs', 'storm', 'score')
+    const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
+    // document.querySelector('.lbullet' + rowNum).textContent = bullet
+    const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
+    // document.querySelector('.lblitz' + rowNum).textContent = blitz
+    const rapid = getJsonValue3(playerName, jsonObj, 'perfs', 'rapid', 'rating')
+    // document.querySelector('.lrapid' + rowNum).textContent = rapid
+    const puzzle = getJsonValue3(playerName, jsonObj, 'perfs', 'puzzle', 'rating')
+    // document.querySelector('.lpuzzle' + rowNum).textContent = puzzle
+    const rush = getJsonValue3(playerName, jsonObj, 'perfs', 'storm', 'score') //rush (max)
+    // document.querySelector('.lrush' + rowNum).textContent = rush
+
+    //временно
+    vm.vueArLichessPlayers.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 
   } else {
     console.log(playerName + ' - lichess, response-error: ' + response.status)
     //player not found
-    document.querySelector('.lplayer' + rowNum).innerHTML = '? ' + playerName
+    // document.querySelector('.lplayer' + rowNum).innerHTML = '? ' + playerName
+    //временно
+    vm.vueArLichessPlayers.push({ playerName: '? ' + playerName, playerName: '', bullet: '', blitz: '', rapid: '', puzzle: '', rush: '' })
   }
 }
 
@@ -1141,10 +1174,10 @@ async function fetchGetLichessOrg(rowNum, playerName) {
 //fill table's row for player on Chess.com
 async function fetchGetChessCom(rowNum, playerName) {
 
-  let url, response, cell, last_online
-  let playerURL = '', onlineSymbol = '', playerTitle = ''
+  let url, response, cell
+  let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = ''
 
-  clearRowChessCom(rowNum)
+  // clearRowChessCom(rowNum) //временно закомментарено
 
   //is-online
   url = urlHttpServiceChessCom + playerName + '/is-online'
@@ -1162,7 +1195,7 @@ async function fetchGetChessCom(rowNum, playerName) {
   }
 
   //player, playerURL
-  const v = mapDefaultChessComPlayers.get(playerName)
+  let v = mapDefaultChessComPlayers.get(playerName)
   const playerHint = v ? v : ''
   url = urlHttpServiceChessCom + playerName
   try {
@@ -1171,25 +1204,33 @@ async function fetchGetChessCom(rowNum, playerName) {
       let jsonObj = await response.json() // read answer in JSON
       playerURL = getJsonValue1(playerName, jsonObj, 'url')
       //title (GM, IM, FM, ...)
-      playerTitle = getJsonValue1(playerName, jsonObj, 'title')
-      playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
+      v = getJsonValue1(playerName, jsonObj, 'title')
+      playerTitle = (v === undefined) ? '' : v + ' '
     } else {
       console.log(playerName + ' - chess.com, playerURL, response-error: ' + response.status)
     }
   } catch (err) {
     console.log(playerName + ' - chess.com, playerURL, fetch-error: ' + err)
   } finally {
+
     //player
-    cell = document.querySelector('.cplayer' + rowNum)
-    if (playerURL === ''
-      || playerURL === undefined) {
-      cell.innerHTML = '? ' + playerName //player not found
+    //временно закомментарено
+    // cell = document.querySelector('.cplayer' + rowNum)
+    // if (playerURL === '' || playerURL === undefined) {
+    //   cell.innerHTML = '? ' + playerName //player not found
+    // }
+    // else {
+    //   cell.innerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+    //     + onlineSymbol + playerTitle + playerName + '</a>'
+    // }
+    if (playerURL === '' || playerURL === undefined) {
+      playerHTML = '? ' + playerName //player not found
     }
     else {
-      cell.innerHTML = '<a href="' + playerURL
-        + '" target="_blank" title="' + playerHint + '">'
+      playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
         + onlineSymbol + playerTitle + playerName + '</a>'
     }
+    playerHTML = '<strong>' + playerHTML + '</strong>'
   }
 
   //blitz, bullet, rapid, puzzle, rush
@@ -1197,16 +1238,20 @@ async function fetchGetChessCom(rowNum, playerName) {
   response = await fetch(url)
   if (response.ok) { // HTTP-state in 200-299
     let jsonObj = await response.json() // read answer in JSON
-    //bullet
-    document.querySelector('.cbullet' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
-    //blitz
-    document.querySelector('.cblitz' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
-    //rapid
-    document.querySelector('.crapid' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
-    //puzzle (max)
-    document.querySelector('.cpuzzle' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
-    //rush
-    document.querySelector('.crush' + rowNum).textContent = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score')
+    const bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+    // document.querySelector('.cbullet' + rowNum).textContent = bullet
+    const blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+    // document.querySelector('.cblitz' + rowNum).textContent = blitz
+    const rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+    // document.querySelector('.crapid' + rowNum).textContent = rapid
+    const puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+    // document.querySelector('.cpuzzle' + rowNum).textContent = puzzle
+    const rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+    // document.querySelector('.crush' + rowNum).textContent = rush
+
+    //временно
+    vm.vueArChessComPlayers.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+
   } else {
     console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
   }
@@ -1241,7 +1286,7 @@ function goUserMode() {
   clearMessages()
 
   setElementNonVisible('main')
-  setElementNonVisible('#buttonUser')
+  // setElementNonVisible('#buttonUser')
   setElementVisible('.sectionLoginArea')
 
   let regtypeLocal = localStorage.getItem('regtype')
@@ -1279,11 +1324,11 @@ function goUserMode() {
 function goMainModeFromUser() {
   setElementNonVisible('.sectionLoginArea')
   setElementVisible('main')
-  setElementVisible('#buttonUser')
+  // setElementVisible('#buttonUser')
 }
 
 function goSetMode() {
-  setElementNonVisible('#buttonUser')
+  // setElementNonVisible('#buttonUser')
   setElementNonVisible('main')
   setElementVisible('.sectionSettingsArea')
 }
@@ -1308,7 +1353,7 @@ function goMainModeFromSettings() {
 
   setElementNonVisible('.sectionSettingsArea')
   setElementVisible('main')
-  setElementVisible('#buttonUser')
+  // setElementVisible('#buttonUser')
 }
 
 function setElementVisible(elem) {
