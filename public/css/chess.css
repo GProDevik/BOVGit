@@ -86,7 +86,7 @@ table {
   table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
-  border: 3px solid purple;
+  border: 2px solid purple;
   margin-top: 1vw;
 }
 
@@ -129,7 +129,7 @@ thead {
 
 thead th, tfoot th, tfoot td {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
-  border: 3px solid purple;
+  border: 0px solid purple;
 }
 
 tbody tr:nth-child(odd) {

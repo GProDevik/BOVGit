@@ -14,6 +14,7 @@ const root = {
       vueAutoRefreshInterval: '',
       vueCheckDarkTheme: false,
       vueArLichessPlayers: [], //временно
+      vueArLichessPlayersTmp: [], //временно
       vueArChessComPlayers: [], //временно
     }
   },
@@ -1024,7 +1025,7 @@ function fillTableFromServer(thisIsLichess) {
   rowNum = 0
 
   //временно
-  if (thisIsLichess) { vm.vueArLichessPlayers.length = 0 }
+  if (thisIsLichess) { vm.vueArLichessPlayersTmp.length = 0 }
   else { vm.vueArChessComPlayers.length = 0 }
 
   for (let step = 0; step < arPlayerNames.length; step++) {
@@ -1037,6 +1038,11 @@ function fillTableFromServer(thisIsLichess) {
     }
   }
 
+  //временно
+  //correctSort(thisIsLichess, arPlayerNames)
+  const milliSeconds = thisIsLichess ? 1000 : 2000
+  setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+
   //временно закомментарено
   // //delete unnecessary last rows (if number of players less than number of rows)
   // for (let j = 0; j < 100; j++) {
@@ -1044,6 +1050,39 @@ function fillTableFromServer(thisIsLichess) {
   //     break
   //   }
   //   deleteLastRowFromTable(thisIsLichess)
+  // }
+}
+
+//resort table (it is random order seldom after refresh)
+function correctSort(thisIsLichess, arPlayerNames) {
+
+  if (arPlayerNames.length === 0) {
+    return
+  }
+
+  const rowCount = thisIsLichess ? vm.vueArLichessPlayersTmp.length : vm.vueArChessComPlayers.length
+  const arTmp = []
+  for (let step = 0; step < arPlayerNames.length; step++) {
+    const playerName = arPlayerNames[step]
+    if (playerName !== '') {
+      for (let r1 = 0; r1 < rowCount; r1++) {
+        const vuePlayerName = thisIsLichess ? vm.vueArLichessPlayersTmp[r1].playerName : vm.vueArChessComPlayers[r1].playerName
+        if (playerName === vuePlayerName) {
+          arTmp.push(thisIsLichess ? vm.vueArLichessPlayersTmp[r1] : vm.vueArChessComPlayers[r1])
+          break
+        }
+      }
+    }
+  }
+
+  let vueArLichessPlayers = [...arTmp];
+
+  // for (let r = 0; r < rowCount; r++) {
+  //   if (thisIsLichess) {
+  //     vm.vueArLichessPlayers[r] = arTmp[r]
+  //   } else {
+  //     vm.vueArChessComPlayers[r] = arTmp[r]
+  //   }
   // }
 }
 
@@ -1143,7 +1182,7 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
     const v = mapDefaultLichessPlayers.get(playerName)
     const playerHint = v ? v : ''
-    const playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+    let playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
       + onlineSymbol + playerTitle + playerName + '</a></strong>'
     // document.querySelector('.lplayer' + rowNum).innerHTML = playerHTML
 
@@ -1159,14 +1198,14 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     // document.querySelector('.lrush' + rowNum).textContent = rush
 
     //временно
-    vm.vueArLichessPlayers.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+    vm.vueArLichessPlayersTmp.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 
   } else {
     console.log(playerName + ' - lichess, response-error: ' + response.status)
     //player not found
     // document.querySelector('.lplayer' + rowNum).innerHTML = '? ' + playerName
     //временно
-    vm.vueArLichessPlayers.push({ playerName: '? ' + playerName, playerName: '', bullet: '', blitz: '', rapid: '', puzzle: '', rush: '' })
+    vm.vueArLichessPlayersTmp.push({ playerHTML: '<em>? ' + playerName + '</em>', playerName })
   }
 }
 
@@ -1224,16 +1263,15 @@ async function fetchGetChessCom(rowNum, playerName) {
     //     + onlineSymbol + playerTitle + playerName + '</a>'
     // }
     if (playerURL === '' || playerURL === undefined) {
-      playerHTML = '? ' + playerName //player not found
+      playerHTML = '<em>? ' + playerName + '</em>' //player not found
     }
     else {
-      playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-        + onlineSymbol + playerTitle + playerName + '</a>'
+      playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+        + onlineSymbol + playerTitle + playerName + '</a></strong>'
     }
-    playerHTML = '<strong>' + playerHTML + '</strong>'
   }
 
-  //blitz, bullet, rapid, puzzle, rush
+  //bullet, blitz, rapid, puzzle, rush
   url = urlHttpServiceChessCom + playerName + '/stats'
   response = await fetch(url)
   if (response.ok) { // HTTP-state in 200-299
@@ -1254,6 +1292,7 @@ async function fetchGetChessCom(rowNum, playerName) {
 
   } else {
     console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
+    vm.vueArChessComPlayers.push({ playerHTML, playerName })
   }
 }
 
