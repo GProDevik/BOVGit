@@ -16,6 +16,7 @@ const root = {
       vueArLichessPlayers: [], //временно
       vueArLichessPlayersTmp: [], //временно
       vueArChessComPlayers: [], //временно
+      vueArChessComPlayersTmp: [], //временно
     }
   },
   methods: {
@@ -1026,7 +1027,7 @@ function fillTableFromServer(thisIsLichess) {
 
   //временно
   if (thisIsLichess) { vm.vueArLichessPlayersTmp.length = 0 }
-  else { vm.vueArChessComPlayers.length = 0 }
+  else { vm.vueArChessComPlayersTmp.length = 0 }
 
   for (let step = 0; step < arPlayerNames.length; step++) {
     const playerName = arPlayerNames[step]
@@ -1039,8 +1040,8 @@ function fillTableFromServer(thisIsLichess) {
   }
 
   //временно
-  //correctSort(thisIsLichess, arPlayerNames)
-  const milliSeconds = thisIsLichess ? 1000 : 2000
+  // correctSort(thisIsLichess, arPlayerNames)
+  const milliSeconds = thisIsLichess ? 500 : 2000
   setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
 
   //временно закомментарено
@@ -1060,22 +1061,28 @@ function correctSort(thisIsLichess, arPlayerNames) {
     return
   }
 
-  const rowCount = thisIsLichess ? vm.vueArLichessPlayersTmp.length : vm.vueArChessComPlayers.length
+  const rowCount = thisIsLichess ? vm.vueArLichessPlayersTmp.length : vm.vueArChessComPlayersTmp.length
   const arTmp = []
   for (let step = 0; step < arPlayerNames.length; step++) {
     const playerName = arPlayerNames[step]
     if (playerName !== '') {
       for (let r1 = 0; r1 < rowCount; r1++) {
-        const vuePlayerName = thisIsLichess ? vm.vueArLichessPlayersTmp[r1].playerName : vm.vueArChessComPlayers[r1].playerName
+        const vuePlayerName = thisIsLichess ? vm.vueArLichessPlayersTmp[r1].playerName : vm.vueArChessComPlayersTmp[r1].playerName
         if (playerName === vuePlayerName) {
-          arTmp.push(thisIsLichess ? vm.vueArLichessPlayersTmp[r1] : vm.vueArChessComPlayers[r1])
+          arTmp.push(thisIsLichess ? vm.vueArLichessPlayersTmp[r1] : vm.vueArChessComPlayersTmp[r1])
           break
         }
       }
     }
   }
 
-  let vueArLichessPlayers = [...arTmp];
+  if (thisIsLichess) {
+    vm.vueArLichessPlayers = [...arTmp]
+  } else {
+    vm.vueArChessComPlayers = [...arTmp]
+  }
+
+  //vm.vueArLichessPlayers = JSON.parse(JSON.stringify(arTmp))
 
   // for (let r = 0; r < rowCount; r++) {
   //   if (thisIsLichess) {
@@ -1288,11 +1295,11 @@ async function fetchGetChessCom(rowNum, playerName) {
     // document.querySelector('.crush' + rowNum).textContent = rush
 
     //временно
-    vm.vueArChessComPlayers.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+    vm.vueArChessComPlayersTmp.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 
   } else {
     console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
-    vm.vueArChessComPlayers.push({ playerHTML, playerName })
+    vm.vueArChessComPlayersTmp.push({ playerHTML, playerName })
   }
 }
 
