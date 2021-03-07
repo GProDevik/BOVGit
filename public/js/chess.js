@@ -1047,7 +1047,7 @@ function fillTableFromServer(thisIsLichess) {
 
   //временно
   // correctSort(thisIsLichess, arPlayerNames)
-  const milliSeconds = thisIsLichess ? 500 : 2000
+  const milliSeconds = thisIsLichess ? 1000 : 3000
   setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
 
   //временно закомментарено
@@ -1219,7 +1219,8 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     // document.querySelector('.lplayer' + rowNum).innerHTML = '? ' + playerName
     //временно
     vm.vueArLichessPlayersBuf.push({
-      playerHTML: '<em>? ' + playerName + '</em>',
+      // playerHTML: '<em>? ' + playerName + '</em>',
+      playerHTML: '<em>' + playerName + '</em>',
       playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: ''
     })
   }
