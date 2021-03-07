@@ -81,8 +81,8 @@ html {
 
 /* -------- Table ----------- */
 
-table {
-  background-color: #ff33cc;
+ table {
+  /* background-color: #ff33cc; */
   table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
@@ -129,15 +129,17 @@ thead {
 
 thead th, tfoot th, tfoot td {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
-  border: 0px solid purple;
+  /* border: 0px solid purple; */
 }
 
 tbody tr:nth-child(odd) {
-  background-color: #e495e4;
+  /* background-color: #e495e4; */
+  background-color: lightgray;
 }
 
 tbody tr:nth-child(even), thead tr:nth-child(odd) {
-  background-color: #ff33cc;
+  /* background-color: #ff33cc; */
+  background-color: gainsboro;
 }
 
 tbody td {

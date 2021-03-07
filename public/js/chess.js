@@ -14,9 +14,9 @@ const root = {
       vueAutoRefreshInterval: '',
       vueCheckDarkTheme: false,
       vueArLichessPlayers: [], //временно
-      vueArLichessPlayersTmp: [], //временно
       vueArChessComPlayers: [], //временно
-      vueArChessComPlayersTmp: [], //временно
+      vueArLichessPlayersBuf: [], //временно
+      vueArChessComPlayersBuf: [], //временно
     }
   },
   methods: {
@@ -91,12 +91,15 @@ const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
   ['MagnusCarlsen', 'World champion - Magnus Carlsen'],
-  ['Hikaru', 'Top player - Hikaru Nakamura'],
   ['LachesisQ', 'Top player - Ian Nepomniachtchi'],
+  ['Hikaru', 'Top player - Hikaru Nakamura'],
   ['GM_Crest', 'Streamer - Sergey Shipov'],
   ['Challenger_Spy', 'Streamer - Dmitry Filimonov'],
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
+
+// let arLichessPlayersBuf = [] //временно
+// let arChessComPlayersBuf = [] //временно
 
 let intervalID, needRefresh
 let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
@@ -985,38 +988,41 @@ function clearAllTables() {
 }
 
 function clearTable(thisIsLichess) {
-  return //временно
-  const pref = thisIsLichess ? '.l' : '.c'
-  const n = getTableRowsNumber(thisIsLichess)
-  for (let step = 0; step < n; step++) {
-    const rowNum = step + 1
-    document.querySelector(pref + 'player' + rowNum).innerHTML = '' //innerHTML (because 'href')
-    document.querySelector(pref + 'bullet' + rowNum).textContent = ''
-    document.querySelector(pref + 'blitz' + rowNum).textContent = ''
-    document.querySelector(pref + 'rapid' + rowNum).textContent = ''
-    document.querySelector(pref + 'puzzle' + rowNum).textContent = ''
-    document.querySelector(pref + 'rush' + rowNum).textContent = ''
-  }
+  //временно закомментарено
+  // const pref = thisIsLichess ? '.l' : '.c'
+  // const n = getTableRowsNumber(thisIsLichess)
+  // for (let step = 0; step < n; step++) {
+  //   const rowNum = step + 1
+  //   document.querySelector(pref + 'player' + rowNum).innerHTML = '' //innerHTML (because 'href')
+  //   document.querySelector(pref + 'bullet' + rowNum).textContent = ''
+  //   document.querySelector(pref + 'blitz' + rowNum).textContent = ''
+  //   document.querySelector(pref + 'rapid' + rowNum).textContent = ''
+  //   document.querySelector(pref + 'puzzle' + rowNum).textContent = ''
+  //   document.querySelector(pref + 'rush' + rowNum).textContent = ''
+  // }
 }
 
 //clear all cells at row (exception: Player)
 function clearRow(thisIsLichess, rowNum) {
-  const pref = thisIsLichess ? '.l' : '.c'
-  document.querySelector(pref + 'bullet' + rowNum).textContent = ''
-  document.querySelector(pref + 'blitz' + rowNum).textContent = ''
-  document.querySelector(pref + 'rapid' + rowNum).textContent = ''
-  document.querySelector(pref + 'puzzle' + rowNum).textContent = ''
-  document.querySelector(pref + 'rush' + rowNum).textContent = ''
+  //временно закомментарено
+  // const pref = thisIsLichess ? '.l' : '.c'
+  // document.querySelector(pref + 'bullet' + rowNum).textContent = ''
+  // document.querySelector(pref + 'blitz' + rowNum).textContent = ''
+  // document.querySelector(pref + 'rapid' + rowNum).textContent = ''
+  // document.querySelector(pref + 'puzzle' + rowNum).textContent = ''
+  // document.querySelector(pref + 'rush' + rowNum).textContent = ''
 }
 
 function clearRowLichess(rowNum) {
-  const thisIsLichess = true
-  clearRow(thisIsLichess, rowNum)
+  //временно закомментарено
+  // const thisIsLichess = true
+  // clearRow(thisIsLichess, rowNum)
 }
 
 function clearRowChessCom(rowNum) {
-  const thisIsLichess = false
-  clearRow(thisIsLichess, rowNum)
+  //временно закомментарено
+  // const thisIsLichess = false
+  // clearRow(thisIsLichess, rowNum)
 }
 
 function fillTableFromServer(thisIsLichess) {
@@ -1026,8 +1032,8 @@ function fillTableFromServer(thisIsLichess) {
   rowNum = 0
 
   //временно
-  if (thisIsLichess) { vm.vueArLichessPlayersTmp.length = 0 }
-  else { vm.vueArChessComPlayersTmp.length = 0 }
+  if (thisIsLichess) { vm.vueArLichessPlayersBuf.length = 0 }
+  else { vm.vueArChessComPlayersBuf.length = 0 }
 
   for (let step = 0; step < arPlayerNames.length; step++) {
     const playerName = arPlayerNames[step]
@@ -1054,22 +1060,22 @@ function fillTableFromServer(thisIsLichess) {
   // }
 }
 
-//resort table (it is random order seldom after refresh)
+//resort table (it's random order sometimes after refresh by ajax)
 function correctSort(thisIsLichess, arPlayerNames) {
 
   if (arPlayerNames.length === 0) {
     return
   }
 
-  const rowCount = thisIsLichess ? vm.vueArLichessPlayersTmp.length : vm.vueArChessComPlayersTmp.length
+  const rowCount = thisIsLichess ? vm.vueArLichessPlayersBuf.length : vm.vueArChessComPlayersBuf.length
   const arTmp = []
   for (let step = 0; step < arPlayerNames.length; step++) {
     const playerName = arPlayerNames[step]
     if (playerName !== '') {
       for (let r1 = 0; r1 < rowCount; r1++) {
-        const vuePlayerName = thisIsLichess ? vm.vueArLichessPlayersTmp[r1].playerName : vm.vueArChessComPlayersTmp[r1].playerName
+        const vuePlayerName = thisIsLichess ? vm.vueArLichessPlayersBuf[r1].playerName : vm.vueArChessComPlayersBuf[r1].playerName
         if (playerName === vuePlayerName) {
-          arTmp.push(thisIsLichess ? vm.vueArLichessPlayersTmp[r1] : vm.vueArChessComPlayersTmp[r1])
+          arTmp.push(thisIsLichess ? vm.vueArLichessPlayersBuf[r1] : vm.vueArChessComPlayersBuf[r1])
           break
         }
       }
@@ -1078,11 +1084,11 @@ function correctSort(thisIsLichess, arPlayerNames) {
 
   if (thisIsLichess) {
     vm.vueArLichessPlayers = [...arTmp]
+    // vm.vueArLichessPlayers = JSON.parse(JSON.stringify(arTmp))
   } else {
     vm.vueArChessComPlayers = [...arTmp]
+    // vm.vueArChessComPlayers = JSON.parse(JSON.stringify(arTmp))
   }
-
-  //vm.vueArLichessPlayers = JSON.parse(JSON.stringify(arTmp))
 
   // for (let r = 0; r < rowCount; r++) {
   //   if (thisIsLichess) {
@@ -1205,14 +1211,17 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     // document.querySelector('.lrush' + rowNum).textContent = rush
 
     //временно
-    vm.vueArLichessPlayersTmp.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+    vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 
   } else {
     console.log(playerName + ' - lichess, response-error: ' + response.status)
     //player not found
     // document.querySelector('.lplayer' + rowNum).innerHTML = '? ' + playerName
     //временно
-    vm.vueArLichessPlayersTmp.push({ playerHTML: '<em>? ' + playerName + '</em>', playerName })
+    vm.vueArLichessPlayersBuf.push({
+      playerHTML: '<em>? ' + playerName + '</em>',
+      playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: ''
+    })
   }
 }
 
@@ -1270,7 +1279,8 @@ async function fetchGetChessCom(rowNum, playerName) {
     //     + onlineSymbol + playerTitle + playerName + '</a>'
     // }
     if (playerURL === '' || playerURL === undefined) {
-      playerHTML = '<em>? ' + playerName + '</em>' //player not found
+      // playerHTML = '<em>? ' + playerName + '</em>' //player not found
+      playerHTML = '<em>' + playerName + '</em>' //player not found
     }
     else {
       playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
@@ -1295,11 +1305,11 @@ async function fetchGetChessCom(rowNum, playerName) {
     // document.querySelector('.crush' + rowNum).textContent = rush
 
     //временно
-    vm.vueArChessComPlayersTmp.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+    vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 
   } else {
     console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
-    vm.vueArChessComPlayersTmp.push({ playerHTML, playerName })
+    vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: '' })
   }
 }
 
