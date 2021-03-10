@@ -83,18 +83,18 @@ const mapTimeControl = new Map([
 const mapDefaultLichessPlayers = new Map([
   ['Thibault', 'Creator of Lichess.org'],
   ['DrNykterstein', 'World champion - Magnus Carlsen'],
-  ['Crest64', 'Streamer - Sergey Shipov'],
-  ['Challenger_Spy', 'Streamer - Dmitry Filimonov'],
-  ['Chess-Network', 'Streamer - Jerry'],
+  ['Zhigalko_Sergei', 'Sergei Zhigalko'],
+  ['Crest64', 'Sergey Shipov'],
+  ['Challenger_Spy', 'Dmitry Filimonov'],
 ])
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
   ['MagnusCarlsen', 'World champion - Magnus Carlsen'],
-  ['LachesisQ', 'Top player - Ian Nepomniachtchi'],
-  ['Hikaru', 'Top player - Hikaru Nakamura'],
-  ['GM_Crest', 'Streamer - Sergey Shipov'],
-  ['Challenger_Spy', 'Streamer - Dmitry Filimonov'],
+  ['LachesisQ', 'Ian Nepomniachtchi'],
+  ['Hikaru', 'Hikaru Nakamura'],
+  ['ChessNetwork', 'Jerry'],
+  ['ShahMatKanal', 'Evgenij Novikov'],
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
 
@@ -1579,7 +1579,7 @@ function getAutoRefreshInterval() {
 
 function setAutoRefreshInterval(v) {
   // document.getElementById('elemTextLichessOrgPlayerNames').value = v.trim()
-  vm.vueAutoRefreshInterval = v.trim()
+  vm.vueAutoRefreshInterval = v ? v.trim() : ''
 }
 
 function isCheckDarkTheme() {
