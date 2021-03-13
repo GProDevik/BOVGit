@@ -82,24 +82,21 @@ const mapTimeControl = new Map([
 ])
 const mapDefaultLichessPlayers = new Map([
   ['Thibault', 'Creator of Lichess.org'],
-  ['DrNykterstein', 'World champion - Magnus Carlsen'],
-  ['Zhigalko_Sergei', 'Sergei Zhigalko'],
-  ['Crest64', 'Sergey Shipov'],
-  ['Challenger_Spy', 'Dmitry Filimonov'],
+  ['DrNykterstein', 'Magnus Carlsen'],
+  ['Zhigalko_Sergei'],
+  ['Crest64'],
+  ['Challenger_Spy'],
 ])
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
-  ['MagnusCarlsen', 'World champion - Magnus Carlsen'],
-  ['LachesisQ', 'Ian Nepomniachtchi'],
-  ['Hikaru', 'Hikaru Nakamura'],
-  ['ChessNetwork', 'Jerry'],
-  ['ShahMatKanal', 'Evgenij Novikov'],
+  ['MagnusCarlsen'],
+  ['LachesisQ'],
+  ['Hikaru'],
+  ['ChessNetwork'],
+  ['ShahMatKanal'],
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
-
-// let arLichessPlayersBuf = [] //временно
-// let arChessComPlayersBuf = [] //временно
 
 let intervalID, needRefresh
 let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
@@ -127,7 +124,9 @@ document.querySelector('#buttonPostLogout').onclick = () => postLogout()
 
 //hot keys
 document.addEventListener('keydown', function (event) {
-  if (event.key === 'Enter') {
+  if (event.key === 'Enter'
+    || event.keyCode === 13 //for mobile device
+  ) {
     refresh()
   }
 })
@@ -711,7 +710,9 @@ function onchangeAutoRefreshInterval() {
   let v = getAutoRefreshInterval()
   v = (v === undefined ? '' : v)
   setAutoRefreshInterval(v.trim())
-  useAJAX ? postSettingsAJAX() : postSettings()
+
+  //временно закомментарено, пока недоступна кнопка 'User'
+  //useAJAX ? postSettingsAJAX() : postSettings()
 }
 
 function onClickSetTheme() {
@@ -1046,7 +1047,6 @@ function fillTableFromServer(thisIsLichess) {
   }
 
   //временно
-  // correctSort(thisIsLichess, arPlayerNames)
   const milliSeconds = thisIsLichess ? 1000 : 3000
   setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
 
@@ -1191,10 +1191,27 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
     playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
 
-    //player (href !)
+    //playerHint
+    let playerHint
+    let v = mapDefaultLichessPlayers.get(playerName)
+    if (v) { playerHint = v }
+    else {
+      const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
+      const lastName = getJsonValue2(playerName, jsonObj, 'profile', 'lastName')
+      const location = getJsonValue2(playerName, jsonObj, 'profile', 'location')
+      const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
+      const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
+      const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
+      playerHint = (firstName ? firstName : '')
+        + ' ' + (lastName ? lastName : '')
+        + (location ? ', ' + location : '')
+        + (fideRating ? ', FIDE ' + fideRating : '')
+        + (bio ? '\n' + bio : '')
+        + (links ? '\n' + links : '')
+    }
+
+    //playerHTML (href !)
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
-    const v = mapDefaultLichessPlayers.get(playerName)
-    const playerHint = v ? v : ''
     let playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
       + onlineSymbol + playerTitle + playerName + '</a></strong>'
     // document.querySelector('.lplayer' + rowNum).innerHTML = playerHTML
@@ -1235,24 +1252,25 @@ async function fetchGetChessCom(rowNum, playerName) {
 
   // clearRowChessCom(rowNum) //временно закомментарено
 
-  //is-online
-  url = urlHttpServiceChessCom + playerName + '/is-online'
-  try {
-    response = await fetch(url)
-    if (response.ok) { // HTTP-state in 200-299
-      let jsonObj = await response.json() // read answer in JSON
-      let isOnline = getJsonValue1(playerName, jsonObj, 'online')
-      onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
-    } else {
-      console.log(playerName + ' - chess.com, is-online, response-error: ' + response.status)
-    }
-  } catch (err) {
-    console.log(playerName + ' - chess.com, is-online, fetch-error: ' + err)
-  }
+  //временно закомментарено, пока не наладится работа api на chess.com (не выдается параметр 'is-online' !!!)
+  // //is-online
+  // url = urlHttpServiceChessCom + playerName + '/is-online'
+  // try {
+  //   response = await fetch(url)
+  //   if (response.ok) { // HTTP-state in 200-299
+  //     let jsonObj = await response.json() // read answer in JSON
+  //     let isOnline = getJsonValue1(playerName, jsonObj, 'online')
+  //     onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
+  //   } else {
+  //     console.log(playerName + ' - chess.com, is-online, response-error: ' + response.status)
+  //   }
+  // } catch (err) {
+  //   console.log(playerName + ' - chess.com, is-online, fetch-error: ' + err)
+  // }
 
-  //player, playerURL
+  //playerHTML (href !)
   let v = mapDefaultChessComPlayers.get(playerName)
-  const playerHint = v ? v : ''
+  let playerHint = v ? v : ''
   url = urlHttpServiceChessCom + playerName
   try {
     response = await fetch(url)
@@ -1262,6 +1280,14 @@ async function fetchGetChessCom(rowNum, playerName) {
       //title (GM, IM, FM, ...)
       v = getJsonValue1(playerName, jsonObj, 'title')
       playerTitle = (v === undefined) ? '' : v + ' '
+      if (playerHint === '') {
+        const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
+        const location = getJsonValue1(playerName, jsonObj, 'location')
+        // const fideRating = getJsonValue1(playerName, jsonObj, 'profile', 'fideRating')
+        playerHint = (name ? name : '')
+          + (location ? ', ' + location : '')
+        // + (fideRating ? ', FIDE ' + fideRating : '')
+      }
     } else {
       console.log(playerName + ' - chess.com, playerURL, response-error: ' + response.status)
     }
@@ -1321,6 +1347,17 @@ function getJsonValue1(playerName, jsonObj, field1) {
   }
   catch (err) {
     console.log('Error in getJsonValue1(): playerName=' + playerName + ' ' + field1 + ': ' + err)
+  }
+  return value
+}
+
+function getJsonValue2(playerName, jsonObj, field1, field2) {
+  let value = ''
+  try {
+    value = jsonObj[field1][field2]
+  }
+  catch (err) {
+    console.log('Error in getJsonValue2(): playerName=' + playerName + ' ' + field1 + '.' + field2 + ': ' + err)
   }
   return value
 }
