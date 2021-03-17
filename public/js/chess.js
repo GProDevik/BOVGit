@@ -82,7 +82,7 @@ const mapTimeControl = new Map([
 ])
 const mapDefaultLichessPlayers = new Map([
   ['Thibault', 'Creator of Lichess.org'],
-  ['DrNykterstein', 'Magnus Carlsen'],
+  ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway'],
   ['Zhigalko_Sergei'],
   ['Crest64'],
   ['Challenger_Spy'],
@@ -90,9 +90,9 @@ const mapDefaultLichessPlayers = new Map([
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
-  ['MagnusCarlsen'],
-  ['LachesisQ'],
+  ['MagnusCarlsen', 'World champion'],
   ['Hikaru'],
+  ['LachesisQ'],
   ['ChessNetwork'],
   ['ShahMatKanal'],
 ])
@@ -823,11 +823,21 @@ function sortTable(thisIsLichess, timeControl) {
     cellcount = cells.length
     a[r] = new Array(cellcount)
     for (c = 0; c < cellcount; c++) {
-      s = (c === 0) ? cells[c].innerHTML : cells[c].textContent
+      // s = (c === 0) ? cells[c].innerHTML : cells[c].textContent
+      // s = s.replace(onlineSymbolAtPlayer, '✔')
+      // s = s.replace('\r', '')
+      if (c === 0) {
+        s = thisIsLichess ? vm.vueArLichessPlayers[r].playerName : vm.vueArChessComPlayers[r].playerName
+      } else {
+        s = cells[c].textContent
+      }
+
       s = s.trim() //cell value
 
-      //playerName
-      if (c === 0) a[r][c] = s
+      //playerHTML
+      if (c === 0) {
+        a[r][c] = s
+      }
 
       //bullet, blitz, rapid, puzzle, rush ---> to number
       else {
@@ -889,8 +899,10 @@ function sortTable(thisIsLichess, timeControl) {
   let r1, playerHTML
   for (r = 0; r < rowCount; r++) {
     for (r1 = 0; r1 < rowCount; r1++) {
-      playerHTML = thisIsLichess ? vm.vueArLichessPlayers[r1].playerHTML : vm.vueArChessComPlayers[r1].playerHTML
-      playerHTML = playerHTML.replace(onlineSymbolAtPlayer, '✔')
+      // playerHTML = thisIsLichess ? vm.vueArLichessPlayers[r1].playerHTML : vm.vueArChessComPlayers[r1].playerHTML
+      // playerHTML = playerHTML.replace(onlineSymbolAtPlayer, '✔')
+      // playerHTML = playerHTML.replace('\r', '')
+      playerHTML = thisIsLichess ? vm.vueArLichessPlayers[r1].playerName : vm.vueArChessComPlayers[r1].playerName
       if (a[r][0] === playerHTML) {
         arTmp.push(thisIsLichess ? vm.vueArLichessPlayers[r1] : vm.vueArChessComPlayers[r1])
         break
@@ -1192,23 +1204,22 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
 
     //playerHint
-    let playerHint
+    let playerHint = ''
     let v = mapDefaultLichessPlayers.get(playerName)
-    if (v) { playerHint = v }
-    else {
-      const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
-      const lastName = getJsonValue2(playerName, jsonObj, 'profile', 'lastName')
-      const location = getJsonValue2(playerName, jsonObj, 'profile', 'location')
-      const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
-      const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
-      const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
-      playerHint = (firstName ? firstName : '')
-        + ' ' + (lastName ? lastName : '')
-        + (location ? ', ' + location : '')
-        + (fideRating ? ', FIDE ' + fideRating : '')
-        + (bio ? '\n' + bio : '')
-        + (links ? '\n' + links : '')
-    }
+    if (v) { playerHint = v + '\n\n' }
+    const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
+    const lastName = getJsonValue2(playerName, jsonObj, 'profile', 'lastName')
+    const location = getJsonValue2(playerName, jsonObj, 'profile', 'location')
+    const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
+    const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
+    const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
+    playerHint += (firstName ? firstName : '')
+      + ' ' + (lastName ? lastName : '')
+      + (location ? ', ' + location : '')
+      + (fideRating ? ', FIDE ' + fideRating : '')
+      + '\n'
+      + (bio ? '\n' + bio : '')
+      + (links ? '\n' + links : '')
 
     //playerHTML (href !)
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
@@ -1270,7 +1281,7 @@ async function fetchGetChessCom(rowNum, playerName) {
 
   //playerHTML (href !)
   let v = mapDefaultChessComPlayers.get(playerName)
-  let playerHint = v ? v : ''
+  let playerHint = v ? v + '\n\n' : ''
   url = urlHttpServiceChessCom + playerName
   try {
     response = await fetch(url)
@@ -1280,14 +1291,13 @@ async function fetchGetChessCom(rowNum, playerName) {
       //title (GM, IM, FM, ...)
       v = getJsonValue1(playerName, jsonObj, 'title')
       playerTitle = (v === undefined) ? '' : v + ' '
-      if (playerHint === '') {
-        const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
-        const location = getJsonValue1(playerName, jsonObj, 'location')
-        // const fideRating = getJsonValue1(playerName, jsonObj, 'profile', 'fideRating')
-        playerHint = (name ? name : '')
-          + (location ? ', ' + location : '')
-        // + (fideRating ? ', FIDE ' + fideRating : '')
-      }
+
+      const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
+      const location = getJsonValue1(playerName, jsonObj, 'location')
+      // const fideRating = getJsonValue1(playerName, jsonObj, 'profile', 'fide')
+      playerHint += (name ? name : '')
+        + (location ? ', ' + location : '')
+      // + (fideRating ? ', FIDE ' + fideRating : '')
     } else {
       console.log(playerName + ' - chess.com, playerURL, response-error: ' + response.status)
     }
@@ -1521,7 +1531,8 @@ function setDataToStorage() {
   localStorage.setItem('DarkThemeChecked', v)
 
   if (isDiff /*&& isUserLogged()*/) {
-    useAJAX ? postSettingsAJAX() : postSettings()
+    //временно закомментарено, пока недоступна кнопка 'User'
+    // useAJAX ? postSettingsAJAX() : postSettings()
   }
 }
 
@@ -1529,7 +1540,8 @@ function setFirstChessComToStorage() {
   isFirstChessCom = !isFirstChessCom
   const v = (isFirstChessCom ? '1' : '')
   localStorage.setItem('isFirstChessCom', v)
-  useAJAX ? postSettingsAJAX() : postSettings()
+  //временно закомментарено, пока недоступна кнопка 'User'
+  // useAJAX ? postSettingsAJAX() : postSettings()
 }
 
 function clearSettings() {

@@ -33,7 +33,10 @@ html {
   margin-left: 35%;
   cursor: url('NeonCursor04-Blue.cur'), pointer;
   text-shadow: 1px 1px 1px #e495e4;
-  border: 2px solid #e495e4;
+  /* text-shadow: 1px 1px 1px lightgray; */
+  /* border: 2px solid #e495e4; */
+  /* border: 2px solid gainsboro; */
+  border: 2px solid lightgray;
   border-radius: 6px;
 }
 
@@ -86,7 +89,8 @@ html {
   table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
-  border: 2px solid purple;
+  /* border: 2px solid purple; */
+  border: 2px solid black;
   margin-top: 1vw;
 }
 
