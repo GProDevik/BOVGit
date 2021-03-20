@@ -954,7 +954,7 @@ function refresh() {
 
   refreshOneTable(false)
   if (lastSortTimeControlChessCom !== '') {
-    setTimeout(function () { sortTable(false, lastSortTimeControlChessCom) }, 5000) //execute in N ms
+    setTimeout(function () { sortTable(false, lastSortTimeControlChessCom) }, 3000) //execute in N ms
   }
   setDataToStorage()
   // setAutoRefresh()
@@ -1038,11 +1038,25 @@ function clearRowChessCom(rowNum) {
   // clearRow(thisIsLichess, rowNum)
 }
 
+// async function getDataFromServer(thisIsLichess, arPlayerNames) {
+//   let rowNum = 0 //неиспользуемая переменная
+//   for (let step = 0; step < arPlayerNames.length; step++) {
+//     const playerName = arPlayerNames[step]
+//     if (playerName !== '') {
+//       // if (++rowNum > getTableRowsNumber(thisIsLichess)) {
+//       // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
+//       // }
+//       fetchTable(thisIsLichess, rowNum, playerName)
+//     }
+//   }
+//   let aa
+//   return aa = await Promise.resolve('q')
+// }
+
 function fillTableFromServer(thisIsLichess) {
-  let playerNames, arPlayerNames, rowNum
+  let playerNames, arPlayerNames, rowNum = 0
   playerNames = getPlayerNames(thisIsLichess)
   arPlayerNames = playerNames.split(' ') //get array of Players names
-  rowNum = 0
 
   //временно
   if (thisIsLichess) { vm.vueArLichessPlayersBuf.length = 0 }
@@ -1051,16 +1065,24 @@ function fillTableFromServer(thisIsLichess) {
   for (let step = 0; step < arPlayerNames.length; step++) {
     const playerName = arPlayerNames[step]
     if (playerName !== '') {
-      if (++rowNum > getTableRowsNumber(thisIsLichess)) {
-        // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
-      }
+      // if (++rowNum > getTableRowsNumber(thisIsLichess)) {
+      // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
+      // }
       fetchTable(thisIsLichess, rowNum, playerName)
     }
   }
 
+  // if (thisIsLichess) {
+  //   let a = getDataFromServer(thisIsLichess, arPlayerNames)
+  //   a.then(
+  //     correctSort(thisIsLichess, arPlayerNames)
+  //   )
+  // } else {
+
   //временно
   const milliSeconds = thisIsLichess ? 1000 : 3000
   setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+  // }
 
   //временно закомментарено
   // //delete unnecessary last rows (if number of players less than number of rows)
@@ -1199,7 +1221,7 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const isOnline = getJsonValue1(playerName, jsonObj, 'online')
     const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
 
-    //title of player (GM, IM, FM, ...)
+    //playerTitle: title of player (GM, IM, FM, ...)
     let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
     playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
 
@@ -1258,12 +1280,15 @@ async function fetchGetLichessOrg(rowNum, playerName) {
 //fill table's row for player on Chess.com
 async function fetchGetChessCom(rowNum, playerName) {
 
-  let url, response, cell
+  let url, response, cell, isOK1 = false, isOK2 = false
   let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = ''
+  let bullet = '', blitz = '', rapid = '', puzzle = '', rush = '', playerHint = '', fideRating = ''
 
   // clearRowChessCom(rowNum) //временно закомментарено
 
-  //временно закомментарено, пока не наладится работа api на chess.com (не выдается параметр 'is-online' !!!)
+  //закомментарено, пока не наладится работа api на chess.com:
+  //не выдается параметр 'is-online' и уже не будет выдаваться в обозримом будущем, т.к. это сильно грузило chess.com
+  //см. https://www.chess.com/clubs/forum/view/api-rfc-deprecate-and-remove-is-online-endpoint
   // //is-online
   // url = urlHttpServiceChessCom + playerName + '/is-online'
   // try {
@@ -1279,9 +1304,11 @@ async function fetchGetChessCom(rowNum, playerName) {
   //   console.log(playerName + ' - chess.com, is-online, fetch-error: ' + err)
   // }
 
-  //playerHTML (href !)
+  //playerHint
   let v = mapDefaultChessComPlayers.get(playerName)
-  let playerHint = v ? v + '\n\n' : ''
+  playerHint = v ? v + '\n\n' : ''
+
+  //playerHTML (href !)
   url = urlHttpServiceChessCom + playerName
   try {
     response = await fetch(url)
@@ -1297,7 +1324,6 @@ async function fetchGetChessCom(rowNum, playerName) {
       // const fideRating = getJsonValue1(playerName, jsonObj, 'profile', 'fide')
       playerHint += (name ? name : '')
         + (location ? ', ' + location : '')
-      // + (fideRating ? ', FIDE ' + fideRating : '')
     } else {
       console.log(playerName + ' - chess.com, playerURL, response-error: ' + response.status)
     }
@@ -1320,8 +1346,7 @@ async function fetchGetChessCom(rowNum, playerName) {
       playerHTML = '<em>' + playerName + '</em>' //player not found
     }
     else {
-      playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-        + onlineSymbol + playerTitle + playerName + '</a></strong>'
+      isOK1 = true
     }
   }
 
@@ -1330,25 +1355,33 @@ async function fetchGetChessCom(rowNum, playerName) {
   response = await fetch(url)
   if (response.ok) { // HTTP-state in 200-299
     let jsonObj = await response.json() // read answer in JSON
-    const bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+    bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
     // document.querySelector('.cbullet' + rowNum).textContent = bullet
-    const blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+    blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
     // document.querySelector('.cblitz' + rowNum).textContent = blitz
-    const rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+    rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
     // document.querySelector('.crapid' + rowNum).textContent = rapid
-    const puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+    puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
     // document.querySelector('.cpuzzle' + rowNum).textContent = puzzle
-    const rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+    rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
     // document.querySelector('.crush' + rowNum).textContent = rush
 
-    //временно
-    vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+    fideRating = getJsonValue1(playerName, jsonObj, 'fide')
 
+    isOK2 = true
   } else {
     console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
-    vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: '' })
   }
+
+  //временно
+  if (isOK1 === true && isOK2 === true) {
+    playerHint += (fideRating ? ', FIDE ' + fideRating : '')
+    playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+      + onlineSymbol + playerTitle + playerName + '</a></strong>'
+  }
+  vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 }
+
 
 function getJsonValue1(playerName, jsonObj, field1) {
   let value = ''
