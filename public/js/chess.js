@@ -86,6 +86,9 @@ const mapDefaultLichessPlayers = new Map([
   ['Zhigalko_Sergei'],
   ['Crest64'],
   ['Challenger_Spy'],
+  ['Shuvalov'],
+  ['Pandochka'],
+  ['bovgit', 'Creator of this page :)'],
 ])
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
@@ -93,6 +96,7 @@ const mapDefaultChessComPlayers = new Map([
   ['MagnusCarlsen', 'World champion'],
   ['Hikaru'],
   ['LachesisQ'],
+  ['ChessQueen'],
   ['ChessNetwork'],
   ['ShahMatKanal'],
 ])
@@ -100,7 +104,7 @@ const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayer
 
 //milliseconds for refresh table after 'await fetch'
 const lichessDelay = 1000
-const chessComDelay = 4000
+const chessComDelay = 2000
 
 let intervalID, needRefresh
 let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
@@ -591,7 +595,7 @@ function processUrlParams() {
     v2 = sessionStorage.getItem(v1)
     if (!v2) {
       sessionStorage.setItem(v1, 1)
-      useAJAX ? checkAndMarkUserAsDisconnectedAJAX() : postSettings()
+      // useAJAX ? checkAndMarkUserAsDisconnectedAJAX() : postSettings()
     }
     return
   }
@@ -716,7 +720,7 @@ function onchangeAutoRefreshInterval() {
   setAutoRefreshInterval(v.trim())
 
   //временно закомментарено, пока недоступна кнопка 'User'
-  //useAJAX ? postSettingsAJAX() : postSettings()
+  // useAJAX ? postSettingsAJAX() : postSettings()
 }
 
 function onClickSetTheme() {
@@ -951,15 +955,20 @@ function clearLastSort(thisIsLichess) {
 function refresh() {
   clearAllTables()
 
-  refreshOneTable(true)
-  if (lastSortTimeControlLichess !== '') {
-    setTimeout(function () { sortTable(true, lastSortTimeControlLichess) }, lichessDelay) //execute in N ms
-  }
+  let thisIsLichess = true
+  clearLastSort(thisIsLichess)
+  refreshOneTable(thisIsLichess)
+  // if (lastSortTimeControlLichess !== '') {
+  //   setTimeout(function () { sortTable(thisIsLichess, lastSortTimeControlLichess) }, lichessDelay) //execute in N ms
+  // }
 
-  refreshOneTable(false)
-  if (lastSortTimeControlChessCom !== '') {
-    setTimeout(function () { sortTable(false, lastSortTimeControlChessCom) }, chessComDelay) //execute in N ms
-  }
+  thisIsLichess = false
+  clearLastSort(thisIsLichess)
+  refreshOneTable(thisIsLichess)
+  // if (lastSortTimeControlChessCom !== '') {
+  //   setTimeout(function () { sortTable(fthisIsLichess, lastSortTimeControlChessCom) }, chessComDelay) //execute in N ms
+  // }
+
   setDataToStorage()
   // setAutoRefresh()
 }
@@ -1042,30 +1051,8 @@ function clearRowChessCom(rowNum) {
   // clearRow(thisIsLichess, rowNum)
 }
 
-// async function getDataFromServer(thisIsLichess, arPlayerNames) {
-//   let rowNum = 0 //неиспользуемая переменная
-//   for (let step = 0; step < arPlayerNames.length; step++) {
-//     const playerName = arPlayerNames[step]
-//     if (playerName !== '') {
-//       // if (++rowNum > getTableRowsNumber(thisIsLichess)) {
-//       // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
-//       // }
-//       fetchPlayer(thisIsLichess, rowNum, playerName)
-//     }
-//   }
-//   let aa
-//   return aa = await Promise.resolve('q')
-// }
-
-function fillTableFromServer(thisIsLichess) {
-  let playerNames, arPlayerNames, rowNum = 0
-  playerNames = getPlayerNames(thisIsLichess)
-  arPlayerNames = playerNames.split(' ') //get array of Players names
-
-  //временно
-  if (thisIsLichess) { vm.vueArLichessPlayersBuf.length = 0 }
-  else { vm.vueArChessComPlayersBuf.length = 0 }
-
+async function getDataFromServer(thisIsLichess, arPlayerNames) {
+  let rowNum = 0 //неиспользуемая переменная
   for (let step = 0; step < arPlayerNames.length; step++) {
     const playerName = arPlayerNames[step]
     if (playerName !== '') {
@@ -1075,18 +1062,39 @@ function fillTableFromServer(thisIsLichess) {
       fetchPlayer(thisIsLichess, rowNum, playerName)
     }
   }
+  // return Promise.resolve("bla-bla")
+}
 
-  // if (thisIsLichess) {
-  //   let a = getDataFromServer(thisIsLichess, arPlayerNames)
-  //   a.then(
-  //     correctSort(thisIsLichess, arPlayerNames)
-  //   )
-  // } else {
+async function fillTableFromServer(thisIsLichess) {
+  let playerNames, arPlayerNames, rowNum = 0
+  playerNames = getPlayerNames(thisIsLichess)
+  arPlayerNames = playerNames.split(' ') //get array of Players names
 
   //временно
-  const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
-  setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+  if (thisIsLichess) { vm.vueArLichessPlayersBuf.length = 0 }
+  else { vm.vueArChessComPlayersBuf.length = 0 }
+
+  // for (let step = 0; step < arPlayerNames.length; step++) {
+  //   const playerName = arPlayerNames[step]
+  //   if (playerName !== '') {
+  //     // if (++rowNum > getTableRowsNumber(thisIsLichess)) {
+  //     // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
+  //     // }
+  //     fetchPlayer(thisIsLichess, rowNum, playerName)
+  //   }
   // }
+
+  // let q = getDataFromServer(thisIsLichess, arPlayerNames)
+  // q.then((v) => {
+  //   const milliSeconds = thisIsLichess ? lichessDelay : 2000 //chessComDelay
+  //   setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+  // }
+  // )
+
+  await getDataFromServer(thisIsLichess, arPlayerNames)
+  const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
+  // const milliSeconds = thisIsLichess ? lichessDelay : 2000
+  setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
 
   //временно закомментарено
   // //delete unnecessary last rows (if number of players less than number of rows)
@@ -1239,10 +1247,20 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
     const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
     const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
-    playerHint += (firstName ? firstName : '')
-      + ' ' + (lastName ? lastName : '')
+    let createdAt = '' //registration date
+    v = getJsonValue1(playerName, jsonObj, 'createdAt')
+    if (v) { createdAt = (new Date(v)).getFullYear() }
+    let lastOnline = '' //lastOnline date&time
+    v = getJsonValue1(playerName, jsonObj, 'seenAt')
+    if (v) { lastOnline = (new Date(v)).toLocaleString() }
+    const firstPart = (firstName ? firstName + ' ' : '')
+      + (lastName ? lastName : '')
       + (location ? ', ' + location : '')
       + (fideRating ? ', FIDE ' + fideRating : '')
+    playerHint += firstPart
+      + (firstPart ? '\n' : '')
+      + (createdAt ? 'reg. ' + createdAt : '')
+      + (lastOnline ? '\nlast online ' + lastOnline : '')
       + '\n'
       + (bio ? '\n' + bio : '')
       + (links ? '\n' + links : '')
@@ -1285,7 +1303,7 @@ async function fetchGetLichessOrg(rowNum, playerName) {
 async function fetchGetChessCom(rowNum, playerName) {
 
   let url, response, cell, isOK1 = false, isOK2 = false
-  let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = ''
+  let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
   let bullet = '', blitz = '', rapid = '', puzzle = '', rush = '', playerHint = '', fideRating = ''
 
   // clearRowChessCom(rowNum) //временно закомментарено
@@ -1325,7 +1343,10 @@ async function fetchGetChessCom(rowNum, playerName) {
 
       const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
       const location = getJsonValue1(playerName, jsonObj, 'location')
-      // const fideRating = getJsonValue1(playerName, jsonObj, 'profile', 'fide')
+      v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
+      if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
+      v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login
+      if (v) { lastOnline = (new Date(v * 1000)).toLocaleString() }
       playerHint += (name ? name : '')
         + (location ? ', ' + location : '')
     } else {
@@ -1380,6 +1401,9 @@ async function fetchGetChessCom(rowNum, playerName) {
   //временно
   if (isOK1 === true && isOK2 === true) {
     playerHint += (fideRating ? ', FIDE ' + fideRating : '')
+    playerHint += (playerHint ? '\n' : '')
+      + 'reg. ' + createdAt
+      + '\nlast online ' + lastOnline
     playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
       + onlineSymbol + playerTitle + playerName + '</a></strong>'
   }
