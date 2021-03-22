@@ -98,6 +98,10 @@ const mapDefaultChessComPlayers = new Map([
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
 
+//milliseconds for refresh table after 'await fetch'
+const lichessDelay = 1000
+const chessComDelay = 4000
+
 let intervalID, needRefresh
 let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
 let lastSortSelectorLichess = '', lastSortSelectorChessCom = ''
@@ -949,12 +953,12 @@ function refresh() {
 
   refreshOneTable(true)
   if (lastSortTimeControlLichess !== '') {
-    setTimeout(function () { sortTable(true, lastSortTimeControlLichess) }, 1000) //execute in N ms
+    setTimeout(function () { sortTable(true, lastSortTimeControlLichess) }, lichessDelay) //execute in N ms
   }
 
   refreshOneTable(false)
   if (lastSortTimeControlChessCom !== '') {
-    setTimeout(function () { sortTable(false, lastSortTimeControlChessCom) }, 3000) //execute in N ms
+    setTimeout(function () { sortTable(false, lastSortTimeControlChessCom) }, chessComDelay) //execute in N ms
   }
   setDataToStorage()
   // setAutoRefresh()
@@ -1046,7 +1050,7 @@ function clearRowChessCom(rowNum) {
 //       // if (++rowNum > getTableRowsNumber(thisIsLichess)) {
 //       // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
 //       // }
-//       fetchTable(thisIsLichess, rowNum, playerName)
+//       fetchPlayer(thisIsLichess, rowNum, playerName)
 //     }
 //   }
 //   let aa
@@ -1068,7 +1072,7 @@ function fillTableFromServer(thisIsLichess) {
       // if (++rowNum > getTableRowsNumber(thisIsLichess)) {
       // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
       // }
-      fetchTable(thisIsLichess, rowNum, playerName)
+      fetchPlayer(thisIsLichess, rowNum, playerName)
     }
   }
 
@@ -1080,7 +1084,7 @@ function fillTableFromServer(thisIsLichess) {
   // } else {
 
   //временно
-  const milliSeconds = thisIsLichess ? 1000 : 3000
+  const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
   setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
   // }
 
@@ -1133,7 +1137,7 @@ function correctSort(thisIsLichess, arPlayerNames) {
   // }
 }
 
-function fetchTable(thisIsLichess, rowNum, playerName) {
+function fetchPlayer(thisIsLichess, rowNum, playerName) {
   thisIsLichess ? fetchGetLichessOrg(rowNum, playerName) :
     fetchGetChessCom(rowNum, playerName)
 }

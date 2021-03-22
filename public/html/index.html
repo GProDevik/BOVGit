@@ -48,7 +48,7 @@
         <form>
           <label id="InputOrder1" class="oneLine" for="elemTextLichessOrgPlayerNames">
             <input @click="vueOnClickCheckLichess" v-model="vueCheckLichess" class="inputCheck" type="checkbox"
-              id="elemCheckLichess" name="elemCheckLichess">
+              id="elemCheckLichess" name="elemCheckLichess" title="Make visible/unvisible Lichess table">
             <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
               title="Refresh Lichess table">
             <input @change="vueOnchangeLichessPlayerNames" v-model="vueLichessOrgPlayerNames" class="inputText"
@@ -57,11 +57,9 @@
               placeholder="Player names on Lichess, separated by spaces">
           </label>
 
-          <!-- <span class="msgChangePlayerList">you may change player lists</span> -->
-
           <label id="InputOrder2" class="oneLine" for="elemTextChessComPlayerNames">
             <input @click="vueOnClickCheckChessCom" v-model="vueCheckChessCom" class="inputCheck" type="checkbox"
-              id="elemCheckChessCom" name="elemCheckChessCom">
+              id="elemCheckChessCom" name="elemCheckChessCom" title="Make visible/unvisible Chess.com table">
             <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh"
               title="Refresh Chess.com table">
             <input @change="vueOnchangeChessComPlayerNames" v-model="vueChessComPlayerNames" class="inputText"
@@ -69,6 +67,9 @@
               title="Enter names of players on Chess.com, separated by spaces"
               placeholder="Player names on Chess.com, separated by spaces">
           </label>
+
+          <center><span class="msgChangePlayerList">You may change player lists !</span></center>
+
         </form>
 
         <div id="TableOrder1" class="TableLichess showBlock">
@@ -84,7 +85,6 @@
               </tr>
             </thead>
             <tbody class="TBodyLichess">
-
               <tr v-for="(item, name, index) in vueArLichessPlayers" :key="index">
                 <td v-html="item.playerHTML"></td>
                 <td>{{item.bullet}}</td>
@@ -93,7 +93,6 @@
                 <td>{{item.puzzle}}</td>
                 <td>{{item.rush}}</td>
               </tr>
-
             </tbody>
           </table>
         </div>
@@ -111,7 +110,6 @@
               </tr>
             </thead>
             <tbody class="TBodyChessCom">
-
               <tr v-for="(item, name, index) in vueArChessComPlayers" :key="index">
                 <td v-html="item.playerHTML"></td>
                 <td>{{item.bullet}}</td>
@@ -120,7 +118,6 @@
                 <td>{{item.puzzle}}</td>
                 <td>{{item.rush}}</td>
               </tr>
-
             </tbody>
           </table>
         </div>
@@ -235,7 +232,6 @@
 
   <noscript><em>You need to enable JavaScript to run this app !!!</em></noscript>
   <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.prod.js"></script>
-  <!-- <script src="https://unpkg.com/vue@3.2.20"></script> -->
 
   <script src="js/chess.js"></script>
 </body>

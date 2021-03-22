@@ -82,6 +82,11 @@ html {
   margin-left: 1vw;
 }
 
+.msgChangePlayerList {
+  font-size: small;
+  font-style: italic;
+}
+
 /* -------- Table ----------- */
 
  table {
