@@ -104,7 +104,7 @@ const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayer
 
 //milliseconds for refresh table after 'await fetch'
 const lichessDelay = 1000
-const chessComDelay = 2000
+const chessComDelay = 5000
 
 let intervalID, needRefresh
 let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
@@ -595,7 +595,7 @@ function processUrlParams() {
     v2 = sessionStorage.getItem(v1)
     if (!v2) {
       sessionStorage.setItem(v1, 1)
-      // useAJAX ? checkAndMarkUserAsDisconnectedAJAX() : postSettings()
+      useAJAX ? checkAndMarkUserAsDisconnectedAJAX() : postSettings()
     }
     return
   }
@@ -720,7 +720,7 @@ function onchangeAutoRefreshInterval() {
   setAutoRefreshInterval(v.trim())
 
   //временно закомментарено, пока недоступна кнопка 'User'
-  // useAJAX ? postSettingsAJAX() : postSettings()
+  useAJAX ? postSettingsAJAX() : postSettings()
 }
 
 function onClickSetTheme() {
@@ -1593,7 +1593,7 @@ function setDataToStorage() {
 
   if (isDiff /*&& isUserLogged()*/) {
     //временно закомментарено, пока недоступна кнопка 'User'
-    // useAJAX ? postSettingsAJAX() : postSettings()
+    useAJAX ? postSettingsAJAX() : postSettings()
   }
 }
 
@@ -1602,7 +1602,7 @@ function setFirstChessComToStorage() {
   const v = (isFirstChessCom ? '1' : '')
   localStorage.setItem('isFirstChessCom', v)
   //временно закомментарено, пока недоступна кнопка 'User'
-  // useAJAX ? postSettingsAJAX() : postSettings()
+  useAJAX ? postSettingsAJAX() : postSettings()
 }
 
 function clearSettings() {
