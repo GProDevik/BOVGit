@@ -104,7 +104,7 @@ const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayer
 
 //milliseconds for refresh table after 'await fetch'
 const lichessDelay = 1000
-const chessComDelay = 5000
+const chessComDelay = 3000
 
 let intervalID, needRefresh
 let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
@@ -1372,41 +1372,76 @@ async function fetchGetChessCom(rowNum, playerName) {
     }
     else {
       isOK1 = true
+
+      //bullet, blitz, rapid, puzzle, rush
+      url = urlHttpServiceChessCom + playerName + '/stats'
+      response = await fetch(url)
+      if (response.ok) { // HTTP-state in 200-299
+        let jsonObj = await response.json() // read answer in JSON
+        bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+        // document.querySelector('.cbullet' + rowNum).textContent = bullet
+        blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+        // document.querySelector('.cblitz' + rowNum).textContent = blitz
+        rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+        // document.querySelector('.crapid' + rowNum).textContent = rapid
+        puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+        // document.querySelector('.cpuzzle' + rowNum).textContent = puzzle
+        rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+        // document.querySelector('.crush' + rowNum).textContent = rush
+
+        fideRating = getJsonValue1(playerName, jsonObj, 'fide')
+
+        isOK2 = true
+      } else {
+        console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
+      }
+
+      //временно
+      if (isOK1 === true && isOK2 === true) {
+        playerHint += (fideRating ? ', FIDE ' + fideRating : '')
+        playerHint += (playerHint ? '\n' : '')
+          + 'reg. ' + createdAt
+          + '\nlast online ' + lastOnline
+        playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+          + onlineSymbol + playerTitle + playerName + '</a></strong>'
+      }
+
+
     }
   }
 
-  //bullet, blitz, rapid, puzzle, rush
-  url = urlHttpServiceChessCom + playerName + '/stats'
-  response = await fetch(url)
-  if (response.ok) { // HTTP-state in 200-299
-    let jsonObj = await response.json() // read answer in JSON
-    bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
-    // document.querySelector('.cbullet' + rowNum).textContent = bullet
-    blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
-    // document.querySelector('.cblitz' + rowNum).textContent = blitz
-    rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
-    // document.querySelector('.crapid' + rowNum).textContent = rapid
-    puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
-    // document.querySelector('.cpuzzle' + rowNum).textContent = puzzle
-    rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
-    // document.querySelector('.crush' + rowNum).textContent = rush
+  // //bullet, blitz, rapid, puzzle, rush
+  // url = urlHttpServiceChessCom + playerName + '/stats'
+  // response = await fetch(url)
+  // if (response.ok) { // HTTP-state in 200-299
+  //   let jsonObj = await response.json() // read answer in JSON
+  //   bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+  //   // document.querySelector('.cbullet' + rowNum).textContent = bullet
+  //   blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+  //   // document.querySelector('.cblitz' + rowNum).textContent = blitz
+  //   rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+  //   // document.querySelector('.crapid' + rowNum).textContent = rapid
+  //   puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+  //   // document.querySelector('.cpuzzle' + rowNum).textContent = puzzle
+  //   rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+  //   // document.querySelector('.crush' + rowNum).textContent = rush
 
-    fideRating = getJsonValue1(playerName, jsonObj, 'fide')
+  //   fideRating = getJsonValue1(playerName, jsonObj, 'fide')
 
-    isOK2 = true
-  } else {
-    console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
-  }
+  //   isOK2 = true
+  // } else {
+  //   console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
+  // }
 
-  //временно
-  if (isOK1 === true && isOK2 === true) {
-    playerHint += (fideRating ? ', FIDE ' + fideRating : '')
-    playerHint += (playerHint ? '\n' : '')
-      + 'reg. ' + createdAt
-      + '\nlast online ' + lastOnline
-    playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-      + onlineSymbol + playerTitle + playerName + '</a></strong>'
-  }
+  // //временно
+  // if (isOK1 === true && isOK2 === true) {
+  //   playerHint += (fideRating ? ', FIDE ' + fideRating : '')
+  //   playerHint += (playerHint ? '\n' : '')
+  //     + 'reg. ' + createdAt
+  //     + '\nlast online ' + lastOnline
+  //   playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+  //     + onlineSymbol + playerTitle + playerName + '</a></strong>'
+  // }
   vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 }
 
