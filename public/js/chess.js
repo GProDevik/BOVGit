@@ -93,7 +93,7 @@ const mapDefaultLichessPlayers = new Map([
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
-  ['MagnusCarlsen', 'World champion'],
+  // ['MagnusCarlsen', 'World champion'],
   ['Hikaru'],
   ['LachesisQ'],
   ['ChessQueen'],
@@ -104,14 +104,31 @@ const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayer
 
 //milliseconds for refresh table after 'await fetch'
 const lichessDelay = 1000
-const chessComDelay = 3000
+const chessComDelay = 4000
 
-let intervalID, needRefresh
-let isFirstChessCom = false, inputNode1, inputNode2, tableNode1, tableNode2
+let groupObjs = [
+  {
+    name: 'Start',
+    lichessPlayerNames: lichessDefaultPlayers,
+    chessComPlayerNames: chessComDefaultPlayers
+  },
+  {
+    name: 'World top',
+    lichessPlayerNames: 'DrNykterstein',
+    chessComPlayerNames: 'MagnusCarlsen Hikaru LachesisQ'
+  },
+]
+let groupNames = groupObjs.map(item => item.name)
+const startGroupNum = groupObjs.length
+let currentGroupName = groupNames[0]
+
+let isFirstChessCom = false
 let lastSortSelectorLichess = '', lastSortSelectorChessCom = ''
 let lastSortTimeControlLichess = '', lastSortTimeControlChessCom = ''
 let username = '', regtype = ''
+let intervalID, needRefresh
 
+let inputNode1, inputNode2, tableNode1, tableNode2
 inputNode1 = document.querySelector('#InputOrder1')
 inputNode2 = document.querySelector('#InputOrder2')
 tableNode1 = document.querySelector('#TableOrder1')
@@ -124,6 +141,8 @@ if (isMobileDevice) {
 }
 
 // ------------- On-Click ---------------
+
+// document.querySelector('#group').onchange = () => selectGroup()
 
 //login
 document.querySelector('#buttonPostRegistration').onclick = () => postRegistration()
@@ -140,6 +159,8 @@ document.addEventListener('keydown', function (event) {
 })
 
 getDataFromStorage()
+
+// fillElementGroup()
 
 if (isFirstChessCom) {
   changeTablesOrder() //set first chess.com
@@ -158,6 +179,34 @@ needRefresh = true
 processUrlParams()
 
 if (needRefresh) {
+  refresh()
+}
+
+/////////////////// groups of players /////////////////////////
+
+function fillElementGroup() {
+  let group = document.getElementById('group')
+  for (let i = 0; i < groupNames.length; i++) {
+    let option = document.createElement("option")
+    option.value = option.innerHTML = groupNames[i]
+    group.appendChild(option)
+  }
+}
+
+//after select of group there are:
+//group.value, group.selectedIndex (0 ... N), group.options[selectedIndex].selected (true/false)
+function selectGroup() {
+  const group = document.getElementById('group')
+  // alert(group.value + ':' + group.selectedIndex + ':' + group.options[group.selectedIndex].selected)
+  let groupObj = groupObjs.find(item => item.name === group.value)
+  currentGroupName = groupObj.name
+  setLichessOrgPlayerNames(groupObj.lichessPlayerNames)
+  setChessComPlayerNames(groupObj.chessComPlayerNames)
+
+  // const playerListDisabled = (group.selectedIndex < startGroupNum - 1)
+  // document.getElementById('elemTextLichessOrgPlayerNames').disabled = playerListDisabled
+  // document.getElementById('elemTextChessComPlayerNames').disabled = playerListDisabled
+
   refresh()
 }
 
@@ -1267,8 +1316,9 @@ async function fetchGetLichessOrg(rowNum, playerName) {
 
     //playerHTML (href !)
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
-    let playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-      + onlineSymbol + playerTitle + playerName + '</a></strong>'
+    let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+      + onlineSymbol + '<strong>' + playerTitle + playerName + '</strong></a>'
+      + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
     // document.querySelector('.lplayer' + rowNum).innerHTML = playerHTML
 
     const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1402,46 +1452,18 @@ async function fetchGetChessCom(rowNum, playerName) {
         playerHint += (playerHint ? '\n' : '')
           + 'reg. ' + createdAt
           + '\nlast online ' + lastOnline
+        // playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+        //   + onlineSymbol + playerTitle + playerName
+        //   + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+        //   + '</a></strong>'
         playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-          + onlineSymbol + playerTitle + playerName + '</a></strong>'
+          + onlineSymbol + '<strong>' + playerTitle + playerName + '</strong></a>'
+          + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+          + '</a></strong>'
       }
-
-
     }
   }
 
-  // //bullet, blitz, rapid, puzzle, rush
-  // url = urlHttpServiceChessCom + playerName + '/stats'
-  // response = await fetch(url)
-  // if (response.ok) { // HTTP-state in 200-299
-  //   let jsonObj = await response.json() // read answer in JSON
-  //   bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
-  //   // document.querySelector('.cbullet' + rowNum).textContent = bullet
-  //   blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
-  //   // document.querySelector('.cblitz' + rowNum).textContent = blitz
-  //   rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
-  //   // document.querySelector('.crapid' + rowNum).textContent = rapid
-  //   puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
-  //   // document.querySelector('.cpuzzle' + rowNum).textContent = puzzle
-  //   rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
-  //   // document.querySelector('.crush' + rowNum).textContent = rush
-
-  //   fideRating = getJsonValue1(playerName, jsonObj, 'fide')
-
-  //   isOK2 = true
-  // } else {
-  //   console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
-  // }
-
-  // //временно
-  // if (isOK1 === true && isOK2 === true) {
-  //   playerHint += (fideRating ? ', FIDE ' + fideRating : '')
-  //   playerHint += (playerHint ? '\n' : '')
-  //     + 'reg. ' + createdAt
-  //     + '\nlast online ' + lastOnline
-  //   playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-  //     + onlineSymbol + playerTitle + playerName + '</a></strong>'
-  // }
   vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 }
 

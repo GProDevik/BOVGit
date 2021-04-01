@@ -181,6 +181,13 @@ td {
   padding-right: 1vw;
 }
 
+.lastOnline{
+  font-size: x-small;
+  color: gray;
+  /* font-weight: bold;
+  font-style: italic; */
+}
+
 footer {
   font-size: small;
   margin: auto;
