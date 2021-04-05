@@ -1318,7 +1318,7 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
     let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
       + onlineSymbol + '<strong>' + playerTitle + playerName + '</strong></a>'
-      + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+      + (lastOnline ? '<br><span class="lastOnline">' + lastOnline.replace(',', '') + '</span>' : '')
     // document.querySelector('.lplayer' + rowNum).innerHTML = playerHTML
 
     const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1458,7 +1458,7 @@ async function fetchGetChessCom(rowNum, playerName) {
         //   + '</a></strong>'
         playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
           + onlineSymbol + '<strong>' + playerTitle + playerName + '</strong></a>'
-          + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+          + (lastOnline ? '<br><span class="lastOnline">' + lastOnline.replace(',', '') + '</span>' : '')
           + '</a></strong>'
       }
     }

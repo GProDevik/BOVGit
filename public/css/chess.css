@@ -156,8 +156,10 @@ tbody td {
 }
 
 th, td {
-  padding-top: 0.5vh;
-  padding-bottom: 0.5vh;
+  /* padding-top: 0.5vh;
+  padding-bottom: 0.5vh; */
+  padding-top: 0.2vh;
+  padding-bottom: 0.0vh;
   word-break: break-all;
 }
 
@@ -184,8 +186,6 @@ td {
 .lastOnline{
   font-size: x-small;
   color: gray;
-  /* font-weight: bold;
-  font-style: italic; */
 }
 
 footer {
