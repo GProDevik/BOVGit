@@ -93,7 +93,6 @@ const mapDefaultLichessPlayers = new Map([
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
-  // ['MagnusCarlsen', 'World champion'],
   ['Hikaru'],
   ['LachesisQ'],
   ['ChessQueen'],
@@ -142,7 +141,7 @@ if (isMobileDevice) {
 
 // ------------- On-Click ---------------
 
-// document.querySelector('#group').onchange = () => selectGroup()
+document.querySelector('#group').onchange = () => selectGroup()
 
 //login
 document.querySelector('#buttonPostRegistration').onclick = () => postRegistration()
@@ -160,7 +159,7 @@ document.addEventListener('keydown', function (event) {
 
 getDataFromStorage()
 
-// fillElementGroup()
+fillElementGroup()
 
 if (isFirstChessCom) {
   changeTablesOrder() //set first chess.com
@@ -189,6 +188,9 @@ function fillElementGroup() {
   for (let i = 0; i < groupNames.length; i++) {
     let option = document.createElement("option")
     option.value = option.innerHTML = groupNames[i]
+    if (option.value === currentGroupName) {
+      option.selected = true
+    }
     group.appendChild(option)
   }
 }
@@ -208,6 +210,12 @@ function selectGroup() {
   // document.getElementById('elemTextChessComPlayerNames').disabled = playerListDisabled
 
   refresh()
+}
+
+function updateGroupObj() {
+  const groupObj = groupObjs.find(item => item.name === currentGroupName)
+  groupObj.lichessPlayerNames = vm.vueLichessOrgPlayerNames
+  groupObj.chessComPlayerNames = vm.vueChessComPlayerNames
 }
 
 /////////////////// exchange data with server (Login, Logout, Registration, ...) by AJAX /////////////////////////
@@ -757,11 +765,13 @@ function onchangeLichessPlayerNames() {
   let v = getLichessOrgPlayerNames()
   v = (v === undefined ? '' : v)
   setLichessOrgPlayerNames(v)
+  updateGroupObj()
 }
 function onchangeChessComPlayerNames() {
   let v = getChessComPlayerNames()
   v = (v === undefined ? '' : v)
   setChessComPlayerNames(v)
+  updateGroupObj()
 }
 function onchangeAutoRefreshInterval() {
   let v = getAutoRefreshInterval()
@@ -1589,7 +1599,22 @@ function setElementNonVisible(elem) {
 //////////////////////////////////////////////////////////
 
 function getDataFromStorage() {
-  let v = localStorage.getItem('LichessOrgPlayerNames')
+  let v
+
+  v = localStorage.getItem('groupObjs')
+  if (v && (v !== '') && (v !== 'undefined')) {
+    groupObjs = JSON.parse(v)
+  }
+
+  v = localStorage.getItem('currentGroupName')
+  if (!v) {
+    v = currentGroupName
+  }
+  if (v !== '') {
+    currentGroupName = v
+  }
+
+  v = localStorage.getItem('LichessOrgPlayerNames')
   if (!v) {
     v = lichessDefaultPlayers
   }
@@ -1623,6 +1648,9 @@ function getDataFromStorage() {
 
 function setDataToStorage() {
   let v, isDiff, vs
+
+  localStorage.setItem('groupObjs', JSON.stringify(groupObjs))
+  localStorage.setItem('currentGroupName', currentGroupName)
 
   v = getLichessOrgPlayerNames()
   vs = localStorage.getItem('LichessOrgPlayerNames')
