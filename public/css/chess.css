@@ -84,7 +84,9 @@ html {
 
 .msgChangePlayerList {
   font-size: small;
+  /* font-size: x-small; */
   font-style: italic;
+  color: gray;
 }
 
 /* -------- Table ----------- */
@@ -153,6 +155,7 @@ tbody tr:nth-child(even), thead tr:nth-child(odd) {
 
 tbody td {
   text-align: center;
+  color: black;
 }
 
 th, td {

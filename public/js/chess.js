@@ -779,7 +779,7 @@ function onchangeAutoRefreshInterval() {
   setAutoRefreshInterval(v.trim())
 
   //временно закомментарено, пока недоступна кнопка 'User'
-  useAJAX ? postSettingsAJAX() : postSettings()
+  // useAJAX ? postSettingsAJAX() : postSettings()
 }
 
 function onClickSetTheme() {
@@ -1306,12 +1306,15 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
     const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
     const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
+
     let createdAt = '' //registration date
     v = getJsonValue1(playerName, jsonObj, 'createdAt')
     if (v) { createdAt = (new Date(v)).getFullYear() }
+
     let lastOnline = '' //lastOnline date&time
     v = getJsonValue1(playerName, jsonObj, 'seenAt')
-    if (v) { lastOnline = (new Date(v)).toLocaleString() }
+    if (v) { lastOnline = getDateHHMM(v) }
+
     const firstPart = (firstName ? firstName + ' ' : '')
       + (lastName ? lastName : '')
       + (location ? ', ' + location : '')
@@ -1403,10 +1406,13 @@ async function fetchGetChessCom(rowNum, playerName) {
 
       const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
       const location = getJsonValue1(playerName, jsonObj, 'location')
+
       v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
       if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
+
       v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login
-      if (v) { lastOnline = (new Date(v * 1000)).toLocaleString() }
+      if (v) { lastOnline = getDateHHMM(v * 1000) }
+
       playerHint += (name ? name : '')
         + (location ? ', ' + location : '')
     } else {
@@ -1462,13 +1468,9 @@ async function fetchGetChessCom(rowNum, playerName) {
         playerHint += (playerHint ? '\n' : '')
           + 'reg. ' + createdAt
           + '\nlast online ' + lastOnline
-        // playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-        //   + onlineSymbol + playerTitle + playerName
-        //   + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
-        //   + '</a></strong>'
         playerHTML = '<strong><a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
           + onlineSymbol + '<strong>' + playerTitle + playerName + '</strong></a>'
-          + (lastOnline ? '<br><span class="lastOnline">' + lastOnline.replace(',', '') + '</span>' : '')
+          + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
           + '</a></strong>'
       }
     }
@@ -1477,6 +1479,13 @@ async function fetchGetChessCom(rowNum, playerName) {
   vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 }
 
+//14.11.2021, 11:25:17 --> 14.11.2021 11:25
+function getDateHHMM(milliseconds) {
+  let lastOnline = (new Date(milliseconds)).toLocaleString() //14.11.2021, 11:25:17
+  lastOnline = lastOnline.replace(',', '') //del comma
+  lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25
+  return lastOnline
+}
 
 function getJsonValue1(playerName, jsonObj, field1) {
   let value = ''
@@ -1678,7 +1687,7 @@ function setDataToStorage() {
 
   if (isDiff /*&& isUserLogged()*/) {
     //временно закомментарено, пока недоступна кнопка 'User'
-    useAJAX ? postSettingsAJAX() : postSettings()
+    // useAJAX ? postSettingsAJAX() : postSettings()
   }
 }
 
@@ -1687,7 +1696,7 @@ function setFirstChessComToStorage() {
   const v = (isFirstChessCom ? '1' : '')
   localStorage.setItem('isFirstChessCom', v)
   //временно закомментарено, пока недоступна кнопка 'User'
-  useAJAX ? postSettingsAJAX() : postSettings()
+  // useAJAX ? postSettingsAJAX() : postSettings()
 }
 
 function clearSettings() {
@@ -1836,6 +1845,8 @@ function setTheme() {
 
   const v = isDarkTheme ? '1' : '0'
   localStorage.setItem('DarkThemeChecked', v)
+
+  goMainModeFromSettings()
 }
 
 function is_mobile_device() {
