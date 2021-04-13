@@ -46,13 +46,18 @@
 
       <main>
 
-        <p id="groups">
-          <center>
-            Group:
-            <select id="group">
-            </select>
-          </center>
-        </p>
+        <div id="groupLine">
+          <p>
+            <center>
+              Group:
+              <select id="group" class="select"></select>
+              <input @click="vueGroupAdd" class="buttonRefresh" type="button" value="add (+)" id="buttonGroupAdd"
+                title="Add group">
+              <input @click="vueGroupDel" class="buttonRefresh" type="button" value="del (-)" id="buttonGroupDel"
+                title="Delete group">
+            </center>
+          </p>
+        </div>
 
         <form>
           <label id="InputOrder1" class="oneLine" for="elemTextLichessOrgPlayerNames">

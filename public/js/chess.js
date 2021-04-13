@@ -20,6 +20,8 @@ const root = {
     }
   },
   methods: {
+    vueGroupAdd() { groupAdd() },
+    vueGroupDel() { groupDel() },
     vueGoUserMode() { goUserMode() },
     vueRefresh() { refresh() },
     vueOnClickCheckLichess() {
@@ -101,25 +103,12 @@ const mapDefaultChessComPlayers = new Map([
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
 
+let groupObjs, startGroupNum, groupNames, currentGroupName
+initGroupObjs()
+
 //milliseconds for refresh table after 'await fetch'
 const lichessDelay = 1000
 const chessComDelay = 4000
-
-let groupObjs = [
-  {
-    name: 'Start',
-    lichessPlayerNames: lichessDefaultPlayers,
-    chessComPlayerNames: chessComDefaultPlayers
-  },
-  {
-    name: 'World top',
-    lichessPlayerNames: 'DrNykterstein',
-    chessComPlayerNames: 'MagnusCarlsen Hikaru LachesisQ'
-  },
-]
-let groupNames = groupObjs.map(item => item.name)
-const startGroupNum = groupObjs.length
-let currentGroupName = groupNames[0]
 
 let isFirstChessCom = false
 let lastSortSelectorLichess = '', lastSortSelectorChessCom = ''
@@ -141,7 +130,7 @@ if (isMobileDevice) {
 
 // ------------- On-Click ---------------
 
-document.querySelector('#group').onchange = () => selectGroup()
+document.querySelector('#group').onchange = () => onchangeSelectGroup()
 
 //login
 document.querySelector('#buttonPostRegistration').onclick = () => postRegistration()
@@ -183,32 +172,49 @@ if (needRefresh) {
 
 /////////////////// groups of players /////////////////////////
 
+function initGroupObjs() {
+  groupObjs = [
+    {
+      name: 'Start',
+      lichessPlayerNames: lichessDefaultPlayers,
+      chessComPlayerNames: chessComDefaultPlayers
+    },
+    {
+      name: 'World top',
+      lichessPlayerNames: 'DrNykterstein',
+      chessComPlayerNames: 'MagnusCarlsen Hikaru LachesisQ'
+    },
+  ]
+  startGroupNum = groupObjs.length
+  groupNames = getArGroupNames()
+  currentGroupName = groupNames[0]
+}
+
 function fillElementGroup() {
-  let group = document.getElementById('group')
+  let groupElement = document.getElementById('group')
   for (let i = 0; i < groupNames.length; i++) {
-    let option = document.createElement("option")
-    option.value = option.innerHTML = groupNames[i]
-    if (option.value === currentGroupName) {
-      option.selected = true
-    }
-    group.appendChild(option)
+    addOptionToSelectElement(groupElement, groupNames[i], currentGroupName)
   }
+}
+
+function addOptionToSelectElement(selectElement, optionValue, currentOptionValue) {
+  const option = document.createElement("option")
+  option.value = optionValue
+  option.innerHTML = '<strong><em>' + optionValue + '</em></strong>'
+  if (option.value === currentOptionValue) {
+    option.selected = true
+  }
+  selectElement.appendChild(option)
 }
 
 //after select of group there are:
 //group.value, group.selectedIndex (0 ... N), group.options[selectedIndex].selected (true/false)
-function selectGroup() {
+function onchangeSelectGroup() {
   const group = document.getElementById('group')
-  // alert(group.value + ':' + group.selectedIndex + ':' + group.options[group.selectedIndex].selected)
   let groupObj = groupObjs.find(item => item.name === group.value)
   currentGroupName = groupObj.name
   setLichessOrgPlayerNames(groupObj.lichessPlayerNames)
   setChessComPlayerNames(groupObj.chessComPlayerNames)
-
-  // const playerListDisabled = (group.selectedIndex < startGroupNum - 1)
-  // document.getElementById('elemTextLichessOrgPlayerNames').disabled = playerListDisabled
-  // document.getElementById('elemTextChessComPlayerNames').disabled = playerListDisabled
-
   refresh()
 }
 
@@ -216,6 +222,95 @@ function updateGroupObj() {
   const groupObj = groupObjs.find(item => item.name === currentGroupName)
   groupObj.lichessPlayerNames = vm.vueLichessOrgPlayerNames
   groupObj.chessComPlayerNames = vm.vueChessComPlayerNames
+}
+
+function getArGroupNames() {
+  return groupObjs.map(item => item.name)
+}
+
+function groupAdd() {
+  const MAX_GROUPS_NUM = 10
+  const MAX_GROUPNAME_LEN = 30
+  let v
+
+  if (getArGroupNames().length === MAX_GROUPS_NUM) {
+    alert(`${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !`)
+    return
+  }
+
+  const groupName = prompt('Input name of new group:', '')
+  if (groupName === null || groupName === '') {
+    return
+  }
+  if (groupName.length > MAX_GROUPNAME_LEN) {
+    alert(`The name must not exceed ${MAX_GROUPNAME_LEN} characters !`)
+    return
+  }
+  v = groupName.toUpperCase()
+  const groupObj = groupObjs.find(item => item.name.toUpperCase() === v)
+  if (groupObj !== undefined) {
+    alert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
+    return
+  }
+
+  //add new group
+  groupObjs.push({
+    name: groupName,
+    lichessPlayerNames: vm.vueLichessOrgPlayerNames,
+    chessComPlayerNames: vm.vueChessComPlayerNames
+  })
+  currentGroupName = groupName
+
+  const groupElement = document.getElementById('group')
+  addOptionToSelectElement(groupElement, currentGroupName, currentGroupName)
+
+  setDataToStorage()
+  alert(`It's created group "${groupName}" with the current lists of players.\n\nChange player lists !`)
+}
+
+//del current group
+function groupDel() {
+
+  let groupName = currentGroupName
+
+  const groupIndex = groupNames.indexOf(groupName, 0)
+  if (groupIndex > -1 && groupIndex < startGroupNum) {
+    alert(`Group "${groupName}" cannot be deleted !`)
+    return
+  }
+
+  if (!confirm(`Delete group "${groupName}" ?`)) {
+    return
+  }
+
+  const groupElement = document.getElementById('group')
+  groupElement.options[groupIndex] = null
+  groupElement.options[0].selected = true
+
+  groupObjs = groupObjs.filter((item, index, array) => index !== groupIndex) //del group from groupObjs
+  groupNames = getArGroupNames()
+  currentGroupName = groupNames[0] //go to group Start
+
+  onchangeSelectGroup()
+  setDataToStorage()
+
+  alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
+}
+
+function clearUserOptionsForElementGroup() {
+  const groupElement = document.getElementById('group')
+  let opts = groupElement.options;
+  while (opts.length > startGroupNum) {
+    opts[opts.length - 1] = null
+  }
+}
+
+function clearGroupSettings() {
+  initGroupObjs()
+  fillElementGroup()
+  setLichessOrgPlayerNames(lichessDefaultPlayers)
+  setChessComPlayerNames(chessComDefaultPlayers)
+  clearUserOptionsForElementGroup()
 }
 
 /////////////////// exchange data with server (Login, Logout, Registration, ...) by AJAX /////////////////////////
@@ -1331,7 +1426,7 @@ async function fetchGetLichessOrg(rowNum, playerName) {
     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
     let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
       + onlineSymbol + '<strong>' + playerTitle + playerName + '</strong></a>'
-      + (lastOnline ? '<br><span class="lastOnline">' + lastOnline.replace(',', '') + '</span>' : '')
+      + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
     // document.querySelector('.lplayer' + rowNum).innerHTML = playerHTML
 
     const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1482,7 +1577,7 @@ async function fetchGetChessCom(rowNum, playerName) {
 //14.11.2021, 11:25:17 --> 14.11.2021 11:25
 function getDateHHMM(milliseconds) {
   let lastOnline = (new Date(milliseconds)).toLocaleString() //14.11.2021, 11:25:17
-  lastOnline = lastOnline.replace(',', '') //del comma
+  // lastOnline = lastOnline.replace(',', '') //del comma
   lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25
   return lastOnline
 }
@@ -1610,11 +1705,6 @@ function setElementNonVisible(elem) {
 function getDataFromStorage() {
   let v
 
-  v = localStorage.getItem('groupObjs')
-  if (v && (v !== '') && (v !== 'undefined')) {
-    groupObjs = JSON.parse(v)
-  }
-
   v = localStorage.getItem('currentGroupName')
   if (!v) {
     v = currentGroupName
@@ -1623,20 +1713,32 @@ function getDataFromStorage() {
     currentGroupName = v
   }
 
-  v = localStorage.getItem('LichessOrgPlayerNames')
-  if (!v) {
-    v = lichessDefaultPlayers
-  }
-  if (v !== '') {
+  v = localStorage.getItem('groupObjs')
+  if (v && (v !== '') && (v !== 'undefined')) {
+    groupObjs = JSON.parse(v)
+    groupNames = getArGroupNames()
+    v = localStorage.getItem('LichessOrgPlayerNames')
     setLichessOrgPlayerNames(v)
-  }
-
-  v = localStorage.getItem('ChessComPlayerNames')
-  if (!v) {
-    v = chessComDefaultPlayers
-  }
-  if (v !== '') {
+    v = localStorage.getItem('ChessComPlayerNames')
     setChessComPlayerNames(v)
+
+  } else {
+
+    v = localStorage.getItem('LichessOrgPlayerNames')
+    if (!v) {
+      v = lichessDefaultPlayers
+    }
+    if (v !== '') {
+      setLichessOrgPlayerNames(v)
+    }
+
+    v = localStorage.getItem('ChessComPlayerNames')
+    if (!v) {
+      v = chessComDefaultPlayers
+    }
+    if (v !== '') {
+      setChessComPlayerNames(v)
+    }
   }
 
   v = localStorage.getItem('LichessChecked')
@@ -1700,12 +1802,18 @@ function setFirstChessComToStorage() {
 }
 
 function clearSettings() {
+
+  if (!confirm('All settings will be cleared.\n\nAre you sure ?')) {
+    return
+  }
+
   localStorage.clear()
 
   setAutoRefreshInterval('')
   setCheckDarkTheme(false)
-  setLichessOrgPlayerNames('')
-  setChessComPlayerNames('')
+
+  //leave first fixed groups (Start, World Top)
+  clearGroupSettings()
 
   if (isFirstChessCom) {
     isFirstChessCom = false
