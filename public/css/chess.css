@@ -190,6 +190,7 @@ td {
 .lastOnline{
   font-size: x-small;
   color: gray;
+  font-weight: bold;
 }
 
 footer {
