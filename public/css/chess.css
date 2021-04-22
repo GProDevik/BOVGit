@@ -37,8 +37,16 @@ html {
   border-radius: 6px;
 }
 
+.buttonGroup {
+  font-size: small;
+  font-style: italic;
+  margin-left: 1vw;
+}
+
+
 .select {
-  font-weight: bold;
+  font-size: medium;
+  /* font-weight: bold; */
 }
 
 /* -------- Form ----------- */
@@ -85,7 +93,6 @@ html {
 
 .msgChangePlayerList {
   font-size: small;
-  /* font-size: x-small; */
   font-style: italic;
   color: gray;
 }

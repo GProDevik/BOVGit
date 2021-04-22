@@ -1296,15 +1296,14 @@ async function fillTableFromServer(thisIsLichess) {
 
   // getDataFromServer(thisIsLichess, arPlayerNames)
   // const milliSeconds = thisIsLichess ? lichessDelay : 2000
-  // setTimeout(function () { correctSort(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+  // setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
 
   if (thisIsLichess) {
     await getDataFromLichess(thisIsLichess, arPlayerNames)
-    correctSort(thisIsLichess, arPlayerNames)
   } else {
     await getDataFromChessCom(thisIsLichess, arPlayerNames)
-    correctSort(thisIsLichess, arPlayerNames)
   }
+  showTableContent(thisIsLichess, arPlayerNames)
 
   //временно закомментарено
   // //delete unnecessary last rows (if number of players less than number of rows)
@@ -1371,7 +1370,7 @@ async function getDataFromLichess(thisIsLichess, arPlayerNames) {
       //playerHTML (href !)
       const playerURL = getJsonValue1(playerName, jsonObj, 'url')
       let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-        + onlineSymbol + playerTitle + playerName + '</a>'
+        + onlineSymbol + playerTitle + '<strong>' + playerName + '</strong></a>'
         + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
 
       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1450,32 +1449,85 @@ async function getDataFromLichess(thisIsLichess, arPlayerNames) {
 //   })
 // }
 
+// async function getDataFromChessCom(thisIsLichess, arPlayerNames) {
+
+//   let arFideRatings = [...arPlayerNames]
+//   arFideRatings = arFideRatings.map(item => '')
+
+//   //get statistics for player
+//   let statResults = await getFetchResultsFromServer(thisIsLichess, arPlayerNames, '/stats')
+//   statResults.forEach((jsonObj, index) => {
+//     let playerName = arPlayerNames[index]
+//     let playerHTML = playerName
+//     let bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+//     let blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+//     let rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+//     let puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+//     let rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+//     arFideRatings[index] = getJsonValue1(playerName, jsonObj, 'fide')
+//     vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+//   })
+
+//   //get profile for player
+//   let profileResults = await getFetchResultsFromServer(thisIsLichess, arPlayerNames)
+//   profileResults.forEach((jsonObj, index) => {
+//     let playerName = arPlayerNames[index]
+//     // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
+//     let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
+//     let playerHint = '', fideRating = ''
+
+//     //my own description ! ('Creator of ...')
+//     let v = mapDefaultChessComPlayers.get(playerName)
+//     playerHint = v ? v + '\n\n' : ''
+
+//     playerURL = getJsonValue1(playerName, jsonObj, 'url')
+
+//     if (playerURL === '' || playerURL === undefined) {
+//       playerHTML = '<em>' + playerName + '</em>' //player not found
+//     }
+//     else {
+//       //title (GM, IM, FM, ...)
+//       v = getJsonValue1(playerName, jsonObj, 'title')
+//       playerTitle = (v === undefined) ? '' : v + ' '
+
+//       const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
+//       const location = getJsonValue1(playerName, jsonObj, 'location')
+
+//       v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
+//       if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
+
+//       v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login
+//       if (v) { lastOnline = getDateHHMM(v * 1000) }
+
+//       playerHint += (name ? name : '')
+//         + (location ? ', ' + location : '')
+
+//       fideRating = arFideRatings[index]
+//       playerHint += (fideRating ? ', FIDE ' + fideRating : '')
+//       playerHint += (playerHint ? '\n' : '')
+//         + 'reg. ' + createdAt
+//         + '\nlast online ' + lastOnline
+//       playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+//         + onlineSymbol + playerTitle + playerName + '</a>'
+//         + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+//     }
+//     vm.vueArChessComPlayersBuf[index].playerHTML = playerHTML
+//   })
+// }
+
 async function getDataFromChessCom(thisIsLichess, arPlayerNames) {
 
+  const META_FIDE = '@FIDE@'
   let arFideRatings = [...arPlayerNames]
   arFideRatings = arFideRatings.map(item => '')
-
-  //get statistics for player
-  let statResults = await getFetchResultsFromServer(thisIsLichess, arPlayerNames, '/stats')
-  statResults.forEach((jsonObj, index) => {
-    let playerName = arPlayerNames[index]
-    let playerHTML = playerName
-    let bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
-    let blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
-    let rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
-    let puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
-    let rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
-    arFideRatings[index] = getJsonValue1(playerName, jsonObj, 'fide')
-    vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
-  })
 
   //get profile for player
   let profileResults = await getFetchResultsFromServer(thisIsLichess, arPlayerNames)
   profileResults.forEach((jsonObj, index) => {
     let playerName = arPlayerNames[index]
-    console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
+    // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
     let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
-    let playerHint = '', fideRating = ''
+    let playerHint = ''
 
     //my own description ! ('Creator of ...')
     let v = mapDefaultChessComPlayers.get(playerName)
@@ -1503,16 +1555,33 @@ async function getDataFromChessCom(thisIsLichess, arPlayerNames) {
       playerHint += (name ? name : '')
         + (location ? ', ' + location : '')
 
-      fideRating = arFideRatings[index]
-      playerHint += (fideRating ? ', FIDE ' + fideRating : '')
+      playerHint += META_FIDE
       playerHint += (playerHint ? '\n' : '')
         + 'reg. ' + createdAt
         + '\nlast online ' + lastOnline
       playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-        + onlineSymbol + playerTitle + playerName + '</a>'
+        + onlineSymbol + playerTitle + '<strong>' + playerName + '</strong></a>'
         + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
     }
-    vm.vueArChessComPlayersBuf[index].playerHTML = playerHTML
+    const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
+    vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+  })
+
+  //get statistics for player
+  let statResults = await getFetchResultsFromServer(thisIsLichess, arPlayerNames, '/stats')
+  statResults.forEach((jsonObj, index) => {
+    let playerName = arPlayerNames[index]
+
+    const fideRating = getJsonValue1(playerName, jsonObj, 'fide')
+    const fideRatingString = fideRating ? `, FIDE ${fideRating}` : ''
+    const playerHTML = vm.vueArChessComPlayersBuf[index].playerHTML.replace(META_FIDE, fideRatingString)
+
+    const bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+    const blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+    const rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+    const puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+    const rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+    vm.vueArChessComPlayersBuf[index] = { playerHTML, playerName, bullet, blitz, rapid, puzzle, rush }
   })
 }
 
@@ -1572,7 +1641,7 @@ function _getDataFromServer(thisIsLichess, arPlayerNames) {
 }
 
 //resort table (it's random order sometimes after refresh by ajax)
-function correctSort(thisIsLichess, arPlayerNames) {
+function showTableContent(thisIsLichess, arPlayerNames) {
 
   if (arPlayerNames.length === 0) {
     return
@@ -1601,6 +1670,7 @@ function correctSort(thisIsLichess, arPlayerNames) {
     // vm.vueArChessComPlayers = JSON.parse(JSON.stringify(arTmp))
   }
 }
+
 
 function _fetchPlayer(thisIsLichess, rowNum, playerName) {
   // thisIsLichess ? fetchGetLichessOrg(rowNum, playerName) :
@@ -1826,7 +1896,7 @@ function getJsonValue1(playerName, jsonObj, field1) {
     value = jsonObj[field1]
   }
   catch (err) {
-    console.log('Error in getJsonValue1(): playerName=' + playerName + ' ' + field1 + ': ' + err)
+    //   console.log('Error in getJsonValue1(): playerName=' + playerName + ' ' + field1 + ': ' + err)
   }
   return value
 }
@@ -1837,7 +1907,7 @@ function getJsonValue2(playerName, jsonObj, field1, field2) {
     value = jsonObj[field1][field2]
   }
   catch (err) {
-    console.log('Error in getJsonValue2(): playerName=' + playerName + ' ' + field1 + '.' + field2 + ': ' + err)
+    //   console.log('Error in getJsonValue2(): playerName=' + playerName + ' ' + field1 + '.' + field2 + ': ' + err)
   }
   return value
 }
@@ -1848,7 +1918,7 @@ function getJsonValue3(playerName, jsonObj, field1, field2, field3) {
     value = jsonObj[field1][field2][field3]
   }
   catch (err) {
-    console.log('Error in getJsonValue3(): playerName=' + playerName + ' ' + field1 + '.' + field2 + '.' + field3 + ': ' + err)
+    //   console.log('Error in getJsonValue3(): playerName=' + playerName + ' ' + field1 + '.' + field2 + '.' + field3 + ': ' + err)
   }
   return value
 }
