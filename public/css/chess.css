@@ -39,7 +39,7 @@ html {
 
 .buttonGroup {
   font-size: small;
-  font-style: italic;
+  /* font-style: italic; */
   margin-left: 1vw;
 }
 

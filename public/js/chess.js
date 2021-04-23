@@ -74,6 +74,7 @@ const useAJAX = true //for exchange data between server & client
 const DISCONNECTED_TEXT = '  (disconnected)'
 const sortSymbolAtHead = '↑' //&#8593
 const onlineSymbolAtPlayer = '&#10004;' //check
+const META_FIDE = '@FIDE@'
 const mapTimeControl = new Map([
   ['player', 0],
   ['bullet', 1],
@@ -291,7 +292,11 @@ function groupDel() {
   groupNames = getArGroupNames()
   currentGroupName = groupNames[0] //go to group Start
 
-  onchangeSelectGroup()
+  // onchangeSelectGroup()
+  setLichessOrgPlayerNames(groupObjs[0].lichessPlayerNames)
+  setChessComPlayerNames(groupObjs[0].chessComPlayerNames)
+  refresh()
+
   setDataToStorage()
 
   alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
@@ -1299,9 +1304,9 @@ async function fillTableFromServer(thisIsLichess) {
   // setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
 
   if (thisIsLichess) {
-    await getDataFromLichess(thisIsLichess, arPlayerNames)
+    await getDataFromLichess(arPlayerNames)
   } else {
-    await getDataFromChessCom(thisIsLichess, arPlayerNames)
+    await getDataFromChessCom(arPlayerNames)
   }
   showTableContent(thisIsLichess, arPlayerNames)
 
@@ -1315,8 +1320,8 @@ async function fillTableFromServer(thisIsLichess) {
   // }
 }
 
-async function getDataFromLichess(thisIsLichess, arPlayerNames) {
-  let profileResults = await getFetchResultsFromServer(thisIsLichess, arPlayerNames)
+async function getDataFromLichess(arPlayerNames) {
+  let profileResults = await getFetchResultsFromServer(true, arPlayerNames)
   profileResults.forEach((jsonObj, index) => {
     let playerName = arPlayerNames[index]
     if (jsonObj === null) {
@@ -1515,16 +1520,87 @@ async function getDataFromLichess(thisIsLichess, arPlayerNames) {
 //   })
 // }
 
-async function getDataFromChessCom(thisIsLichess, arPlayerNames) {
+// async function getDataFromChessCom(arPlayerNames) {
 
-  const META_FIDE = '@FIDE@'
-  let arFideRatings = [...arPlayerNames]
-  arFideRatings = arFideRatings.map(item => '')
+//   const META_FIDE = '@FIDE@'
+//   // let arFideRatings = [...arPlayerNames]
+//   // arFideRatings = arFideRatings.map(item => '')
+
+//   //get profile for player
+//   let profileResults = await getFetchResultsFromServer(false, arPlayerNames)
+//   profileResults.forEach((jsonObj, index) => {
+//     let playerName = arPlayerNames[index]
+//     // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
+//     let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
+//     let playerHint = ''
+
+//     //my own description ! ('Creator of ...')
+//     let v = mapDefaultChessComPlayers.get(playerName)
+//     playerHint = v ? v + '\n\n' : ''
+
+//     playerURL = getJsonValue1(playerName, jsonObj, 'url')
+
+//     if (playerURL === '' || playerURL === undefined) {
+//       playerHTML = '<em>' + playerName + '</em>' //player not found
+//     }
+//     else {
+//       //title (GM, IM, FM, ...)
+//       v = getJsonValue1(playerName, jsonObj, 'title')
+//       playerTitle = (v === undefined) ? '' : v + ' '
+
+//       const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
+//       const location = getJsonValue1(playerName, jsonObj, 'location')
+
+//       v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
+//       if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
+
+//       v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login
+//       if (v) { lastOnline = getDateHHMM(v * 1000) }
+
+//       playerHint += (name ? name : '')
+//         + (location ? ', ' + location : '')
+
+//       playerHint += META_FIDE
+//       playerHint += (playerHint ? '\n' : '')
+//         + 'reg. ' + createdAt
+//         + '\nlast online ' + lastOnline
+//       playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+//         + onlineSymbol + playerTitle + '<strong>' + playerName + '</strong></a>'
+//         + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+//     }
+//     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
+//     vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+//   })
+
+//   //get statistics for player
+//   let statResults = await getFetchResultsFromServer(false, arPlayerNames, '/stats')
+//   statResults.forEach((jsonObj, index) => {
+//     let playerName = arPlayerNames[index]
+
+//     const fideRating = getJsonValue1(playerName, jsonObj, 'fide')
+//     const fideRatingString = fideRating ? `, FIDE ${fideRating}` : ''
+//     const playerHTML = vm.vueArChessComPlayersBuf[index].playerHTML.replace(META_FIDE, fideRatingString)
+
+//     const bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+//     const blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+//     const rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+//     const puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+//     const rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+//     vm.vueArChessComPlayersBuf[index] = { playerHTML, playerName, bullet, blitz, rapid, puzzle, rush }
+//   })
+// }
+
+async function getDataFromChessCom(arPlayerNames) {
+  await getProfileAfterFetchFromChessCom(arPlayerNames)
+  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+}
+
+async function getProfileAfterFetchFromChessCom(arPlayerNames) {
 
   //get profile for player
-  let profileResults = await getFetchResultsFromServer(thisIsLichess, arPlayerNames)
+  let profileResults = await getFetchResultsFromServer(false, arPlayerNames)
   profileResults.forEach((jsonObj, index) => {
-    let playerName = arPlayerNames[index]
+    const playerName = arPlayerNames[index]
     // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
     let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
     let playerHint = ''
@@ -1566,14 +1642,18 @@ async function getDataFromChessCom(thisIsLichess, arPlayerNames) {
     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
     vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
   })
+}
+
+async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
 
   //get statistics for player
-  let statResults = await getFetchResultsFromServer(thisIsLichess, arPlayerNames, '/stats')
+  let statResults = await getFetchResultsFromServer(false, arPlayerNames, '/stats')
   statResults.forEach((jsonObj, index) => {
-    let playerName = arPlayerNames[index]
+    const playerName = arPlayerNames[index]
 
     const fideRating = getJsonValue1(playerName, jsonObj, 'fide')
     const fideRatingString = fideRating ? `, FIDE ${fideRating}` : ''
+    // console.log(index)
     const playerHTML = vm.vueArChessComPlayersBuf[index].playerHTML.replace(META_FIDE, fideRatingString)
 
     const bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
@@ -1626,19 +1706,19 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
 }
 
 // async function getDataFromServer(thisIsLichess, arPlayerNames) {
-function _getDataFromServer(thisIsLichess, arPlayerNames) {
-  // let rowNum = 0 //неиспользуемая переменная
-  // for (let step = 0; step < arPlayerNames.length; step++) {
-  //   const playerName = arPlayerNames[step]
-  //   if (playerName !== '') {
-  //     // if (++rowNum > getTableRowsNumber(thisIsLichess)) {
-  //     // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
-  //     // }
-  //     fetchPlayer(thisIsLichess, rowNum, playerName)
-  //   }
-  // }
-  // // return Promise.resolve("bla-bla")
-}
+// function getDataFromServer(thisIsLichess, arPlayerNames) {
+// let rowNum = 0 //неиспользуемая переменная
+// for (let step = 0; step < arPlayerNames.length; step++) {
+//   const playerName = arPlayerNames[step]
+//   if (playerName !== '') {
+//     // if (++rowNum > getTableRowsNumber(thisIsLichess)) {
+//     // addRowToTable(thisIsLichess, rowNum) //временно закомментарено
+//     // }
+//     fetchPlayer(thisIsLichess, rowNum, playerName)
+//   }
+// }
+// // return Promise.resolve("bla-bla")
+// }
 
 //resort table (it's random order sometimes after refresh by ajax)
 function showTableContent(thisIsLichess, arPlayerNames) {
@@ -1671,216 +1751,210 @@ function showTableContent(thisIsLichess, arPlayerNames) {
   }
 }
 
+// function fetchPlayer(thisIsLichess, rowNum, playerName) {
+//   thisIsLichess ? fetchGetLichessOrg(rowNum, playerName) :
+//     fetchGetChessCom(rowNum, playerName)
+// }
 
-function _fetchPlayer(thisIsLichess, rowNum, playerName) {
-  // thisIsLichess ? fetchGetLichessOrg(rowNum, playerName) :
-  //   fetchGetChessCom(rowNum, playerName)
-}
+// //------------------------------------------------------
+// //fill table's row for player on Lichess.org
+// async function fetchGetLichessOrg(rowNum, playerName) {
 
-//------------------------------------------------------
-//fill table's row for player on Lichess.org
-async function _fetchGetLichessOrg(rowNum, playerName) {
+//   //clearRowLichess(rowNum) //временно закомментарено
 
-  // //clearRowLichess(rowNum) //временно закомментарено
+//   const url = urlHttpServiceLichess + playerName
+//   const response = await fetch(url)
+//   if (response.ok) { // HTTP-state in 200-299
+//     const jsonObj = await response.json() // read answer in JSON
 
-  // // https://lichess.org/api#section/Introduction/Endpoint
-  // // All requests are rate limited using various strategies, to ensure the API remains responsive for everyone.
-  // // Only make one request at a time.
-  // // If you receive an HTTP response with a 429 status, please wait a full minute before resuming API usage.
+//     const isOnline = getJsonValue1(playerName, jsonObj, 'online')
+//     const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
 
-  // const url = urlHttpServiceLichess + playerName
-  // const response = await fetch(url)
-  // if (response.ok) { // HTTP-state in 200-299
-  //   const jsonObj = await response.json() // read answer in JSON
+//     //playerTitle: title of player (GM, IM, FM, ...)
+//     let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
+//     playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
 
-  //   const isOnline = getJsonValue1(playerName, jsonObj, 'online')
-  //   const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
+//     //playerHint
+//     let playerHint = ''
+//     let v = mapDefaultLichessPlayers.get(playerName)
+//     if (v) { playerHint = v + '\n\n' }
+//     const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
+//     const lastName = getJsonValue2(playerName, jsonObj, 'profile', 'lastName')
+//     const location = getJsonValue2(playerName, jsonObj, 'profile', 'location')
+//     const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
+//     const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
+//     const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
 
-  //   //playerTitle: title of player (GM, IM, FM, ...)
-  //   let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
-  //   playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
+//     let createdAt = '' //registration date
+//     v = getJsonValue1(playerName, jsonObj, 'createdAt')
+//     if (v) { createdAt = (new Date(v)).getFullYear() }
 
-  //   //playerHint
-  //   let playerHint = ''
-  //   let v = mapDefaultLichessPlayers.get(playerName)
-  //   if (v) { playerHint = v + '\n\n' }
-  //   const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
-  //   const lastName = getJsonValue2(playerName, jsonObj, 'profile', 'lastName')
-  //   const location = getJsonValue2(playerName, jsonObj, 'profile', 'location')
-  //   const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
-  //   const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
-  //   const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
+//     let lastOnline = '' //lastOnline date&time
+//     v = getJsonValue1(playerName, jsonObj, 'seenAt')
+//     if (v) { lastOnline = getDateHHMM(v) }
 
-  //   let createdAt = '' //registration date
-  //   v = getJsonValue1(playerName, jsonObj, 'createdAt')
-  //   if (v) { createdAt = (new Date(v)).getFullYear() }
+//     const firstPart = (firstName ? firstName + ' ' : '')
+//       + (lastName ? lastName : '')
+//       + (location ? ', ' + location : '')
+//       + (fideRating ? ', FIDE ' + fideRating : '')
+//     playerHint += firstPart
+//       + (firstPart ? '\n' : '')
+//       + (createdAt ? 'reg. ' + createdAt : '')
+//       + (lastOnline ? '\nlast online ' + lastOnline : '')
+//       + '\n'
+//       + (bio ? '\n' + bio : '')
+//       + (links ? '\n' + links : '')
 
-  //   let lastOnline = '' //lastOnline date&time
-  //   v = getJsonValue1(playerName, jsonObj, 'seenAt')
-  //   if (v) { lastOnline = getDateHHMM(v) }
+//     //playerHTML (href !)
+//     const playerURL = getJsonValue1(playerName, jsonObj, 'url')
+//     let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+//       + onlineSymbol + playerTitle + playerName + '</a>'
+//       + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+//     // document.querySelector('.lplayer' + rowNum).innerHTML = playerHTML
 
-  //   const firstPart = (firstName ? firstName + ' ' : '')
-  //     + (lastName ? lastName : '')
-  //     + (location ? ', ' + location : '')
-  //     + (fideRating ? ', FIDE ' + fideRating : '')
-  //   playerHint += firstPart
-  //     + (firstPart ? '\n' : '')
-  //     + (createdAt ? 'reg. ' + createdAt : '')
-  //     + (lastOnline ? '\nlast online ' + lastOnline : '')
-  //     + '\n'
-  //     + (bio ? '\n' + bio : '')
-  //     + (links ? '\n' + links : '')
+//     const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
+//     // document.querySelector('.lbullet' + rowNum).textContent = bullet
+//     const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
+//     // document.querySelector('.lblitz' + rowNum).textContent = blitz
+//     const rapid = getJsonValue3(playerName, jsonObj, 'perfs', 'rapid', 'rating')
+//     // document.querySelector('.lrapid' + rowNum).textContent = rapid
+//     const puzzle = getJsonValue3(playerName, jsonObj, 'perfs', 'puzzle', 'rating')
+//     // document.querySelector('.lpuzzle' + rowNum).textContent = puzzle
+//     const rush = getJsonValue3(playerName, jsonObj, 'perfs', 'storm', 'score') //rush (max)
+//     // document.querySelector('.lrush' + rowNum).textContent = rush
 
-  //   //playerHTML (href !)
-  //   const playerURL = getJsonValue1(playerName, jsonObj, 'url')
-  //   let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-  //     + onlineSymbol + playerTitle + playerName + '</a>'
-  //     + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
-  //   // document.querySelector('.lplayer' + rowNum).innerHTML = playerHTML
+//     //временно
+//     vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
 
-  //   const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
-  //   // document.querySelector('.lbullet' + rowNum).textContent = bullet
-  //   const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
-  //   // document.querySelector('.lblitz' + rowNum).textContent = blitz
-  //   const rapid = getJsonValue3(playerName, jsonObj, 'perfs', 'rapid', 'rating')
-  //   // document.querySelector('.lrapid' + rowNum).textContent = rapid
-  //   const puzzle = getJsonValue3(playerName, jsonObj, 'perfs', 'puzzle', 'rating')
-  //   // document.querySelector('.lpuzzle' + rowNum).textContent = puzzle
-  //   const rush = getJsonValue3(playerName, jsonObj, 'perfs', 'storm', 'score') //rush (max)
-  //   // document.querySelector('.lrush' + rowNum).textContent = rush
-
-  //   //временно
-  //   vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
-
-  // } else {
-  //   console.log(playerName + ' - lichess, response-error: ' + response.status)
-  //   //player not found
-  //   // document.querySelector('.lplayer' + rowNum).innerHTML = '? ' + playerName
-  //   //временно
-  //   vm.vueArLichessPlayersBuf.push({
-  //     // playerHTML: '<em>? ' + playerName + '</em>',
-  //     playerHTML: '<em>' + playerName + '</em>',
-  //     playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: ''
-  //   })
-  // }
-}
+//   } else {
+//     console.log(playerName + ' - lichess, response-error: ' + response.status)
+//     //player not found
+//     // document.querySelector('.lplayer' + rowNum).innerHTML = '? ' + playerName
+//     //временно
+//     vm.vueArLichessPlayersBuf.push({
+//       // playerHTML: '<em>? ' + playerName + '</em>',
+//       playerHTML: '<em>' + playerName + '</em>',
+//       playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: ''
+//     })
+//   }
+// }
 
 //------------------------------------------------------
 //fill table's row for player on Chess.com
-async function _fetchGetChessCom(rowNum, playerName) {
+// async function fetchGetChessCom(rowNum, playerName) {
 
-  // let url, response, cell, isOK1 = false, isOK2 = false
-  // let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
-  // let bullet = '', blitz = '', rapid = '', puzzle = '', rush = '', playerHint = '', fideRating = ''
+//   let url, response, cell, isOK1 = false, isOK2 = false
+//   let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
+//   let bullet = '', blitz = '', rapid = '', puzzle = '', rush = '', playerHint = '', fideRating = ''
 
-  // // clearRowChessCom(rowNum) //временно закомментарено
+//   // clearRowChessCom(rowNum) //временно закомментарено
 
-  // //закомментарено, пока не наладится работа api на chess.com:
-  // //не выдается параметр 'is-online' и уже не будет выдаваться в обозримом будущем, т.к. это сильно грузило chess.com
-  // //см. https://www.chess.com/clubs/forum/view/api-rfc-deprecate-and-remove-is-online-endpoint
-  // // //is-online
-  // // url = urlHttpServiceChessCom + playerName + '/is-online'
-  // // try {
-  // //   response = await fetch(url)
-  // //   if (response.ok) { // HTTP-state in 200-299
-  // //     let jsonObj = await response.json() // read answer in JSON
-  // //     let isOnline = getJsonValue1(playerName, jsonObj, 'online')
-  // //     onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
-  // //   } else {
-  // //     console.log(playerName + ' - chess.com, is-online, response-error: ' + response.status)
-  // //   }
-  // // } catch (err) {
-  // //   console.log(playerName + ' - chess.com, is-online, fetch-error: ' + err)
-  // // }
+//   //закомментарено, пока не наладится работа api на chess.com:
+//   //не выдается параметр 'is-online' и уже не будет выдаваться в обозримом будущем, т.к. это сильно грузило chess.com
+//   //см. https://www.chess.com/clubs/forum/view/api-rfc-deprecate-and-remove-is-online-endpoint
+//   // //is-online
+//   // url = urlHttpServiceChessCom + playerName + '/is-online'
+//   // try {
+//   //   response = await fetch(url)
+//   //   if (response.ok) { // HTTP-state in 200-299
+//   //     let jsonObj = await response.json() // read answer in JSON
+//   //     let isOnline = getJsonValue1(playerName, jsonObj, 'online')
+//   //     onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
+//   //   } else {
+//   //     console.log(playerName + ' - chess.com, is-online, response-error: ' + response.status)
+//   //   }
+//   // } catch (err) {
+//   //   console.log(playerName + ' - chess.com, is-online, fetch-error: ' + err)
+//   // }
 
-  // //playerHint
-  // let v = mapDefaultChessComPlayers.get(playerName)
-  // playerHint = v ? v + '\n\n' : ''
+//   //playerHint
+//   let v = mapDefaultChessComPlayers.get(playerName)
+//   playerHint = v ? v + '\n\n' : ''
 
-  // //playerHTML (href !)
-  // url = urlHttpServiceChessCom + playerName
-  // try {
-  //   response = await fetch(url)
-  //   if (response.ok) { // HTTP-state in 200-299
-  //     let jsonObj = await response.json() // read answer in JSON
-  //     playerURL = getJsonValue1(playerName, jsonObj, 'url')
-  //     //title (GM, IM, FM, ...)
-  //     v = getJsonValue1(playerName, jsonObj, 'title')
-  //     playerTitle = (v === undefined) ? '' : v + ' '
+//   //playerHTML (href !)
+//   url = urlHttpServiceChessCom + playerName
+//   try {
+//     response = await fetch(url)
+//     if (response.ok) { // HTTP-state in 200-299
+//       let jsonObj = await response.json() // read answer in JSON
+//       playerURL = getJsonValue1(playerName, jsonObj, 'url')
+//       //title (GM, IM, FM, ...)
+//       v = getJsonValue1(playerName, jsonObj, 'title')
+//       playerTitle = (v === undefined) ? '' : v + ' '
 
-  //     const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
-  //     const location = getJsonValue1(playerName, jsonObj, 'location')
+//       const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
+//       const location = getJsonValue1(playerName, jsonObj, 'location')
 
-  //     v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
-  //     if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
+//       v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
+//       if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
 
-  //     v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login
-  //     if (v) { lastOnline = getDateHHMM(v * 1000) }
+//       v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login
+//       if (v) { lastOnline = getDateHHMM(v * 1000) }
 
-  //     playerHint += (name ? name : '')
-  //       + (location ? ', ' + location : '')
-  //   } else {
-  //     console.log(playerName + ' - chess.com, playerURL, response-error: ' + response.status)
-  //   }
-  // } catch (err) {
-  //   console.log(playerName + ' - chess.com, playerURL, fetch-error: ' + err)
-  // } finally {
+//       playerHint += (name ? name : '')
+//         + (location ? ', ' + location : '')
+//     } else {
+//       console.log(playerName + ' - chess.com, playerURL, response-error: ' + response.status)
+//     }
+//   } catch (err) {
+//     console.log(playerName + ' - chess.com, playerURL, fetch-error: ' + err)
+//   } finally {
 
-  //   //player
-  //   //временно закомментарено
-  //   // cell = document.querySelector('.cplayer' + rowNum)
-  //   // if (playerURL === '' || playerURL === undefined) {
-  //   //   cell.innerHTML = '? ' + playerName //player not found
-  //   // }
-  //   // else {
-  //   //   cell.innerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-  //   //     + onlineSymbol + playerTitle + playerName + '</a>'
-  //   // }
-  //   if (playerURL === '' || playerURL === undefined) {
-  //     // playerHTML = '<em>? ' + playerName + '</em>' //player not found
-  //     playerHTML = '<em>' + playerName + '</em>' //player not found
-  //   }
-  //   else {
-  //     isOK1 = true
+//     //player
+//     //временно закомментарено
+//     // cell = document.querySelector('.cplayer' + rowNum)
+//     // if (playerURL === '' || playerURL === undefined) {
+//     //   cell.innerHTML = '? ' + playerName //player not found
+//     // }
+//     // else {
+//     //   cell.innerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+//     //     + onlineSymbol + playerTitle + playerName + '</a>'
+//     // }
+//     if (playerURL === '' || playerURL === undefined) {
+//       // playerHTML = '<em>? ' + playerName + '</em>' //player not found
+//       playerHTML = '<em>' + playerName + '</em>' //player not found
+//     }
+//     else {
+//       isOK1 = true
 
-  //     //bullet, blitz, rapid, puzzle, rush
-  //     url = urlHttpServiceChessCom + playerName + '/stats'
-  //     response = await fetch(url)
-  //     if (response.ok) { // HTTP-state in 200-299
-  //       let jsonObj = await response.json() // read answer in JSON
-  //       bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
-  //       // document.querySelector('.cbullet' + rowNum).textContent = bullet
-  //       blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
-  //       // document.querySelector('.cblitz' + rowNum).textContent = blitz
-  //       rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
-  //       // document.querySelector('.crapid' + rowNum).textContent = rapid
-  //       puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
-  //       // document.querySelector('.cpuzzle' + rowNum).textContent = puzzle
-  //       rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
-  //       // document.querySelector('.crush' + rowNum).textContent = rush
+//       //bullet, blitz, rapid, puzzle, rush
+//       url = urlHttpServiceChessCom + playerName + '/stats'
+//       response = await fetch(url)
+//       if (response.ok) { // HTTP-state in 200-299
+//         let jsonObj = await response.json() // read answer in JSON
+//         bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+//         // document.querySelector('.cbullet' + rowNum).textContent = bullet
+//         blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+//         // document.querySelector('.cblitz' + rowNum).textContent = blitz
+//         rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+//         // document.querySelector('.crapid' + rowNum).textContent = rapid
+//         puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+//         // document.querySelector('.cpuzzle' + rowNum).textContent = puzzle
+//         rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+//         // document.querySelector('.crush' + rowNum).textContent = rush
 
-  //       fideRating = getJsonValue1(playerName, jsonObj, 'fide')
+//         fideRating = getJsonValue1(playerName, jsonObj, 'fide')
 
-  //       isOK2 = true
-  //     } else {
-  //       console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
-  //     }
+//         isOK2 = true
+//       } else {
+//         console.log(playerName + ' - chess.com, bullet...rush, fetch-error: ' + response.status)
+//       }
 
-  //     //временно
-  //     if (isOK1 === true && isOK2 === true) {
-  //       playerHint += (fideRating ? ', FIDE ' + fideRating : '')
-  //       playerHint += (playerHint ? '\n' : '')
-  //         + 'reg. ' + createdAt
-  //         + '\nlast online ' + lastOnline
-  //       playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-  //         + onlineSymbol + playerTitle + playerName + '</a>'
-  //         + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
-  //     }
-  //   }
-  // }
+//       //временно
+//       if (isOK1 === true && isOK2 === true) {
+//         playerHint += (fideRating ? ', FIDE ' + fideRating : '')
+//         playerHint += (playerHint ? '\n' : '')
+//           + 'reg. ' + createdAt
+//           + '\nlast online ' + lastOnline
+//         playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+//           + onlineSymbol + playerTitle + playerName + '</a>'
+//           + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+//       }
+//     }
+//   }
 
-  // vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
-}
+//   vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+// }
 
 //14.11.2021, 11:25:17 --> 14.11.2021 11:25
 function getDateHHMM(milliseconds) {
