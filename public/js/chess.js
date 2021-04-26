@@ -91,7 +91,8 @@ const mapDefaultLichessPlayers = new Map([
   ['Challenger_Spy'],
   ['Shuvalov'],
   ['Pandochka'],
-  ['bovgit', 'Creator of this page :)'],
+  ['bovgit'],
+  // ['bovgit', 'Creator of this page :)'],
 ])
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
@@ -103,6 +104,8 @@ const mapDefaultChessComPlayers = new Map([
   ['ShahMatKanal'],
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
+const BOVGIT_playName = 'bovgit'
+const BOVGIT_description = 'Creator of this page :)'
 
 let groupObjs, startGroupNum, groupNames, currentGroupName
 initGroupObjs()
@@ -1344,7 +1347,12 @@ async function getDataFromLichess(arPlayerNames) {
       //playerHint
       let playerHint = ''
       let v = mapDefaultLichessPlayers.get(playerName)
-      if (v) { playerHint = v + '\n\n' }
+      if (v) {
+        playerHint = v + '\n\n'
+      } else if (playerName.toUpperCase() === BOVGIT_playName.toUpperCase()) {
+        playerHint = BOVGIT_description + '\n\n'
+      }
+
       const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
       const lastName = getJsonValue2(playerName, jsonObj, 'profile', 'lastName')
       const location = getJsonValue2(playerName, jsonObj, 'profile', 'location')
@@ -1607,7 +1615,11 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
 
     //my own description ! ('Creator of ...')
     let v = mapDefaultChessComPlayers.get(playerName)
-    playerHint = v ? v + '\n\n' : ''
+    if (v) {
+      playerHint = v + '\n\n'
+    } else if (playerName.toUpperCase() === BOVGIT_playName.toUpperCase()) {
+      playerHint = BOVGIT_description + '\n\n'
+    }
 
     playerURL = getJsonValue1(playerName, jsonObj, 'url')
 
