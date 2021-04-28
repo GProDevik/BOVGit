@@ -83,6 +83,8 @@ const mapTimeControl = new Map([
   ['puzzle', 4],
   ['rush', 5]
 ])
+const BOVGIT_playerName = 'bovgit'
+const BOVGIT_description = 'Creator of this page :)'
 const mapDefaultLichessPlayers = new Map([
   ['Thibault', 'Creator of Lichess.org'],
   ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway'],
@@ -91,8 +93,7 @@ const mapDefaultLichessPlayers = new Map([
   ['Challenger_Spy'],
   ['Shuvalov'],
   ['Pandochka'],
-  ['bovgit'],
-  // ['bovgit', 'Creator of this page :)'],
+  [BOVGIT_playerName],
 ])
 const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
@@ -104,8 +105,6 @@ const mapDefaultChessComPlayers = new Map([
   ['ShahMatKanal'],
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
-const BOVGIT_playName = 'bovgit'
-const BOVGIT_description = 'Creator of this page :)'
 
 let groupObjs, startGroupNum, groupNames, currentGroupName
 initGroupObjs()
@@ -1349,7 +1348,7 @@ async function getDataFromLichess(arPlayerNames) {
       let v = mapDefaultLichessPlayers.get(playerName)
       if (v) {
         playerHint = v + '\n\n'
-      } else if (playerName.toUpperCase() === BOVGIT_playName.toUpperCase()) {
+      } else if (isPlayerMe(playerName)) {
         playerHint = BOVGIT_description + '\n\n'
       }
 
@@ -1617,7 +1616,7 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
     let v = mapDefaultChessComPlayers.get(playerName)
     if (v) {
       playerHint = v + '\n\n'
-    } else if (playerName.toUpperCase() === BOVGIT_playName.toUpperCase()) {
+    } else if (isPlayerMe(playerName)) {
       playerHint = BOVGIT_description + '\n\n'
     }
 
@@ -2328,6 +2327,10 @@ function getDefaultPlayersFromMap(mapPlayers) {
     s += ' ' + key
   }
   return s.trim()
+}
+
+function isPlayerMe(playerName) {
+  return playerName.toUpperCase() === BOVGIT_playerName.toUpperCase()
 }
 
 ///////////////////////////////////////////////////////////
