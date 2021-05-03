@@ -13,10 +13,10 @@ const root = {
       vueChessComPlayerNames: '',
       vueAutoRefreshInterval: '',
       vueCheckDarkTheme: false,
-      vueArLichessPlayers: [], //временно
-      vueArChessComPlayers: [], //временно
-      vueArLichessPlayersBuf: [], //временно
-      vueArChessComPlayersBuf: [], //временно
+      vueArLichessPlayers: [],
+      vueArChessComPlayers: [],
+      vueArLichessPlayersBuf: [],
+      vueArChessComPlayersBuf: [],
     }
   },
   methods: {
@@ -69,12 +69,15 @@ const vm = app.mount('#vue-mount')
 
 const isMobileDevice = is_mobile_device()
 const urlHttpServiceLichess = 'https://lichess.org/api/user/'
+const urlHttpServiceLichessStatus = 'https://lichess.org/api/users/status?ids='
 const urlHttpServiceChessCom = 'https://api.chess.com/pub/player/'
 const useAJAX = true //for exchange data between server & client
 const DISCONNECTED_TEXT = '  (disconnected)'
 const sortSymbolAtHead = '↑' //&#8593
 const onlineSymbolAtPlayer = '&#10004;' //check
 const META_FIDE = '@FIDE@'
+const META_STATUS_TEXT = '@STATUS-TEXT@'
+const META_STATUS_SYMBOL = '@STATUS-SYMBOL@'
 const mapTimeControl = new Map([
   ['player', 0],
   ['bullet', 1],
@@ -111,7 +114,7 @@ initGroupObjs()
 
 //milliseconds for refresh table after 'await fetch'
 const lichessDelay = 500
-const chessComDelay = 1000
+const chessComDelay = 2000
 
 let isFirstChessCom = false
 let lastSortSelectorLichess = '', lastSortSelectorChessCom = ''
@@ -992,9 +995,6 @@ function sortTable(thisIsLichess, timeControl) {
     cellcount = cells.length
     a[r] = new Array(cellcount)
     for (c = 0; c < cellcount; c++) {
-      // s = (c === 0) ? cells[c].innerHTML : cells[c].textContent
-      // s = s.replace(onlineSymbolAtPlayer, '✔')
-      // s = s.replace('\r', '')
       if (c === 0) {
         s = thisIsLichess ? vm.vueArLichessPlayers[r].playerName : vm.vueArChessComPlayers[r].playerName
       } else {
@@ -1052,25 +1052,10 @@ function sortTable(thisIsLichess, timeControl) {
     lastSortTimeControlChessCom = timeControl
   }
 
-  //временно закомментарено
-  // //fill table from array
-  // const pref = thisIsLichess ? '.l' : '.c'
-  // for (r = 0; r < rowCount; r++) {
-  //   const rowNum = r + 1
-  //   document.querySelector(pref + 'player' + rowNum).innerHTML = a[r][0] //innerHTML (because 'href')
-  //   document.querySelector(pref + 'bullet' + rowNum).textContent = a[r][1] === 0 ? '' : a[r][1]
-  //   document.querySelector(pref + 'blitz' + rowNum).textContent = a[r][2] === 0 ? '' : a[r][2]
-  //   document.querySelector(pref + 'rapid' + rowNum).textContent = a[r][3] === 0 ? '' : a[r][3]
-  //   document.querySelector(pref + 'puzzle' + rowNum).textContent = a[r][4] === 0 ? '' : a[r][4]
-  //   document.querySelector(pref + 'rush' + rowNum).textContent = a[r][5] === 0 ? '' : a[r][5]
-  // }
   const arTmp = []
   let r1, playerHTML
   for (r = 0; r < rowCount; r++) {
     for (r1 = 0; r1 < rowCount; r1++) {
-      // playerHTML = thisIsLichess ? vm.vueArLichessPlayers[r1].playerHTML : vm.vueArChessComPlayers[r1].playerHTML
-      // playerHTML = playerHTML.replace(onlineSymbolAtPlayer, '✔')
-      // playerHTML = playerHTML.replace('\r', '')
       playerHTML = thisIsLichess ? vm.vueArLichessPlayers[r1].playerName : vm.vueArChessComPlayers[r1].playerName
       if (a[r][0] === playerHTML) {
         arTmp.push(thisIsLichess ? vm.vueArLichessPlayers[r1] : vm.vueArChessComPlayers[r1])
@@ -1114,7 +1099,6 @@ function clearLastSort(thisIsLichess) {
 
 //refresh all tables
 function refresh() {
-  clearAllTables()
 
   let thisIsLichess = true
   clearLastSort(thisIsLichess)
@@ -1145,7 +1129,6 @@ function refreshChessCom() {
 }
 
 function refreshOne(thisIsLichess) {
-  clearTable(thisIsLichess)
   clearLastSort(thisIsLichess)
   refreshOneTable(thisIsLichess)
   setDataToStorage()
@@ -1160,7 +1143,6 @@ function refreshOneTable(thisIsLichess) {
     if (elem.style.display !== 'block') {
       elem.style.display = 'block' //table is visible
     }
-    clearTable(thisIsLichess)
     fillTableFromServer(thisIsLichess)
   } else {
     if (elem.style.display !== 'none') {
@@ -1169,116 +1151,10 @@ function refreshOneTable(thisIsLichess) {
   }
 }
 
-function clearAllTables() {
-  clearTable(true)
-  clearTable(false)
-}
-
-function clearTable(thisIsLichess) {
-  //временно закомментарено
-  // const pref = thisIsLichess ? '.l' : '.c'
-  // const n = getTableRowsNumber(thisIsLichess)
-  // for (let step = 0; step < n; step++) {
-  //   const rowNum = step + 1
-  //   document.querySelector(pref + 'player' + rowNum).innerHTML = '' //innerHTML (because 'href')
-  //   document.querySelector(pref + 'bullet' + rowNum).textContent = ''
-  //   document.querySelector(pref + 'blitz' + rowNum).textContent = ''
-  //   document.querySelector(pref + 'rapid' + rowNum).textContent = ''
-  //   document.querySelector(pref + 'puzzle' + rowNum).textContent = ''
-  //   document.querySelector(pref + 'rush' + rowNum).textContent = ''
-  // }
-}
-
-//clear all cells at row (exception: Player)
-function clearRow(thisIsLichess, rowNum) {
-  //временно закомментарено
-  // const pref = thisIsLichess ? '.l' : '.c'
-  // document.querySelector(pref + 'bullet' + rowNum).textContent = ''
-  // document.querySelector(pref + 'blitz' + rowNum).textContent = ''
-  // document.querySelector(pref + 'rapid' + rowNum).textContent = ''
-  // document.querySelector(pref + 'puzzle' + rowNum).textContent = ''
-  // document.querySelector(pref + 'rush' + rowNum).textContent = ''
-}
-
-function clearRowLichess(rowNum) {
-  //временно закомментарено
-  // const thisIsLichess = true
-  // clearRow(thisIsLichess, rowNum)
-}
-
-function clearRowChessCom(rowNum) {
-  //временно закомментарено
-  // const thisIsLichess = false
-  // clearRow(thisIsLichess, rowNum)
-}
-
-function getTableRowsNumber(thisIsLichess) {
-  const tableRef = getChessTableRef(thisIsLichess)
-  return tableRef.rows.length
-}
-
 function getChessTableRef(thisIsLichess) {
   const tableName = thisIsLichess ? '.TBodyLichess' : '.TBodyChessCom'
   const tableRef = document.querySelector(tableName)
   return tableRef
-}
-
-function deleteLastRowFromTable(thisIsLichess) {
-  const tableRef = getChessTableRef(thisIsLichess)
-  tableRef.deleteRow(-1)
-}
-
-function addRowToTable(thisIsLichess, rowNum) {
-
-  let atrClass
-  const letter = thisIsLichess ? 'l' : 'c'
-
-  //create DOM-elements
-  const tableRef = getChessTableRef(thisIsLichess)
-  //const trRef = document.createElement('tr')
-  const trRef = tableRef.insertRow()
-
-  //player
-  const textPlayerRef = document.createTextNode('player' + rowNum)
-  const thRef = document.createElement('th')
-  thRef.setAttribute('scope', 'row')
-  atrClass = letter + 'player' + rowNum
-  thRef.setAttribute('class', atrClass)
-
-  //bullet
-  const tdBulletRef = document.createElement('td')
-  atrClass = letter + 'bullet' + rowNum
-  tdBulletRef.setAttribute('class', atrClass)
-
-  //blitz
-  const tdBlitzRef = document.createElement('td')
-  atrClass = letter + 'blitz' + rowNum
-  tdBlitzRef.setAttribute('class', atrClass)
-
-  //rapid
-  const tdRapidRef = document.createElement('td')
-  atrClass = letter + 'rapid' + rowNum
-  tdRapidRef.setAttribute('class', atrClass)
-
-  //puzzle
-  const tdPuzzleRef = document.createElement('td')
-  atrClass = letter + 'puzzle' + rowNum
-  tdPuzzleRef.setAttribute('class', atrClass)
-
-  //rush
-  const tdRushRef = document.createElement('td')
-  atrClass = letter + 'rush' + rowNum
-  tdRushRef.setAttribute('class', atrClass)
-
-  //new DOM-elements join to elements on HTML-page
-  tableRef.appendChild(trRef)
-  trRef.appendChild(thRef)
-  thRef.appendChild(textPlayerRef)
-  trRef.appendChild(tdBulletRef)
-  trRef.appendChild(tdBlitzRef)
-  trRef.appendChild(tdRapidRef)
-  trRef.appendChild(tdPuzzleRef)
-  trRef.appendChild(tdRushRef)
 }
 
 async function fillTableFromServer(thisIsLichess) {
@@ -1300,6 +1176,11 @@ async function fillTableFromServer(thisIsLichess) {
 }
 
 async function getDataFromLichess(arPlayerNames) {
+  await getProfileAfterFetchFromLichess(arPlayerNames)
+  await getStatusAfterFetchFromLichess(arPlayerNames)
+}
+
+async function getProfileAfterFetchFromLichess(arPlayerNames) {
   let profileResults = await getFetchResultsFromServer(true, arPlayerNames)
   profileResults.forEach((jsonObj, index) => {
     let playerName = arPlayerNames[index]
@@ -1314,7 +1195,7 @@ async function getDataFromLichess(arPlayerNames) {
     } else {
       // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
       const isOnline = getJsonValue1(playerName, jsonObj, 'online')
-      const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
+      //const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
 
       //playerTitle: title of player (GM, IM, FM, ...)
       let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
@@ -1352,14 +1233,15 @@ async function getDataFromLichess(arPlayerNames) {
         + (firstPart ? '\n' : '')
         + (createdAt ? 'reg. ' + createdAt : '')
         + (lastOnline ? '\nlast online ' + lastOnline : '')
-        + '\n'
+        + '\n' + META_STATUS_TEXT
         + (bio ? '\n' + bio : '')
         + (links ? '\n' + links : '')
 
       //playerHTML (href !)
       const playerURL = getJsonValue1(playerName, jsonObj, 'url')
       let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-        + onlineSymbol + playerTitle + '<strong>' + playerName + '</strong></a>'
+        + META_STATUS_SYMBOL // onlineSymbol
+        + playerTitle + '<strong>' + playerName + '</strong></a>'
         + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
 
       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1370,7 +1252,84 @@ async function getDataFromLichess(arPlayerNames) {
 
       vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
     }
-  });
+  })
+}
+
+async function getStatusAfterFetchFromLichess(arPlayerNames) {
+  let statusResults = await getFetchStatusFromLichess(arPlayerNames)
+  statusResults[0].forEach((jsonObj) => {
+    const playerName = jsonObj.name
+    arPlayerNames.forEach((item, index) => {
+      if (playerName.toUpperCase() === item.toUpperCase()) {
+        const patron = getJsonValue1(playerName, jsonObj, 'patron')
+        const online = getJsonValue1(playerName, jsonObj, 'online')
+        const playing = getJsonValue1(playerName, jsonObj, 'playing')
+        const streaming = getJsonValue1(playerName, jsonObj, 'streaming')
+
+        let s = patron ? 'Patron. ' : ''
+        s += online || streaming || playing ? 'Now: ' : ''
+        s += online ? 'online, ' : ''
+        s += playing ? 'playing, ' : ''
+        s += streaming ? 'streaming, ' : ''
+        s = s.trim()
+        if (s[s.length - 1] === ',') {
+          s = s.slice(0, s.length - 1) + '.' //del last symbol (comma)
+        }
+        let status = s ? s + '\n' : ''
+        let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML.replace(META_STATUS_TEXT, status)
+
+        // s = ''
+        // if (playing) {
+        //   s = '<span class="statusPlaying">' + onlineSymbolAtPlayer + '</span>'
+        // } else if (online) {
+        //   s = '<span class="statusOnline">' + onlineSymbolAtPlayer + '</span>'
+        // }
+        // if (streaming) {
+        //   s += '<span class="statusStreaming">' + onlineSymbolAtPlayer + '</span>'
+        // }
+        s = ''
+        if (streaming) {
+          s = '<span class="statusStreaming">' + onlineSymbolAtPlayer + '</span>'
+        }
+        if (playing) {
+          s += '<span class="statusPlaying">' + onlineSymbolAtPlayer + '</span>'
+        }
+        if (online && !streaming && !playing) {
+          s = '<span class="statusOnline">' + onlineSymbolAtPlayer + '</span>'
+        }
+
+        playerHTML = playerHTML.replace(META_STATUS_SYMBOL, s)
+        vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML
+      }
+    })
+  })
+  //clear META_STATUS for players without status
+  arPlayerNames.forEach((item, index) => {
+    let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML.replace(META_STATUS_TEXT, '')
+    playerHTML = playerHTML.replace(META_STATUS_SYMBOL, '')
+    vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML
+  })
+}
+
+async function getFetchStatusFromLichess(arPlayerNames) {
+  let jobs = []
+  const playerNamesByComma = arPlayerNames.join(',')
+  let job = fetch(`${urlHttpServiceLichessStatus}${playerNamesByComma}`).then(
+    successResponse => {
+      if (successResponse.status != 200) {
+        return null
+      } else {
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!! проверить: let job = AWAIT successResponse.json() !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        return successResponse.json()
+      }
+    },
+    failResponse => {
+      return null
+    }
+  );
+  jobs.push(job)
+  let results = await Promise.all(jobs)
+  return results
 }
 
 async function getDataFromChessCom(arPlayerNames) {

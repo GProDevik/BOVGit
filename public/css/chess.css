@@ -200,6 +200,24 @@ td {
   font-weight: bold;
 }
 
+.statusOnline{
+  font-size: small;
+  color: gray;
+}
+
+.statusPlaying{
+  font-size: small;
+  /* color: light; */
+  color: green;
+  font-weight: bold;
+}
+
+.statusStreaming{
+  font-size: small;
+  color: peru;
+  font-weight: bold;
+}
+
 footer {
   font-size: small;
   margin: auto;
