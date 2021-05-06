@@ -75,6 +75,17 @@ const useAJAX = true //for exchange data between server & client
 const DISCONNECTED_TEXT = '  (disconnected)'
 const sortSymbolAtHead = '↑' //&#8593
 const onlineSymbolAtPlayer = '&#10004;' //check
+const onlineSymbolOnline = '&#9675;'	//not-filled circle
+const onlineSymbolPlaying = '&#9679;'	//filled circle
+
+// const onlineSymbolStreaming = '&#9679;' //filled circle
+// const onlineSymbolStreaming = '&#128250;' //📺
+const onlineSymbolStreaming = '&#127908;' //microphone 1
+// const onlineSymbolStreaming = '&#127897;' //microphone 2
+// const onlineSymbolStreaming = '&#127910;' //videocamera 1
+// const onlineSymbolStreaming = '&#127909;' //videocamera 2
+// const onlineSymbolStreaming = '&#127916;' //videocamera 3
+
 const META_FIDE = '@FIDE@'
 const META_STATUS_TEXT = '@STATUS-TEXT@'
 const META_STATUS_SYMBOL = '@STATUS-SYMBOL@'
@@ -113,8 +124,8 @@ let groupObjs, startGroupNum, groupNames, currentGroupName
 initGroupObjs()
 
 //milliseconds for refresh table after 'await fetch'
-const lichessDelay = 500
-const chessComDelay = 2000
+// const lichessDelay = 500
+// const chessComDelay = 1000
 
 let isFirstChessCom = false
 let lastSortSelectorLichess = '', lastSortSelectorChessCom = ''
@@ -1171,8 +1182,9 @@ async function fillTableFromServer(thisIsLichess) {
     await getDataFromChessCom(arPlayerNames)
   }
 
-  const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
-  setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+  // const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
+  // setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+  showTableContent(thisIsLichess, arPlayerNames)
 }
 
 async function getDataFromLichess(arPlayerNames) {
@@ -1241,7 +1253,8 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
       const playerURL = getJsonValue1(playerName, jsonObj, 'url')
       let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
         + META_STATUS_SYMBOL // onlineSymbol
-        + playerTitle + '<strong>' + playerName + '</strong></a>'
+        + '<span class="playerTitle">' + playerTitle + ' </span>'
+        + '<strong>' + playerName + '</strong></a>'
         + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
 
       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1266,6 +1279,7 @@ async function getStatusAfterFetchFromLichess(arPlayerNames) {
         const playing = getJsonValue1(playerName, jsonObj, 'playing')
         const streaming = getJsonValue1(playerName, jsonObj, 'streaming')
 
+        //META_STATUS_TEXT
         let s = patron ? 'Patron. ' : ''
         s += online || streaming || playing ? 'Now: ' : ''
         s += online ? 'online, ' : ''
@@ -1278,24 +1292,16 @@ async function getStatusAfterFetchFromLichess(arPlayerNames) {
         let status = s ? s + '\n' : ''
         let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML.replace(META_STATUS_TEXT, status)
 
-        // s = ''
-        // if (playing) {
-        //   s = '<span class="statusPlaying">' + onlineSymbolAtPlayer + '</span>'
-        // } else if (online) {
-        //   s = '<span class="statusOnline">' + onlineSymbolAtPlayer + '</span>'
-        // }
-        // if (streaming) {
-        //   s += '<span class="statusStreaming">' + onlineSymbolAtPlayer + '</span>'
-        // }
+        //META_STATUS_SYMBOL
         s = ''
         if (streaming) {
-          s = '<span class="statusStreaming">' + onlineSymbolAtPlayer + '</span>'
+          s = '<span class="statusStreaming">' + onlineSymbolStreaming + '</span>'
         }
         if (playing) {
-          s += '<span class="statusPlaying">' + onlineSymbolAtPlayer + '</span>'
+          s += '<span class="statusPlaying">' + onlineSymbolPlaying + '</span>'
         }
         if (online && !streaming && !playing) {
-          s = '<span class="statusOnline">' + onlineSymbolAtPlayer + '</span>'
+          s = '<span class="statusOnline">' + onlineSymbolOnline + '</span>'
         }
 
         playerHTML = playerHTML.replace(META_STATUS_SYMBOL, s)
@@ -1382,7 +1388,9 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
         + 'reg. ' + createdAt
         + '\nlast online ' + lastOnline
       playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-        + onlineSymbol + playerTitle + '<strong>' + playerName + '</strong></a>'
+        + onlineSymbol
+        + '<span class="playerTitle">' + playerTitle + ' </span>'
+        + '<strong>' + playerName + '</strong></a>'
         + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
     }
     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''

@@ -11,9 +11,12 @@ html {
 }
 
 .PCStyle {
+  font-size: 100%;
   margin-left: 30vw;
   width: 40vw;
-  font-size: 100%;
+  /* for kingscrusher-youtube ! (long name) */
+  /* margin-left: 28vw; */
+  /* width: 44vw; */
 }
 
 .projectNameDifMobile {
@@ -201,21 +204,27 @@ td {
 }
 
 .statusOnline{
-  font-size: small;
+  font-size: large;
   color: gray;
 }
 
 .statusPlaying{
-  font-size: small;
-  /* color: light; */
+  font-size: large;
   color: green;
   font-weight: bold;
 }
 
 .statusStreaming{
   font-size: small;
-  color: peru;
+  /* color: peru; */
+  color: black;
   font-weight: bold;
+}
+
+.playerTitle{
+  font-size: medium;
+  color: peru;
+  /* font-weight: bold; */
 }
 
 footer {
