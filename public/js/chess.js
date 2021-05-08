@@ -77,14 +77,8 @@ const sortSymbolAtHead = '↑' //&#8593
 const onlineSymbolAtPlayer = '&#10004;' //check
 const onlineSymbolOnline = '&#9675;'	//not-filled circle
 const onlineSymbolPlaying = '&#9679;'	//filled circle
-
-// const onlineSymbolStreaming = '&#9679;' //filled circle
 // const onlineSymbolStreaming = '&#128250;' //📺
-const onlineSymbolStreaming = '&#127908;' //microphone 1
-// const onlineSymbolStreaming = '&#127897;' //microphone 2
-// const onlineSymbolStreaming = '&#127910;' //videocamera 1
-// const onlineSymbolStreaming = '&#127909;' //videocamera 2
-// const onlineSymbolStreaming = '&#127916;' //videocamera 3
+const onlineSymbolStreaming = '&#127908;' //microphone
 
 const META_FIDE = '@FIDE@'
 const META_STATUS_TEXT = '@STATUS-TEXT@'

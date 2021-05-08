@@ -218,13 +218,13 @@ td {
   font-size: small;
   /* color: peru; */
   color: black;
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 
 .playerTitle{
   font-size: medium;
   color: peru;
-  /* font-weight: bold; */
+  font-weight: bold;
 }
 
 footer {
