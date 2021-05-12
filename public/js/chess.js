@@ -77,6 +77,8 @@ const sortSymbolAtHead = '↑' //&#8593
 const onlineSymbolAtPlayer = '&#10004;' //check
 const onlineSymbolOnline = '&#9675;'	//not-filled circle
 const onlineSymbolPlaying = '&#9679;'	//filled circle
+
+// const onlineSymbolStreaming = '&#9679;'	//filled circle
 // const onlineSymbolStreaming = '&#128250;' //📺
 const onlineSymbolStreaming = '&#127908;' //microphone
 
@@ -1181,9 +1183,40 @@ async function fillTableFromServer(thisIsLichess) {
   showTableContent(thisIsLichess, arPlayerNames)
 }
 
+//show table (it's random order sometimes after refresh by ajax)
+function showTableContent(thisIsLichess, arPlayerNames) {
+
+  if (arPlayerNames.length === 0) {
+    return
+  }
+
+  const rowCount = thisIsLichess ? vm.vueArLichessPlayersBuf.length : vm.vueArChessComPlayersBuf.length
+  const arTmp = []
+  for (let step = 0; step < arPlayerNames.length; step++) {
+    const playerName = arPlayerNames[step]
+    if (playerName !== '') {
+      for (let r1 = 0; r1 < rowCount; r1++) {
+        const vuePlayerName = thisIsLichess ? vm.vueArLichessPlayersBuf[r1].playerName : vm.vueArChessComPlayersBuf[r1].playerName
+        if (playerName === vuePlayerName) {
+          arTmp.push(thisIsLichess ? vm.vueArLichessPlayersBuf[r1] : vm.vueArChessComPlayersBuf[r1])
+          break
+        }
+      }
+    }
+  }
+
+  if (thisIsLichess) {
+    vm.vueArLichessPlayers = [...arTmp]
+    // vm.vueArLichessPlayers = JSON.parse(JSON.stringify(arTmp))
+  } else {
+    vm.vueArChessComPlayers = [...arTmp]
+    // vm.vueArChessComPlayers = JSON.parse(JSON.stringify(arTmp))
+  }
+}
+
 async function getDataFromLichess(arPlayerNames) {
   await getProfileAfterFetchFromLichess(arPlayerNames)
-  await getStatusAfterFetchFromLichess(arPlayerNames)
+  // await getStatusAfterFetchFromLichess(arPlayerNames)
 }
 
 async function getProfileAfterFetchFromLichess(arPlayerNames) {
@@ -1235,6 +1268,7 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
         + (lastName ? lastName : '')
         + (location ? ', ' + location : '')
         + (fideRating ? ', FIDE ' + fideRating : '')
+        + (playerTitle ? ', ' + playerTitle : '')
       playerHint += firstPart
         + (firstPart ? '\n' : '')
         + (createdAt ? 'reg. ' + createdAt : '')
@@ -1260,6 +1294,7 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
       vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
     }
   })
+  await getStatusAfterFetchFromLichess(arPlayerNames)
 }
 
 async function getStatusAfterFetchFromLichess(arPlayerNames) {
@@ -1276,9 +1311,9 @@ async function getStatusAfterFetchFromLichess(arPlayerNames) {
         //META_STATUS_TEXT
         let s = patron ? 'Patron. ' : ''
         s += online || streaming || playing ? 'Now: ' : ''
-        s += online ? 'online, ' : ''
         s += playing ? 'playing, ' : ''
         s += streaming ? 'streaming, ' : ''
+        s += online && !streaming && !playing ? 'online, ' : ''
         s = s.trim()
         if (s[s.length - 1] === ',') {
           s = s.slice(0, s.length - 1) + '.' //del last symbol (comma)
@@ -1334,7 +1369,7 @@ async function getFetchStatusFromLichess(arPlayerNames) {
 
 async function getDataFromChessCom(arPlayerNames) {
   await getProfileAfterFetchFromChessCom(arPlayerNames)
-  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+  //await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
 async function getProfileAfterFetchFromChessCom(arPlayerNames) {
@@ -1378,6 +1413,7 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
         + (location ? ', ' + location : '')
 
       playerHint += META_FIDE
+        + (playerTitle ? ', ' + playerTitle : '')
       playerHint += (playerHint ? '\n' : '')
         + 'reg. ' + createdAt
         + '\nlast online ' + lastOnline
@@ -1390,6 +1426,7 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
     vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
   })
+  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
 async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
@@ -1451,37 +1488,6 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
   }
   let results = await Promise.all(jobs)
   return results
-}
-
-//show table (it's random order sometimes after refresh by ajax)
-function showTableContent(thisIsLichess, arPlayerNames) {
-
-  if (arPlayerNames.length === 0) {
-    return
-  }
-
-  const rowCount = thisIsLichess ? vm.vueArLichessPlayersBuf.length : vm.vueArChessComPlayersBuf.length
-  const arTmp = []
-  for (let step = 0; step < arPlayerNames.length; step++) {
-    const playerName = arPlayerNames[step]
-    if (playerName !== '') {
-      for (let r1 = 0; r1 < rowCount; r1++) {
-        const vuePlayerName = thisIsLichess ? vm.vueArLichessPlayersBuf[r1].playerName : vm.vueArChessComPlayersBuf[r1].playerName
-        if (playerName === vuePlayerName) {
-          arTmp.push(thisIsLichess ? vm.vueArLichessPlayersBuf[r1] : vm.vueArChessComPlayersBuf[r1])
-          break
-        }
-      }
-    }
-  }
-
-  if (thisIsLichess) {
-    vm.vueArLichessPlayers = [...arTmp]
-    // vm.vueArLichessPlayers = JSON.parse(JSON.stringify(arTmp))
-  } else {
-    vm.vueArChessComPlayers = [...arTmp]
-    // vm.vueArChessComPlayers = JSON.parse(JSON.stringify(arTmp))
-  }
 }
 
 //14.11.2021, 11:25:17 --> 14.11.2021 11:25
