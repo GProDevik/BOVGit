@@ -1233,7 +1233,7 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
       })
     } else {
       // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
-      const isOnline = getJsonValue1(playerName, jsonObj, 'online')
+      // const isOnline = getJsonValue1(playerName, jsonObj, 'online')
       //const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
 
       //playerTitle: title of player (GM, IM, FM, ...)
@@ -1658,9 +1658,11 @@ function getDataFromStorage() {
   }
 
   v = localStorage.getItem('LichessChecked')
+  v = v === null ? '1' : v
   setCheckLichess(v === '1' ? true : false)
 
   v = localStorage.getItem('ChessComChecked')
+  v = v === null ? '1' : v
   setCheckChessCom(v === '1' ? true : false)
 
   v = localStorage.getItem('isFirstChessCom')
