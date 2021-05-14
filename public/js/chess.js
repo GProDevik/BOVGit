@@ -1216,7 +1216,7 @@ function showTableContent(thisIsLichess, arPlayerNames) {
 
 async function getDataFromLichess(arPlayerNames) {
   await getProfileAfterFetchFromLichess(arPlayerNames)
-  // await getStatusAfterFetchFromLichess(arPlayerNames)
+  await getStatusAfterFetchFromLichess(arPlayerNames)
 }
 
 async function getProfileAfterFetchFromLichess(arPlayerNames) {
@@ -1294,7 +1294,7 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
       vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
     }
   })
-  await getStatusAfterFetchFromLichess(arPlayerNames)
+  // await getStatusAfterFetchFromLichess(arPlayerNames)
 }
 
 async function getStatusAfterFetchFromLichess(arPlayerNames) {
@@ -1369,7 +1369,7 @@ async function getFetchStatusFromLichess(arPlayerNames) {
 
 async function getDataFromChessCom(arPlayerNames) {
   await getProfileAfterFetchFromChessCom(arPlayerNames)
-  //await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
 async function getProfileAfterFetchFromChessCom(arPlayerNames) {
@@ -1426,7 +1426,7 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
     vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
   })
-  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+  // await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
 async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
@@ -1470,19 +1470,21 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
   for (let name of arPlayerNames) {
     if (name !== '') {
       const url = thisIsLichess ? urlHttpServiceLichess : urlHttpServiceChessCom
-      let job = fetch(`${url}${name}${afterUrl}`).then(
-        successResponse => {
-          if (successResponse.status != 200) {
+      // let job = fetch(`${url}${name}${afterUrl}`)
+      let job = fetch(`${url}${name}${afterUrl}`, { mode: 'cors' })
+        .then(
+          successResponse => {
+            if (successResponse.status != 200) {
+              return null
+            } else {
+              //!!!!!!!!!!!!!!!!!!!!!!!!!!! проверить: let job = AWAIT successResponse.json() !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              return successResponse.json()
+            }
+          },
+          failResponse => {
             return null
-          } else {
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!! проверить: let job = AWAIT successResponse.json() !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            return successResponse.json()
           }
-        },
-        failResponse => {
-          return null
-        }
-      );
+        );
       jobs.push(job)
     }
   }
@@ -1490,7 +1492,7 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
   return results
 }
 
-//14.11.2021, 11:25:17 --> 14.11.2021 11:25
+//14.11.2021, 11:25:17 --> 14.11.2021 11:25 (delete seconds)
 function getDateHHMM(milliseconds) {
   let lastOnline = (new Date(milliseconds)).toLocaleString() //14.11.2021, 11:25:17
   // lastOnline = lastOnline.replace(',', '') //del comma
