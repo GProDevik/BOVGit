@@ -1369,7 +1369,7 @@ async function getFetchStatusFromLichess(arPlayerNames) {
 
 async function getDataFromChessCom(arPlayerNames) {
   await getProfileAfterFetchFromChessCom(arPlayerNames)
-  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+  // await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
 async function getProfileAfterFetchFromChessCom(arPlayerNames) {
@@ -1426,7 +1426,7 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
     vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
   })
-  // await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
 async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
