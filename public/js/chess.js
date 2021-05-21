@@ -1349,7 +1349,7 @@ async function getStatusAfterFetchFromLichess(arPlayerNames) {
 async function getFetchStatusFromLichess(arPlayerNames) {
   let jobs = []
   const playerNamesByComma = arPlayerNames.join(',')
-  let job = fetch(`${urlHttpServiceLichessStatus}${playerNamesByComma}`).then(
+  let job = fetch(`${urlHttpServiceLichessStatus}${playerNamesByComma}`, { mode: 'cors' }).then(
     successResponse => {
       if (successResponse.status != 200) {
         return null
