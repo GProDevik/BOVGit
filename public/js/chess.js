@@ -1274,7 +1274,7 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
         + (createdAt ? 'reg. ' + createdAt : '')
         + (lastOnline ? '\nlast online ' + lastOnline : '')
         + '\n' + META_STATUS_TEXT
-        + (bio ? '\n' + bio : '')
+        + (bio ? '\n' + bio.replaceAll('"', '\'') : '') //" is error
         + (links ? '\n' + links : '')
 
       //playerHTML (href !)
