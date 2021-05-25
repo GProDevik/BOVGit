@@ -70,6 +70,7 @@ const vm = app.mount('#vue-mount')
 const isMobileDevice = is_mobile_device()
 const urlHttpServiceLichess = 'https://lichess.org/api/user/'
 const urlHttpServiceLichessStatus = 'https://lichess.org/api/users/status?ids='
+const urlHttpServiceLichessScore = 'https://lichess.org/api/crosstable/'
 const urlHttpServiceChessCom = 'https://api.chess.com/pub/player/'
 const useAJAX = true //for exchange data between server & client
 const DISCONNECTED_TEXT = '  (disconnected)'
@@ -85,6 +86,7 @@ const onlineSymbolStreaming = '&#127908;' //microphone
 const META_FIDE = '@FIDE@'
 const META_STATUS_TEXT = '@STATUS-TEXT@'
 const META_STATUS_SYMBOL = '@STATUS-SYMBOL@'
+const META_SCORE = '@SCORE-TEXT@'
 const mapTimeControl = new Map([
   ['player', 0],
   ['bullet', 1],
@@ -97,7 +99,7 @@ const BOVGIT_playerName = 'bovgit'
 const BOVGIT_description = 'Creator of this page :)'
 const mapDefaultLichessPlayers = new Map([
   ['Thibault', 'Creator of Lichess.org'],
-  ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway'],
+  ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway, GM'],
   ['Zhigalko_Sergei'],
   ['Crest64'],
   ['Challenger_Spy'],
@@ -1217,6 +1219,21 @@ function showTableContent(thisIsLichess, arPlayerNames) {
 async function getDataFromLichess(arPlayerNames) {
   await getProfileAfterFetchFromLichess(arPlayerNames)
   await getStatusAfterFetchFromLichess(arPlayerNames)
+
+  let playerName = arPlayerNames[0] //временно !
+  await getScoreAfterFetchFromLichess(arPlayerNames, playerName)
+
+  clearMetaText(arPlayerNames)
+}
+
+//clear META_STATUS for players without status
+function clearMetaText(arPlayerNames) {
+  arPlayerNames.forEach((item, index) => {
+    let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML.replace(META_STATUS_TEXT, '')
+    playerHTML = playerHTML.replace(META_STATUS_SYMBOL, '')
+    playerHTML = playerHTML.replace(META_SCORE, '')
+    vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML
+  })
 }
 
 async function getProfileAfterFetchFromLichess(arPlayerNames) {
@@ -1235,6 +1252,7 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
       // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
       // const isOnline = getJsonValue1(playerName, jsonObj, 'online')
       //const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
+      let v
 
       //playerTitle: title of player (GM, IM, FM, ...)
       let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
@@ -1242,9 +1260,9 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
 
       //playerHint
       let playerHint = ''
-      let v = mapDefaultLichessPlayers.get(playerName)
-      if (v) {
-        playerHint = v + '\n\n'
+      let playerMyDesccription = mapDefaultLichessPlayers.get(playerName)
+      if (playerMyDesccription) {
+        playerHint = playerMyDesccription + '\n\n'
       } else if (isPlayerMe(playerName)) {
         playerHint = BOVGIT_description + '\n\n'
       }
@@ -1268,13 +1286,13 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
         + (lastName ? lastName : '')
         + (location ? ', ' + location : '')
         + (fideRating ? ', FIDE ' + fideRating : '')
-        + (playerTitle ? ', ' + playerTitle : '')
+        + (playerTitle && !playerMyDesccription ? ', ' + playerTitle : '')
       playerHint += firstPart
         + (firstPart ? '\n' : '')
         + (createdAt ? 'reg. ' + createdAt : '')
         + (lastOnline ? '\nlast online ' + lastOnline : '')
         + '\n' + META_STATUS_TEXT
-        + (bio ? '\n' + bio.replaceAll('"', '\'') : '') //" is error
+        + (bio ? '\n' + bio.replaceAll('"', '\'') : '') // (") - called error
         + (links ? '\n' + links : '')
 
       //playerHTML (href !)
@@ -1283,7 +1301,8 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
         + META_STATUS_SYMBOL // onlineSymbol
         + '<span class="playerTitle">' + playerTitle + ' </span>'
         + '<strong>' + playerName + '</strong></a>'
-        + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+        // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+        + (lastOnline ? '<br><span class="lastOnline" title="' + META_SCORE + '">' + lastOnline + '</span>' : '')
 
       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
       const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
@@ -1294,7 +1313,6 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
       vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
     }
   })
-  // await getStatusAfterFetchFromLichess(arPlayerNames)
 }
 
 async function getStatusAfterFetchFromLichess(arPlayerNames) {
@@ -1332,44 +1350,84 @@ async function getStatusAfterFetchFromLichess(arPlayerNames) {
         if (online && !streaming && !playing) {
           s = '<span class="statusOnline">' + onlineSymbolOnline + '</span>'
         }
-
         playerHTML = playerHTML.replace(META_STATUS_SYMBOL, s)
+
         vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML
       }
     })
-  })
-  //clear META_STATUS for players without status
-  arPlayerNames.forEach((item, index) => {
-    let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML.replace(META_STATUS_TEXT, '')
-    playerHTML = playerHTML.replace(META_STATUS_SYMBOL, '')
-    vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML
   })
 }
 
 async function getFetchStatusFromLichess(arPlayerNames) {
   let jobs = []
   const playerNamesByComma = arPlayerNames.join(',')
-  let job = fetch(`${urlHttpServiceLichessStatus}${playerNamesByComma}`, { mode: 'cors' }).then(
-    successResponse => {
-      if (successResponse.status != 200) {
-        return null
-      } else {
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!! проверить: let job = AWAIT successResponse.json() !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        return successResponse.json()
-      }
-    },
-    failResponse => {
-      return null
-    }
-  );
+  let job = fetch(`${urlHttpServiceLichessStatus}${playerNamesByComma}`, { mode: 'cors' })
+    .then(
+      successResponse => {
+        if (successResponse.status != 200) { return null }
+        else { return successResponse.json() }
+      },
+      failResponse => { return null }
+    )
   jobs.push(job)
+  let results = await Promise.all(jobs)
+  return results
+}
+
+async function getScoreAfterFetchFromLichess(arPlayerNames, playerName) {
+  let allScore = ''
+  let scoreResults = await getFetchScoreFromLichess(arPlayerNames, playerName)
+  scoreResults.forEach((jsonObj) => {
+    if (jsonObj) {
+      //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
+      // w = jsonObj.users
+      // for (let prop in w) {  console.log("obj." + prop + " = " + w[prop]) }
+      //   obj.bovgit = 16.5
+      //   obj.maia1 = 12.5
+      let myScore = 0, oppoName = '', oppoScore = 0
+      let users = jsonObj.users
+      for (let username in users) {
+        // console.log(username + " = " + users[username])
+        if (username.toUpperCase() === playerName.toUpperCase()) {
+          myScore = users[username]
+        } else {
+          oppoName = username
+          oppoScore = users[username]
+        }
+      }
+      allScore += `${playerName} - ${oppoName} \t-   ${myScore} : ${oppoScore}\n`
+      // allScore += `${myScore} : ${oppoScore}\t - \t${playerName} - ${oppoName}\n`
+    }
+  })
+  let index = 0 //???????
+  let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
+  vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
+}
+
+async function getFetchScoreFromLichess(arPlayerNames, playerName) {
+  let jobs = []
+  for (let opponentName of arPlayerNames) {
+    if (opponentName !== playerName) {
+      const url = `${urlHttpServiceLichessScore}${playerName}/${opponentName}`
+      // let job = fetch(url, { mode: 'cors' })
+      let job = fetch(url)
+        .then(
+          successResponse => {
+            if (successResponse.status != 200) { return null }
+            else { return successResponse.json() }
+          },
+          failResponse => { return null }
+        )
+      jobs.push(job)
+    }
+  }
   let results = await Promise.all(jobs)
   return results
 }
 
 async function getDataFromChessCom(arPlayerNames) {
   await getProfileAfterFetchFromChessCom(arPlayerNames)
-  // await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
 async function getProfileAfterFetchFromChessCom(arPlayerNames) {
@@ -1378,7 +1436,6 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
   let profileResults = await getFetchResultsFromServer(false, arPlayerNames)
   profileResults.forEach((jsonObj, index) => {
     const playerName = arPlayerNames[index]
-    // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
     let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
     let playerHint = ''
 
@@ -1426,7 +1483,7 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
     vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
   })
-  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+  // await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
 async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
@@ -1484,7 +1541,7 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
           failResponse => {
             return null
           }
-        );
+        )
       jobs.push(job)
     }
   }
@@ -1492,7 +1549,7 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
   return results
 }
 
-//14.11.2021, 11:25:17 --> 14.11.2021 11:25 (delete seconds)
+//delete seconds from date: "14.11.2021, 11:25:17" --> "14.11.2021 11:25"
 function getDateHHMM(milliseconds) {
   let lastOnline = (new Date(milliseconds)).toLocaleString() //14.11.2021, 11:25:17
   // lastOnline = lastOnline.replace(',', '') //del comma
