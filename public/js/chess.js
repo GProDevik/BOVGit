@@ -72,6 +72,7 @@ const urlHttpServiceLichess = 'https://lichess.org/api/user/'
 const urlHttpServiceLichessStatus = 'https://lichess.org/api/users/status?ids='
 const urlHttpServiceLichessScore = 'https://lichess.org/api/crosstable/'
 const urlHttpServiceChessCom = 'https://api.chess.com/pub/player/'
+const modeCORS = 'cors' //mode for fetch
 const useAJAX = true //for exchange data between server & client
 const DISCONNECTED_TEXT = '  (disconnected)'
 const sortSymbolAtHead = '↑' //&#8593
@@ -1302,7 +1303,7 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
         + '<span class="playerTitle">' + playerTitle + ' </span>'
         + '<strong>' + playerName + '</strong></a>'
         // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
-        + (lastOnline ? '<br><span class="lastOnline" title="' + META_SCORE + '">' + lastOnline + '</span>' : '')
+        + (lastOnline ? '<br><span class="lastOnline" title="' + META_SCORE + '">' + lastOnline + '</span>' : '') //debug score
 
       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
       const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
@@ -1361,45 +1362,41 @@ async function getStatusAfterFetchFromLichess(arPlayerNames) {
 async function getFetchStatusFromLichess(arPlayerNames) {
   let jobs = []
   const playerNamesByComma = arPlayerNames.join(',')
-  let job = fetch(`${urlHttpServiceLichessStatus}${playerNamesByComma}`, { mode: 'cors' })
-    .then(
-      successResponse => {
-        if (successResponse.status != 200) { return null }
-        else { return successResponse.json() }
-      },
-      failResponse => { return null }
-    )
+  const url = `${urlHttpServiceLichessStatus}${playerNamesByComma}`
+  let job = fetch(url, { mode: modeCORS }).then(
+    successResponse => {
+      if (successResponse.status != 200) { return null }
+      else { return successResponse.json() }
+    },
+    failResponse => { return null }
+  )
   jobs.push(job)
   let results = await Promise.all(jobs)
   return results
 }
 
-async function getScoreAfterFetchFromLichess(arPlayerNames, playerName) {
+async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
+  const index = arPlayerNames.indexOf(myName)
+  if (index === -1) { return } //non-possible, but ...
+  if (index !== 0) { return } //debug
   let allScore = ''
-  let scoreResults = await getFetchScoreFromLichess(arPlayerNames, playerName)
+  let scoreResults = await getFetchScoreFromLichess(arPlayerNames, myName)
   scoreResults.forEach((jsonObj) => {
     if (jsonObj) {
       //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
-      // w = jsonObj.users
-      // for (let prop in w) {  console.log("obj." + prop + " = " + w[prop]) }
-      //   obj.bovgit = 16.5
-      //   obj.maia1 = 12.5
       let myScore = 0, oppoName = '', oppoScore = 0
       let users = jsonObj.users
       for (let username in users) {
-        // console.log(username + " = " + users[username])
-        if (username.toUpperCase() === playerName.toUpperCase()) {
+        if (username.toUpperCase() === myName.toUpperCase()) {
           myScore = users[username]
         } else {
           oppoName = username
           oppoScore = users[username]
         }
       }
-      allScore += `${playerName} - ${oppoName} \t-   ${myScore} : ${oppoScore}\n`
-      // allScore += `${myScore} : ${oppoScore}\t - \t${playerName} - ${oppoName}\n`
+      allScore += `${myName} - ${oppoName} \t-   ${myScore} : ${oppoScore}\n`
     }
   })
-  let index = 0 //???????
   let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
   vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
 }
@@ -1409,15 +1406,13 @@ async function getFetchScoreFromLichess(arPlayerNames, playerName) {
   for (let opponentName of arPlayerNames) {
     if (opponentName !== playerName) {
       const url = `${urlHttpServiceLichessScore}${playerName}/${opponentName}`
-      // let job = fetch(url, { mode: 'cors' })
-      let job = fetch(url)
-        .then(
-          successResponse => {
-            if (successResponse.status != 200) { return null }
-            else { return successResponse.json() }
-          },
-          failResponse => { return null }
-        )
+      let job = fetch(url, { mode: modeCORS }).then(
+        successResponse => {
+          if (successResponse.status != 200) { return null }
+          else { return successResponse.json() }
+        },
+        failResponse => { return null }
+      )
       jobs.push(job)
     }
   }
@@ -1527,21 +1522,13 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
   for (let name of arPlayerNames) {
     if (name !== '') {
       const url = thisIsLichess ? urlHttpServiceLichess : urlHttpServiceChessCom
-      // let job = fetch(`${url}${name}${afterUrl}`)
-      let job = fetch(`${url}${name}${afterUrl}`, { mode: 'cors' })
-        .then(
-          successResponse => {
-            if (successResponse.status != 200) {
-              return null
-            } else {
-              //!!!!!!!!!!!!!!!!!!!!!!!!!!! проверить: let job = AWAIT successResponse.json() !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              return successResponse.json()
-            }
-          },
-          failResponse => {
-            return null
-          }
-        )
+      let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS }).then(
+        successResponse => {
+          if (successResponse.status != 200) { return null }
+          else { return successResponse.json() }
+        },
+        failResponse => { return null }
+      )
       jobs.push(job)
     }
   }
