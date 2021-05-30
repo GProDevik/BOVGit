@@ -22,6 +22,7 @@ const root = {
   methods: {
     vueGroupAdd() { groupAdd() },
     vueGroupDel() { groupDel() },
+    vueScoreLichess(playerName) { scoreLichess(playerName) },
     vueGoUserMode() { goUserMode() },
     vueRefresh() { refresh() },
     vueOnClickCheckLichess() {
@@ -184,6 +185,14 @@ processUrlParams()
 
 if (needRefresh) {
   refresh()
+}
+
+/////////////////// show score player vs opponents (Lichess) /////////////////////////
+
+function scoreLichess(playerName) {
+  const thisIsLichess = true
+  const arPlayerNames = getArPlayerNames(thisIsLichess)
+  getScoreAfterFetchFromLichess(arPlayerNames, playerName)
 }
 
 /////////////////// groups of players /////////////////////////
@@ -1167,12 +1176,16 @@ function getChessTableRef(thisIsLichess) {
   return tableRef
 }
 
-async function fillTableFromServer(thisIsLichess) {
-  let playerNames, arPlayerNames, rowNum = 0
-  playerNames = getPlayerNames(thisIsLichess)
-  arPlayerNames = playerNames.split(' ') //get array of Players names
+function getArPlayerNames(thisIsLichess) {
+  let playerNames = getPlayerNames(thisIsLichess)
+  let arPlayerNames = playerNames.split(' ') //get array of Players names
   arPlayerNames = arPlayerNames.filter(item => item !== '') //leave not-empty values
 
+  return arPlayerNames
+}
+
+async function fillTableFromServer(thisIsLichess) {
+  let arPlayerNames = getArPlayerNames(thisIsLichess)
   if (thisIsLichess) {
     vm.vueArLichessPlayersBuf.length = 0
     await getDataFromLichess(arPlayerNames)
@@ -1221,13 +1234,14 @@ async function getDataFromLichess(arPlayerNames) {
   await getProfileAfterFetchFromLichess(arPlayerNames)
   await getStatusAfterFetchFromLichess(arPlayerNames)
 
-  let playerName = arPlayerNames[0] //временно !
-  await getScoreAfterFetchFromLichess(arPlayerNames, playerName)
+  //debug !
+  // let playerName = arPlayerNames[0]
+  // await getScoreAfterFetchFromLichess(arPlayerNames, playerName)
 
   clearMetaText(arPlayerNames)
 }
 
-//clear META_STATUS for players without status
+//clear not-used META_texts for players
 function clearMetaText(arPlayerNames) {
   arPlayerNames.forEach((item, index) => {
     let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML.replace(META_STATUS_TEXT, '')
@@ -1378,27 +1392,33 @@ async function getFetchStatusFromLichess(arPlayerNames) {
 async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   const index = arPlayerNames.indexOf(myName)
   if (index === -1) { return } //non-possible, but ...
-  if (index !== 0) { return } //debug
   let allScore = ''
   let scoreResults = await getFetchScoreFromLichess(arPlayerNames, myName)
+  const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
   scoreResults.forEach((jsonObj) => {
     if (jsonObj) {
       //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
-      let myScore = 0, oppoName = '', oppoScore = 0
+      let myGetName = '', myScore = 0, oppoName = '', oppoScore = 0
       let users = jsonObj.users
       for (let username in users) {
         if (username.toUpperCase() === myName.toUpperCase()) {
+          myGetName = username
           myScore = users[username]
         } else {
           oppoName = username
           oppoScore = users[username]
         }
       }
-      allScore += `${myName} - ${oppoName} \t-   ${myScore} : ${oppoScore}\n`
+      // const addSpaces = ' '.repeat(maxNameLength - oppoName.length + 2)
+      const addSpaces = '_'.repeat(maxNameLength - oppoName.length + 2)
+      allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore}\n`
+      // allScore += `${myGetName} - ${oppoName}-   ${myScore} : ${oppoScore}\n`
     }
   })
-  let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
-  vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
+  //debug
+  // let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
+  // vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
+  alert(allScore)
 }
 
 async function getFetchScoreFromLichess(arPlayerNames, playerName) {

@@ -101,7 +101,7 @@
             <tbody class="TBodyLichess">
               <tr v-for="(item, name, index) in vueArLichessPlayers" :key="index">
                 <td v-html="item.playerHTML"></td>
-                <td>{{item.bullet}}</td>
+                <td @click="vueScoreLichess(item.playerName)">{{item.bullet}}</td>
                 <td>{{item.blitz}}</td>
                 <td>{{item.rapid}}</td>
                 <td>{{item.puzzle}}</td>
