@@ -1389,56 +1389,162 @@ async function getFetchStatusFromLichess(arPlayerNames) {
   return results
 }
 
+// async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
+//   const index = arPlayerNames.indexOf(myName)
+//   if (index === -1) { return } //non-possible, but ...
+//   let allScore = ''
+//   let scoreResults = await getFetchScoreFromLichess(arPlayerNames, myName)
+//   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
+//   scoreResults.forEach((jsonObj) => {
+//     if (jsonObj) {
+//       //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
+//       let myGetName = '', myScore = 0, oppoName = '', oppoScore = 0
+//       let users = jsonObj.users
+//       for (let username in users) {
+//         if (username.toUpperCase() === myName.toUpperCase()) {
+//           myGetName = username
+//           myScore = users[username]
+//         } else {
+//           oppoName = username
+//           oppoScore = users[username]
+//         }
+//       }
+//       // const addSpaces = ' '.repeat(maxNameLength - oppoName.length + 2)
+//       const addSpaces = '_'.repeat(maxNameLength - oppoName.length + 2)
+//       allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore}\n`
+//       // allScore += `${myGetName} - ${oppoName}-   ${myScore} : ${oppoScore}\n`
+//     }
+//   })
+//   //debug
+//   // let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
+//   // vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
+//   alert(allScore)
+// }
+
+// async function getFetchScoreFromLichess(arPlayerNames, playerName) {
+//   let jobs = []
+//   for (let opponentName of arPlayerNames) {
+//     if (opponentName !== playerName) {
+//       const url = `${urlHttpServiceLichessScore}${playerName}/${opponentName}`
+//       let job = fetch(url, { mode: modeCORS }).then(
+//         successResponse => {
+//           if (successResponse.status != 200) { return null }
+//           else { return successResponse.json() }
+//         },
+//         failResponse => { return null }
+//       )
+//       jobs.push(job)
+//     }
+//   }
+//   let results = await Promise.all(jobs)
+//   return results
+// }
+
 async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   const index = arPlayerNames.indexOf(myName)
-  if (index === -1) { return } //non-possible, but ...
+  if (index === -1) {
+    return //non-possible, but ...
+  }
+
+  let isError = false
   let allScore = ''
-  let scoreResults = await getFetchScoreFromLichess(arPlayerNames, myName)
   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
-  scoreResults.forEach((jsonObj) => {
-    if (jsonObj) {
-      //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
-      let myGetName = '', myScore = 0, oppoName = '', oppoScore = 0
-      let users = jsonObj.users
-      for (let username in users) {
-        if (username.toUpperCase() === myName.toUpperCase()) {
-          myGetName = username
-          myScore = users[username]
+  let milliSeconds = 1000
+  for (let opponentName of arPlayerNames) {
+    if (opponentName !== myName) {
+      const url = `${urlHttpServiceLichessScore}${myName}/${opponentName}`
+
+      milliSeconds += 10
+      // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+
+      try {
+        const response = await fetch(url)
+        if (response.ok) {
+
+          milliSeconds += 10
+          // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+
+
+          const jsonObj = await response.json()
+          //{ error: "Too many requests. Try again later." }
+          if (jsonObj && !jsonObj['error']) {
+            //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
+            let myGetName = '', myScore = 0, oppoName = '', oppoScore = 0
+            let users = jsonObj.users
+            for (let username in users) {
+              if (username.toUpperCase() === myName.toUpperCase()) {
+                myGetName = username
+                myScore = users[username]
+              } else {
+                oppoName = username
+                oppoScore = users[username]
+              }
+            }
+            const addSpaces = '_'.repeat(maxNameLength - oppoName.length + 2)
+            allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore}\n`
+          }
         } else {
-          oppoName = username
-          oppoScore = users[username]
+          isError = true
+          console.log(`status error: ${response.status} ${response.statusText} - ${url}`)
         }
+      } catch (err) {
+        isError = true
+        console.log(`error: ${err} - ${url}`)
       }
-      // const addSpaces = ' '.repeat(maxNameLength - oppoName.length + 2)
-      const addSpaces = '_'.repeat(maxNameLength - oppoName.length + 2)
-      allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore}\n`
-      // allScore += `${myGetName} - ${oppoName}-   ${myScore} : ${oppoScore}\n`
     }
-  })
+  }
   //debug
   // let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
   // vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
+  allScore += isError ? '\nCannot get some data from Lichess.\nTry again later.' : ''
   alert(allScore)
 }
 
-async function getFetchScoreFromLichess(arPlayerNames, playerName) {
-  let jobs = []
-  for (let opponentName of arPlayerNames) {
-    if (opponentName !== playerName) {
-      const url = `${urlHttpServiceLichessScore}${playerName}/${opponentName}`
-      let job = fetch(url, { mode: modeCORS }).then(
-        successResponse => {
-          if (successResponse.status != 200) { return null }
-          else { return successResponse.json() }
-        },
-        failResponse => { return null }
-      )
-      jobs.push(job)
-    }
-  }
-  let results = await Promise.all(jobs)
-  return results
-}
+// function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
+//   const index = arPlayerNames.indexOf(myName)
+//   if (index === -1) { return } //non-possible, but ...
+
+//   let allScore = ''
+//   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
+//   for (let opponentName of arPlayerNames) {
+//     if (opponentName !== myName) {
+//       const url = `${ urlHttpServiceLichessScore }${ myName } / ${ opponentName }`
+//       fetch(url)
+//         .then((response) => {
+//           return response.json()
+//         })
+//         .then((jsonObj) => {
+//           //{ error: "Too many requests. Try again later." }
+//           // if (jsonObj && !jsonObj['error']) {
+//           //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
+//           let myGetName = '', myScore = 0, oppoName = '', oppoScore = 0
+//           let users = jsonObj.users
+//           for (let username in users) {
+//             if (username.toUpperCase() === myName.toUpperCase()) {
+//               myGetName = username
+//               myScore = users[username]
+//             } else {
+//               oppoName = username
+//               oppoScore = users[username]
+//             }
+//           }
+//           .catch((e) => console.error(e))
+//
+//           // const addSpaces = ' '.repeat(maxNameLength - oppoName.length + 2)
+//           const addSpaces = '_'.repeat(maxNameLength - oppoName.length + 2)
+//           allScore += `${ myGetName } - ${ oppoName } ${ addSpaces }   ${ myScore } : ${ oppoScore }\n`
+//           // allScore += `${ myGetName } - ${ oppoName } - ${ myScore } : ${ oppoScore }\n`
+//           // }
+//         })
+
+
+//     }
+//   }
+//   //debug
+//   // let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
+//   // vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
+//   alert(allScore)
+// }
 
 async function getDataFromChessCom(arPlayerNames) {
   await getProfileAfterFetchFromChessCom(arPlayerNames)
@@ -1951,4 +2057,57 @@ function is_mobile_device() {
     + 'blackberry|playstation portable|tablet browser|webOS|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk'
   const devices = new RegExp(s, "i")
   return devices.test(navigator.userAgent) ? true : false
+}
+
+// async function delayMilliseconds(milliSeconds) {
+//   // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+
+//   let promise = new Promise((resolve, reject) => {
+//     setTimeout(() => resolve("готово!"), milliSeconds)
+//   });
+
+//   await promise; // будет ждать, пока промис не выполнится (*)
+// }
+
+
+function delayMilliseconds(milliSeconds) {
+  // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+  return new Promise(resolve => setTimeout(resolve, milliSeconds))
+}
+
+
+// async function f() {
+
+//   let promise = new Promise((resolve, reject) => {
+//     setTimeout(() => resolve("готово!"), 2000)
+//   });
+
+//   let result = await promise; // будет ждать, пока промис не выполнится (*)
+
+//   // alert(result); // "готово!"
+//   let a = 1
+// }
+
+function f() {
+
+  new Promise(function (resolve, reject) {
+
+    setTimeout(() => resolve(1), 1000); // (*)
+
+  }).then(function (result) { // (**)
+
+    alert(result); // 1
+    return result * 2;
+
+  }).then(function (result) { // (***)
+
+    alert(result); // 2
+    return result * 2;
+
+  }).then(function (result) {
+
+    alert(result); // 4
+    return result * 2;
+
+  });
 }
