@@ -77,8 +77,11 @@ const modeCORS = 'cors' //mode for fetch
 const useAJAX = true //for exchange data between server & client
 const DISCONNECTED_TEXT = '  (disconnected)'
 const sortSymbolAtHead = '↑' //&#8593
-const onlineSymbolAtPlayer = '&#10004;' //check
+// const onlineSymbolAtPlayer = '&#10004;' //check
+
 const onlineSymbolOnline = '&#9675;'	//not-filled circle
+// const onlineSymbolOnline = '&#10004;' //check
+
 const onlineSymbolPlaying = '&#9679;'	//filled circle
 
 // const onlineSymbolStreaming = '&#9679;'	//filled circle
@@ -187,7 +190,7 @@ if (needRefresh) {
   refresh()
 }
 
-/////////////////// show score player vs opponents (Lichess) /////////////////////////
+/////////////////// show score: player vs opponents (Lichess) /////////////////////////
 
 function scoreLichess(playerName) {
   const thisIsLichess = true
@@ -1186,17 +1189,29 @@ function getArPlayerNames(thisIsLichess) {
 
 async function fillTableFromServer(thisIsLichess) {
   let arPlayerNames = getArPlayerNames(thisIsLichess)
-  if (thisIsLichess) {
-    vm.vueArLichessPlayersBuf.length = 0
-    await getDataFromLichess(arPlayerNames)
-  } else {
-    vm.vueArChessComPlayersBuf.length = 0
-    await getDataFromChessCom(arPlayerNames)
+  if (arPlayerNames.length === 0) {
+    return
   }
 
-  // const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
-  // setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
-  showTableContent(thisIsLichess, arPlayerNames)
+  outMsgWait(true)
+  try {
+
+    if (thisIsLichess) {
+      vm.vueArLichessPlayersBuf.length = 0
+      await getDataFromLichess(arPlayerNames)
+    } else {
+      vm.vueArChessComPlayersBuf.length = 0
+      await getDataFromChessCom(arPlayerNames)
+    }
+
+    // const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
+    // setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+    showTableContent(thisIsLichess, arPlayerNames)
+
+  } catch (err) {
+    console.log(`error: ${err}`)
+  }
+  outMsgWait(false)
 }
 
 //show table (it's random order sometimes after refresh by ajax)
@@ -1223,15 +1238,14 @@ function showTableContent(thisIsLichess, arPlayerNames) {
 
   if (thisIsLichess) {
     vm.vueArLichessPlayers = [...arTmp]
-    // vm.vueArLichessPlayers = JSON.parse(JSON.stringify(arTmp))
   } else {
     vm.vueArChessComPlayers = [...arTmp]
-    // vm.vueArChessComPlayers = JSON.parse(JSON.stringify(arTmp))
   }
 }
 
 async function getDataFromLichess(arPlayerNames) {
-  await getProfileAfterFetchFromLichess(arPlayerNames)
+  // await getProfileAfterFetchFromLichess(arPlayerNames) //N queries for N players
+  await getProfilesAfterFetchFromLichess(arPlayerNames) //one query for many players
   await getStatusAfterFetchFromLichess(arPlayerNames)
 
   //debug !
@@ -1251,20 +1265,115 @@ function clearMetaText(arPlayerNames) {
   })
 }
 
-async function getProfileAfterFetchFromLichess(arPlayerNames) {
-  let profileResults = await getFetchResultsFromServer(true, arPlayerNames)
-  profileResults.forEach((jsonObj, index) => {
-    let playerName = arPlayerNames[index]
-    if (jsonObj === null) {
+// //N queries for N players
+// async function getProfileAfterFetchFromLichess(arPlayerNames) {
+//   let profileResults = await getFetchResultsFromServer(true, arPlayerNames)
+//   profileResults.forEach((jsonObj, index) => {
+//     let playerName = arPlayerNames[index]
+//     if (jsonObj === null) {
+//       //player not found
+//       console.log(`${playerName} - lichess, response-error`) //: ${response.status}`)
+//       vm.vueArLichessPlayersBuf.push({
+//         // playerHTML: '<em>? ' + playerName + '</em>',
+//         playerHTML: '<em>' + playerName + '</em>',
+//         playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: ''
+//       })
+//     } else {
+//       // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
+//       // const isOnline = getJsonValue1(playerName, jsonObj, 'online')
+//       //const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
+//       let v
+
+//       //playerTitle: title of player (GM, IM, FM, ...)
+//       let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
+//       playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
+
+//       //playerHint
+//       let playerHint = ''
+//       let playerMyDesccription = mapDefaultLichessPlayers.get(playerName)
+//       if (playerMyDesccription) {
+//         playerHint = playerMyDesccription + '\n\n'
+//       } else if (isPlayerMe(playerName)) {
+//         playerHint = BOVGIT_description + '\n\n'
+//       }
+
+//       const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
+//       const lastName = getJsonValue2(playerName, jsonObj, 'profile', 'lastName')
+//       const location = getJsonValue2(playerName, jsonObj, 'profile', 'location')
+//       const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
+//       const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
+//       const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
+
+//       let createdAt = '' //registration date
+//       v = getJsonValue1(playerName, jsonObj, 'createdAt')
+//       if (v) { createdAt = (new Date(v)).getFullYear() }
+
+//       let lastOnline = '' //date&time of last login (milliseconds)
+//       v = getJsonValue1(playerName, jsonObj, 'seenAt')
+//       if (v) { lastOnline = getDateHHMM(v) }
+
+//       const firstPart = (firstName ? firstName + ' ' : '')
+//         + (lastName ? lastName : '')
+//         + (location ? ', ' + location : '')
+//         + (fideRating ? ', FIDE ' + fideRating : '')
+//         + (playerTitle && !playerMyDesccription ? ', ' + playerTitle : '')
+//       playerHint += firstPart
+//         + (firstPart ? '\n' : '')
+//         + (createdAt ? 'reg. ' + createdAt : '')
+//         + (lastOnline ? '\nlast online ' + lastOnline : '')
+//         + '\n' + META_STATUS_TEXT
+//         + (bio ? '\n' + bio.replaceAll('"', '\'') : '') // (") - called error
+//         + (links ? '\n' + links : '')
+
+//       //playerHTML (href !)
+//       const playerURL = getJsonValue1(playerName, jsonObj, 'url')
+//       let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+//         + META_STATUS_SYMBOL // onlineSymbol
+//         + '<span class="playerTitle">' + playerTitle + ' </span>'
+//         + '<strong>' + playerName + '</strong></a>'
+//         // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+//         + (lastOnline ? '<br><span class="lastOnline" title="' + META_SCORE + '">' + lastOnline + '</span>' : '') //debug score
+
+//       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
+//       const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
+//       const rapid = getJsonValue3(playerName, jsonObj, 'perfs', 'rapid', 'rating')
+//       const puzzle = getJsonValue3(playerName, jsonObj, 'perfs', 'puzzle', 'rating')
+//       const rush = getJsonValue3(playerName, jsonObj, 'perfs', 'storm', 'score') //rush (max)
+
+//       vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+//     }
+//   })
+// }
+
+//one query for many players
+async function getProfilesAfterFetchFromLichess(arPlayerNames) {
+
+  const playerNamesByComma = arPlayerNames.join(',')
+  const response = await fetch('https://lichess.org/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    body: playerNamesByComma
+  })
+  if (!response.ok) {
+    console.log(`status error: ${response.status} ${response.statusText} - getProfilesAfterFetchFromLichess`)
+    return
+  }
+
+  const beginDate = getBeginOfLastDay()
+
+  const arJsonObj = await response.json() //array with non-guaranted order
+  arPlayerNames.forEach((playerName, index) => {
+    const playerNameUpper = playerName.toUpperCase()
+    const jsonObj = arJsonObj.find(item => item.username.toUpperCase() === playerNameUpper)
+    if (!jsonObj) {
       //player not found
-      console.log(`${playerName} - lichess, response-error`) //: ${response.status}`)
+      console.log(`${playerName} - lichess, response.json error`) //: ${response.status}`)
       vm.vueArLichessPlayersBuf.push({
         // playerHTML: '<em>? ' + playerName + '</em>',
         playerHTML: '<em>' + playerName + '</em>',
         playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: ''
       })
     } else {
-      // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
       // const isOnline = getJsonValue1(playerName, jsonObj, 'online')
       //const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
       let v
@@ -1295,7 +1404,13 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
 
       let lastOnline = '' //date&time of last login (milliseconds)
       v = getJsonValue1(playerName, jsonObj, 'seenAt')
-      if (v) { lastOnline = getDateHHMM(v) }
+      let classLastOnline = 'lastOnline'
+      if (v) {
+        lastOnline = getDateHHMM(v)
+        if (new Date(v) < beginDate) {
+          classLastOnline = 'lastOnlineBeforeToday'
+        }
+      }
 
       const firstPart = (firstName ? firstName + ' ' : '')
         + (lastName ? lastName : '')
@@ -1311,13 +1426,15 @@ async function getProfileAfterFetchFromLichess(arPlayerNames) {
         + (links ? '\n' + links : '')
 
       //playerHTML (href !)
-      const playerURL = getJsonValue1(playerName, jsonObj, 'url')
+      // const playerURL = getJsonValue1(playerName, jsonObj, 'url')
+      const playerURL = 'https://lichess.org/@/' + playerName
       let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
         + META_STATUS_SYMBOL // onlineSymbol
         + '<span class="playerTitle">' + playerTitle + ' </span>'
         + '<strong>' + playerName + '</strong></a>'
+        // + (lastOnline ? '<br><span class="lastOnline" title="' + META_SCORE + '">' + lastOnline + '</span>' : '') //debug score
         // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
-        + (lastOnline ? '<br><span class="lastOnline" title="' + META_SCORE + '">' + lastOnline + '</span>' : '') //debug score
+        + (lastOnline ? '<br><span class="' + classLastOnline + '">' + lastOnline + '</span>' : '')
 
       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
       const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
@@ -1553,7 +1670,7 @@ async function getDataFromChessCom(arPlayerNames) {
 
 async function getProfileAfterFetchFromChessCom(arPlayerNames) {
 
-  //get profile for player
+  const beginDate = getBeginOfLastDay()
   let profileResults = await getFetchResultsFromServer(false, arPlayerNames)
   profileResults.forEach((jsonObj, index) => {
     const playerName = arPlayerNames[index]
@@ -1585,7 +1702,13 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
       if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
 
       v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login (seconds)
-      if (v) { lastOnline = getDateHHMM(v * 1000) }
+      let classLastOnline = 'lastOnline'
+      if (v) {
+        lastOnline = getDateHHMM(v * 1000)
+        if (new Date(v * 1000) < beginDate) {
+          classLastOnline = 'lastOnlineBeforeToday'
+        }
+      }
 
       playerHint += (name ? name : '')
         + (location ? ', ' + location : '')
@@ -1599,7 +1722,8 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
         + onlineSymbol
         + '<span class="playerTitle">' + playerTitle + ' </span>'
         + '<strong>' + playerName + '</strong></a>'
-        + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+        // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
+        + (lastOnline ? '<br><span class="' + classLastOnline + '">' + lastOnline + '</span>' : '')
     }
     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
     vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
@@ -2059,55 +2183,14 @@ function is_mobile_device() {
   return devices.test(navigator.userAgent) ? true : false
 }
 
-// async function delayMilliseconds(milliSeconds) {
-//   // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
-
-//   let promise = new Promise((resolve, reject) => {
-//     setTimeout(() => resolve("готово!"), milliSeconds)
-//   });
-
-//   await promise; // будет ждать, пока промис не выполнится (*)
-// }
-
-
-function delayMilliseconds(milliSeconds) {
-  // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
-  return new Promise(resolve => setTimeout(resolve, milliSeconds))
+function outMsgWait(show) {
+  const defColor = 'white'
+  const waitColor = '#ffe4b5' //light-yellow (or as "background-color: moccasin ;")
+  document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+  document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
 }
 
-
-// async function f() {
-
-//   let promise = new Promise((resolve, reject) => {
-//     setTimeout(() => resolve("готово!"), 2000)
-//   });
-
-//   let result = await promise; // будет ждать, пока промис не выполнится (*)
-
-//   // alert(result); // "готово!"
-//   let a = 1
-// }
-
-function f() {
-
-  new Promise(function (resolve, reject) {
-
-    setTimeout(() => resolve(1), 1000); // (*)
-
-  }).then(function (result) { // (**)
-
-    alert(result); // 1
-    return result * 2;
-
-  }).then(function (result) { // (***)
-
-    alert(result); // 2
-    return result * 2;
-
-  }).then(function (result) {
-
-    alert(result); // 4
-    return result * 2;
-
-  });
+function getBeginOfLastDay() {
+  const d = (new Date()) - 1000 * 60 * 60 * 24 //1 day before current
+  return (new Date(d)).setHours(0, 0, 0, 0) //time 0:00:00
 }

@@ -40,12 +40,18 @@ html {
   border-radius: 6px;
 }
 
+/* .waitPlease {
+  font-size: small;
+  font-weight: bold;
+  font-style: italic;
+  background-color: moccasin ;
+} */
+
 .buttonGroup {
   font-size: small;
   /* font-style: italic; */
   margin-left: 1vw;
 }
-
 
 .select {
   font-size: medium;
@@ -199,12 +205,22 @@ td {
 
 .lastOnline{
   font-size: x-small;
-  color: gray;
   font-weight: bold;
+  color: gray;
+  /* color: black; */
+}
+
+.lastOnlineBeforeToday{
+  font-size: x-small;
+  font-weight: normal;
+  /* color: white; */
+  /* color: aliceblue; */
+  color: darkgray;
 }
 
 .statusOnline{
   font-size: large;
+  /* font-size: small;  for symbol 'check'*/
   color: gray;
 }
 
