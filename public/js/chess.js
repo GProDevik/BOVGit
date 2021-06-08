@@ -2186,11 +2186,15 @@ function is_mobile_device() {
 function outMsgWait(show) {
   const defColor = 'white'
   const waitColor = '#ffe4b5' //light-yellow (or as "background-color: moccasin ;")
-  document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
-  document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+  if (isCheckLichess()) {
+    document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+  }
+  if (isCheckChessCom()) {
+    document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+  }
 }
 
 function getBeginOfLastDay() {
   const d = (new Date()) - 1000 * 60 * 60 * 24 //1 day before current
-  return (new Date(d)).setHours(0, 0, 0, 0) //time 0:00:00
+  return (new Date(d)).setHours(0, 0, 0, 0) //time 0:00:00,000
 }
