@@ -1193,7 +1193,7 @@ async function fillTableFromServer(thisIsLichess) {
     return
   }
 
-  outMsgWait(true)
+  outMsgWait(thisIsLichess, true)
   try {
 
     if (thisIsLichess) {
@@ -1211,7 +1211,7 @@ async function fillTableFromServer(thisIsLichess) {
   } catch (err) {
     console.log(`error: ${err}`)
   }
-  outMsgWait(false)
+  outMsgWait(thisIsLichess, false)
 }
 
 //show table (it's random order sometimes after refresh by ajax)
@@ -2183,13 +2183,13 @@ function is_mobile_device() {
   return devices.test(navigator.userAgent) ? true : false
 }
 
-function outMsgWait(show) {
+function outMsgWait(thisIsLichess, show) {
   const defColor = 'white'
   const waitColor = '#ffe4b5' //light-yellow (or as "background-color: moccasin ;")
-  if (isCheckLichess()) {
+  if (thisIsLichess && isCheckLichess()) {
     document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
   }
-  if (isCheckChessCom()) {
+  if (!thisIsLichess && isCheckChessCom()) {
     document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
   }
 }
