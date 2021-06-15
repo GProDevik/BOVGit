@@ -218,6 +218,17 @@ td {
   color: darkgray;
 }
 
+.ratingPlus{
+  /* font-size: x-small; */
+  font-size: small;
+  color: green;
+}
+
+.ratingMinus{
+  font-size: x-small;
+  color: red;
+}
+
 .statusOnline{
   font-size: large;
   /* font-size: small;  for symbol 'check'*/

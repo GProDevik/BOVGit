@@ -8,6 +8,7 @@ const root = {
     return {
       vueCurrentUsername: '',
       vueCheckLichess: false,
+      // vueCheckLichessDyn: false,
       vueLichessOrgPlayerNames: '',
       vueCheckChessCom: false,
       vueChessComPlayerNames: '',
@@ -20,6 +21,11 @@ const root = {
     }
   },
   methods: {
+    // vueOnClickCheckLichessDyn() {
+    //   setCheckLichessDyn(!isCheckLichessDyn()) //inversion checkbox
+    //   refreshLichess()
+    // },
+
     vueGroupAdd() { groupAdd() },
     vueGroupDel() { groupDel() },
     vueScoreLichess(playerName) { scoreLichess(playerName) },
@@ -189,6 +195,18 @@ processUrlParams()
 if (needRefresh) {
   refresh()
 }
+
+/////////////////// show rating dynamics (Lichess) /////////////////////////
+
+// function isCheckLichessDyn() {
+//   // return document.getElementById('elemCheckLichessDyn').checked
+//   return vm.vueCheckLichessDyn
+// }
+
+// function setCheckLichessDyn(booleanValue) {
+//   // document.getElementById('elemCheckLichessDyn').checked = booleanValue
+//   vm.vueCheckLichessDyn = booleanValue
+// }
 
 /////////////////// show score: player vs opponents (Lichess) /////////////////////////
 
@@ -1247,10 +1265,7 @@ async function getDataFromLichess(arPlayerNames) {
   // await getProfileAfterFetchFromLichess(arPlayerNames) //N queries for N players
   await getProfilesAfterFetchFromLichess(arPlayerNames) //one query for many players
   await getStatusAfterFetchFromLichess(arPlayerNames)
-
-  //debug !
-  // let playerName = arPlayerNames[0]
-  // await getScoreAfterFetchFromLichess(arPlayerNames, playerName)
+  await getDynamicsAfterFetchFromLichess(arPlayerNames)
 
   clearMetaText(arPlayerNames)
 }
@@ -1279,7 +1294,6 @@ function clearMetaText(arPlayerNames) {
 //         playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: ''
 //       })
 //     } else {
-//       // console.log(getJsonValue1(playerName, jsonObj, 'username')) //debug
 //       // const isOnline = getJsonValue1(playerName, jsonObj, 'online')
 //       //const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
 //       let v
@@ -1332,7 +1346,6 @@ function clearMetaText(arPlayerNames) {
 //         + '<span class="playerTitle">' + playerTitle + ' </span>'
 //         + '<strong>' + playerName + '</strong></a>'
 //         // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
-//         + (lastOnline ? '<br><span class="lastOnline" title="' + META_SCORE + '">' + lastOnline + '</span>' : '') //debug score
 
 //       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
 //       const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
@@ -1344,6 +1357,7 @@ function clearMetaText(arPlayerNames) {
 //     }
 //   })
 // }
+//
 
 //one query for many players
 async function getProfilesAfterFetchFromLichess(arPlayerNames) {
@@ -1432,8 +1446,6 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
         + META_STATUS_SYMBOL // onlineSymbol
         + '<span class="playerTitle">' + playerTitle + ' </span>'
         + '<strong>' + playerName + '</strong></a>'
-        // + (lastOnline ? '<br><span class="lastOnline" title="' + META_SCORE + '">' + lastOnline + '</span>' : '') //debug score
-        // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
         + (lastOnline ? '<br><span class="' + classLastOnline + '">' + lastOnline + '</span>' : '')
 
       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
@@ -1506,6 +1518,68 @@ async function getFetchStatusFromLichess(arPlayerNames) {
   return results
 }
 
+async function getDynamicsAfterFetchFromLichess(arPlayerNames) {
+  let dynamicsResults = await getFetchDynamicsFromLichess(arPlayerNames)
+  dynamicsResults.forEach((jsonObjs, index) => {
+    //let playerName = arPlayerNames[index]
+    if (jsonObjs.length === 0) {
+      return
+    }
+    for (let tableCol of ['bullet', 'blitz', 'rapid', 'puzzle', 'rush']) {
+      const isGames = (tableCol === 'bullet') || (tableCol === 'blitz') || (tableCol === 'rapid')
+      const notGamesKey = isGames ? '' : ((tableCol === 'rush') ? 'storm' : 'puzzle')
+      const jsonObj = jsonObjs.find((item) => {
+        if (isGames) {
+          return item['games'] && item['games'][tableCol] && item['games'][tableCol]['rp']
+            ? true : false
+        } else {
+          return item[notGamesKey] && item[notGamesKey]['rp']
+            ? true : false
+        }
+      })
+      if (jsonObj) {
+        let ratingAfter, ratingBefore
+        if (isGames) {
+          ratingAfter = jsonObj.games[tableCol].rp.after
+          ratingBefore = jsonObj.games[tableCol].rp.before
+        } else {
+          ratingAfter = jsonObj[notGamesKey].rp.after
+          ratingBefore = jsonObj[notGamesKey].rp.before
+        }
+        if (ratingAfter && ratingBefore) {
+          const diff = ratingAfter - ratingBefore
+          if (diff !== 0) {
+            let classRating = diff > 0 ? 'ratingPlus' : 'ratingMinus'
+            let diffTag = (diff > 0 ? '+' : '') + `${diff}`
+            diffTag = diff > 0 ? '<sup>' + diffTag + '</sup>' : '<sub>' + diffTag + '</sub>'
+            diffTag = `<span class="${classRating}">${diffTag}</span>`
+            const row = vm.vueArLichessPlayersBuf[index]
+            row[tableCol] = `${row[tableCol]}${diffTag}`
+            vm.vueArLichessPlayersBuf[index] = row
+          }
+        }
+      }
+    }
+  })
+}
+
+async function getFetchDynamicsFromLichess(arPlayerNames) {
+  let jobs = []
+  for (let playerName of arPlayerNames) {
+    const url = `${urlHttpServiceLichess}${playerName}/activity`
+    let job = fetch(url, { mode: modeCORS }).then(
+      successResponse => {
+        if (successResponse.status != 200) { return null }
+        else { return successResponse.json() }
+      },
+      failResponse => { return null }
+    )
+    jobs.push(job)
+  }
+  let results = await Promise.all(jobs)
+  return results
+}
+
 // async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 //   const index = arPlayerNames.indexOf(myName)
 //   if (index === -1) { return } //non-possible, but ...
@@ -1532,9 +1606,6 @@ async function getFetchStatusFromLichess(arPlayerNames) {
 //       // allScore += `${myGetName} - ${oppoName}-   ${myScore} : ${oppoScore}\n`
 //     }
 //   })
-//   //debug
-//   // let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
-//   // vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
 //   alert(allScore)
 // }
 
@@ -1557,6 +1628,8 @@ async function getFetchStatusFromLichess(arPlayerNames) {
 //   return results
 // }
 
+////////////////////////////////////////////
+
 async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   const index = arPlayerNames.indexOf(myName)
   if (index === -1) {
@@ -1566,28 +1639,27 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   let isError = false
   let allScore = ''
   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
-  let milliSeconds = 1000
+  // let milliSeconds = 1000
   for (let opponentName of arPlayerNames) {
     if (opponentName !== myName) {
       const url = `${urlHttpServiceLichessScore}${myName}/${opponentName}`
 
-      milliSeconds += 10
+      // milliSeconds += 10
       // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
 
       try {
         const response = await fetch(url)
         if (response.ok) {
 
-          milliSeconds += 10
+          // milliSeconds += 10
           // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
-
 
           const jsonObj = await response.json()
           //{ error: "Too many requests. Try again later." }
           if (jsonObj && !jsonObj['error']) {
             //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
             let myGetName = '', myScore = 0, oppoName = '', oppoScore = 0
-            let users = jsonObj.users
+            const users = jsonObj.users
             for (let username in users) {
               if (username.toUpperCase() === myName.toUpperCase()) {
                 myGetName = username
@@ -1610,17 +1682,14 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
       }
     }
   }
-  //debug
-  // let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
-  // vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
   allScore += isError ? '\nCannot get some data from Lichess.\nTry again later.' : ''
   alert(allScore)
 }
 
+//fetch(url).then((response) => {return response.json()}).then((jsonObj) => {...
 // function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 //   const index = arPlayerNames.indexOf(myName)
 //   if (index === -1) { return } //non-possible, but ...
-
 //   let allScore = ''
 //   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
 //   for (let opponentName of arPlayerNames) {
@@ -1653,13 +1722,8 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 //           // allScore += `${ myGetName } - ${ oppoName } - ${ myScore } : ${ oppoScore }\n`
 //           // }
 //         })
-
-
 //     }
 //   }
-//   //debug
-//   // let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML
-//   // vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML.replace(META_SCORE, allScore)
 //   alert(allScore)
 // }
 
@@ -1722,7 +1786,6 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
         + onlineSymbol
         + '<span class="playerTitle">' + playerTitle + ' </span>'
         + '<strong>' + playerName + '</strong></a>'
-        // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
         + (lastOnline ? '<br><span class="' + classLastOnline + '">' + lastOnline + '</span>' : '')
     }
     const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
