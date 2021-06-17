@@ -1212,23 +1212,23 @@ async function fillTableFromServer(thisIsLichess) {
   }
 
   outMsgWait(thisIsLichess, true)
-  try {
+  // try {
 
-    if (thisIsLichess) {
-      vm.vueArLichessPlayersBuf.length = 0
-      await getDataFromLichess(arPlayerNames)
-    } else {
-      vm.vueArChessComPlayersBuf.length = 0
-      await getDataFromChessCom(arPlayerNames)
-    }
-
-    // const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
-    // setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
-    showTableContent(thisIsLichess, arPlayerNames)
-
-  } catch (err) {
-    console.log(`error: ${err}`)
+  if (thisIsLichess) {
+    vm.vueArLichessPlayersBuf.length = 0
+    await getDataFromLichess(arPlayerNames)
+  } else {
+    vm.vueArChessComPlayersBuf.length = 0
+    await getDataFromChessCom(arPlayerNames)
   }
+
+  // const milliSeconds = thisIsLichess ? lichessDelay : chessComDelay
+  // setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
+  showTableContent(thisIsLichess, arPlayerNames)
+
+  // } catch (err) {
+  //   console.log(`error: ${err}`)
+  // }
   outMsgWait(thisIsLichess, false)
 }
 
@@ -1265,7 +1265,10 @@ async function getDataFromLichess(arPlayerNames) {
   // await getProfileAfterFetchFromLichess(arPlayerNames) //N queries for N players
   await getProfilesAfterFetchFromLichess(arPlayerNames) //one query for many players
   await getStatusAfterFetchFromLichess(arPlayerNames)
+
+  // if (!isMobileDevice) { //temporary only for PC
   await getDynamicsAfterFetchFromLichess(arPlayerNames)
+  // }
 
   clearMetaText(arPlayerNames)
 }
@@ -1521,8 +1524,9 @@ async function getFetchStatusFromLichess(arPlayerNames) {
 async function getDynamicsAfterFetchFromLichess(arPlayerNames) {
   let dynamicsResults = await getFetchDynamicsFromLichess(arPlayerNames)
   dynamicsResults.forEach((jsonObjs, index) => {
-    //let playerName = arPlayerNames[index]
-    if (jsonObjs.length === 0) {
+    // let playerName = arPlayerNames[index]
+    // console.log(playerName + ' : getDynamicsAfterFetchFromLichess')
+    if (!jsonObjs || jsonObjs.length === 0) {
       return
     }
     for (let tableCol of ['bullet', 'blitz', 'rapid', 'puzzle', 'rush']) {
