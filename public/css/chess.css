@@ -4,19 +4,16 @@ html {
   font-family: 'helvetica neue', helvetica, arial, sans-serif;
 }
 
-.mobileSyle {
+.mobileStyle {
   margin-left: 0;
   width: 100%;
-  font-size: 90%;
+  font-size: 80%; /*90%*/
 }
 
 .PCStyle {
   font-size: 100%;
   margin-left: 30vw;
   width: 40vw;
-  /* for kingscrusher-youtube ! (long name) */
-  /* margin-left: 28vw; */
-  /* width: 44vw; */
 }
 
 .projectNameDifMobile {
@@ -39,13 +36,6 @@ html {
   border: 2px solid lightgray;
   border-radius: 6px;
 }
-
-/* .waitPlease {
-  font-size: small;
-  font-weight: bold;
-  font-style: italic;
-  background-color: moccasin ;
-} */
 
 .buttonGroup {
   font-size: small;
@@ -219,7 +209,6 @@ td {
 }
 
 .ratingPlus{
-  /* font-size: x-small; */
   font-size: small;
   color: green;
 }
@@ -244,8 +233,6 @@ td {
 .statusStreaming{
   font-size: small;
   /* color: peru; */
-  /* color: black; */
-  /* font-weight: bold; */
 }
 
 .playerTitle{
@@ -257,7 +244,6 @@ td {
 footer {
   font-size: small;
   margin: auto;
-  /* width: 100%; */
 }
 
 /* ------- Settings -------------- */

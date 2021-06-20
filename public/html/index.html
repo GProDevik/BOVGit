@@ -64,8 +64,6 @@
               id="elemCheckLichess" name="elemCheckLichess" title="Make visible/unvisible Lichess table">
             <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
               title="Refresh Lichess table">
-            <!-- <input @click="vueOnClickCheckLichessDyn" v-model="vueCheckLichessDyn" class="inputCheck" type="checkbox"
-              id="elemCheckLichessDyn" name="elemCheckLichessDyn" title="Show or not rating dynamics in Lichess table"> -->
             <input @change="vueOnchangeLichessPlayerNames" v-model="vueLichessOrgPlayerNames" class="inputText"
               type="text" id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames" maxlength="250"
               title="Enter names of players on Lichess.org, separated by spaces"
@@ -87,60 +85,62 @@
 
         </form>
 
-        <div id="TableOrder1" class="TableLichess showBlock">
-          <table>
-            <thead class="THeadLichess">
-              <tr>
-                <th @click="vueRefreshLichess" class="THeadPlayerLichess leftTopOfTable">Lichess</th>
-                <th @click="vueSortBulletLichess" class="THeadbulletLichess">bullet</th>
-                <th @click="vueSortBlitzLichess" class="THeadblitzLichess">blitz</th>
-                <th @click="vueSortRapidLichess" class="THeadrapidLichess">rapid</th>
-                <th @click="vueSortPuzzleLichess" class="THeadpuzzleLichess">puzzle</th>
-                <th @click="vueSortRushLichess" class="THeadrushLichess">storm</th>
-              </tr>
-            </thead>
-            <tbody class="TBodyLichess">
-              <tr v-for="(item, name, index) in vueArLichessPlayers" :key="index">
-                <td v-html="item.playerHTML"></td>
-                <td v-html="item.bullet" @click="vueScoreLichess(item.playerName)"></td>
-                <td v-html="item.blitz"></td>
-                <td v-html="item.rapid"></td>
-                <td v-html="item.puzzle"></td>
-                <td v-html="item.rush"></td>
-                <!--
+        <div id="Tables">
+          <div id="TableOrder1" class="TableLichess showBlock">
+            <table>
+              <thead class="THeadLichess">
+                <tr>
+                  <th @click="vueRefreshLichess" class="THeadPlayerLichess leftTopOfTable">Lichess</th>
+                  <th @click="vueSortBulletLichess" class="THeadbulletLichess">bullet</th>
+                  <th @click="vueSortBlitzLichess" class="THeadblitzLichess">blitz</th>
+                  <th @click="vueSortRapidLichess" class="THeadrapidLichess">rapid</th>
+                  <th @click="vueSortPuzzleLichess" class="THeadpuzzleLichess">puzzle</th>
+                  <th @click="vueSortRushLichess" class="THeadrushLichess">storm</th>
+                </tr>
+              </thead>
+              <tbody class="TBodyLichess">
+                <tr v-for="(item, name, index) in vueArLichessPlayers" :key="index">
+                  <td v-html="item.playerHTML"></td>
+                  <td v-html="item.bullet" @click="vueScoreLichess(item.playerName)"></td>
+                  <td v-html="item.blitz"></td>
+                  <td v-html="item.rapid"></td>
+                  <td v-html="item.puzzle"></td>
+                  <td v-html="item.rush"></td>
+                  <!--
                 <td @click="vueScoreLichess(item.playerName)">{{item.bullet}}</td>
                 <td>{{item.blitz}}</td>
                 <td>{{item.rapid}}</td>
                 <td>{{item.puzzle}}</td>
                 <td>{{item.rush}}</td> -->
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-        <div id="TableOrder2" class="TableChessCom showBlock">
-          <table>
-            <thead class="THeadChessCom">
-              <tr>
-                <th @click="vueRefreshChessCom" class="THeadPlayerChessCom leftTopOfTable">Chess.com</th>
-                <th @click="vueSortBulletChessCom" class="THeadbulletChessCom">bullet</th>
-                <th @click="vueSortBlitzChessCom" class="THeadblitzChessCom">blitz</th>
-                <th @click="vueSortRapidChessCom" class="THeadrapidChessCom">rapid</th>
-                <th @click="vueSortPuzzleChessCom" class="THeadpuzzleChessCom">puzzle</th>
-                <th @click="vueSortRushChessCom" class="THeadrushChessCom">rush</th>
-              </tr>
-            </thead>
-            <tbody class="TBodyChessCom">
-              <tr v-for="(item, name, index) in vueArChessComPlayers" :key="index">
-                <td v-html="item.playerHTML"></td>
-                <td>{{item.bullet}}</td>
-                <td>{{item.blitz}}</td>
-                <td>{{item.rapid}}</td>
-                <td>{{item.puzzle}}</td>
-                <td>{{item.rush}}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div id="TableOrder2" class="TableChessCom showBlock">
+            <table>
+              <thead class="THeadChessCom">
+                <tr>
+                  <th @click="vueRefreshChessCom" class="THeadPlayerChessCom leftTopOfTable">Chess.com</th>
+                  <th @click="vueSortBulletChessCom" class="THeadbulletChessCom">bullet</th>
+                  <th @click="vueSortBlitzChessCom" class="THeadblitzChessCom">blitz</th>
+                  <th @click="vueSortRapidChessCom" class="THeadrapidChessCom">rapid</th>
+                  <th @click="vueSortPuzzleChessCom" class="THeadpuzzleChessCom">puzzle</th>
+                  <th @click="vueSortRushChessCom" class="THeadrushChessCom">rush</th>
+                </tr>
+              </thead>
+              <tbody class="TBodyChessCom">
+                <tr v-for="(item, name, index) in vueArChessComPlayers" :key="index">
+                  <td v-html="item.playerHTML"></td>
+                  <td>{{item.bullet}}</td>
+                  <td>{{item.blitz}}</td>
+                  <td>{{item.rapid}}</td>
+                  <td>{{item.puzzle}}</td>
+                  <td>{{item.rush}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <section class="sectionSettingsButtons">

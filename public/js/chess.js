@@ -8,7 +8,6 @@ const root = {
     return {
       vueCurrentUsername: '',
       vueCheckLichess: false,
-      // vueCheckLichessDyn: false,
       vueLichessOrgPlayerNames: '',
       vueCheckChessCom: false,
       vueChessComPlayerNames: '',
@@ -21,11 +20,6 @@ const root = {
     }
   },
   methods: {
-    // vueOnClickCheckLichessDyn() {
-    //   setCheckLichessDyn(!isCheckLichessDyn()) //inversion checkbox
-    //   refreshLichess()
-    // },
-
     vueGroupAdd() { groupAdd() },
     vueGroupDel() { groupDel() },
     vueScoreLichess(playerName) { scoreLichess(playerName) },
@@ -150,7 +144,7 @@ tableNode2 = document.querySelector('#TableOrder2')
 
 //MobileStyle
 if (isMobileDevice) {
-  document.querySelector('#bodyStyle').setAttribute("class", "mobileSyle")
+  document.querySelector('#bodyStyle').setAttribute("class", "mobileStyle")
   document.querySelector('.projectName').setAttribute("class", "projectName projectNameDifMobile")
 }
 
@@ -195,18 +189,6 @@ processUrlParams()
 if (needRefresh) {
   refresh()
 }
-
-/////////////////// show rating dynamics (Lichess) /////////////////////////
-
-// function isCheckLichessDyn() {
-//   // return document.getElementById('elemCheckLichessDyn').checked
-//   return vm.vueCheckLichessDyn
-// }
-
-// function setCheckLichessDyn(booleanValue) {
-//   // document.getElementById('elemCheckLichessDyn').checked = booleanValue
-//   vm.vueCheckLichessDyn = booleanValue
-// }
 
 /////////////////// show score: player vs opponents (Lichess) /////////////////////////
 
@@ -1265,10 +1247,7 @@ async function getDataFromLichess(arPlayerNames) {
   // await getProfileAfterFetchFromLichess(arPlayerNames) //N queries for N players
   await getProfilesAfterFetchFromLichess(arPlayerNames) //one query for many players
   await getStatusAfterFetchFromLichess(arPlayerNames)
-
-  // if (!isMobileDevice) { //temporary only for PC
   await getDynamicsAfterFetchFromLichess(arPlayerNames)
-  // }
 
   clearMetaText(arPlayerNames)
 }
