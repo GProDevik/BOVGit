@@ -7,7 +7,7 @@ html {
 .mobileStyle {
   margin-left: 0;
   width: 100%;
-  font-size: 80%; /*90%*/
+  font-size: 70%; /*90%*/
 }
 
 .PCStyle {
@@ -109,7 +109,7 @@ html {
 }
 
 thead th:nth-child(1) {
-  width: 29%;
+  width: 32%;
 }
 
 thead th:nth-child(2) {
@@ -129,7 +129,7 @@ thead th:nth-child(5) {
 }
 
 thead th:nth-child(6) {
-  width: 15%;
+  width: 12%;
 }
 
 thead {
@@ -208,6 +208,11 @@ td {
   color: darkgray;
 }
 
+.mobileRatingPlus{
+  font-size: x-small;
+  color: green;
+}
+
 .ratingPlus{
   font-size: small;
   color: green;
@@ -220,12 +225,14 @@ td {
 
 .statusOnline{
   font-size: large;
-  /* font-size: small;  for symbol 'check'*/
+  /* for symbol 'check'*/
+  /* font-size: small; */
   color: gray;
 }
 
 .statusPlaying{
   font-size: large;
+  /* font-size: small; */
   color: green;
   font-weight: bold;
 }
@@ -236,7 +243,7 @@ td {
 }
 
 .playerTitle{
-  font-size: medium;
+  font-size: small;
   color: peru;
   font-weight: bold;
 }

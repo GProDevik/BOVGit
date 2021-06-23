@@ -917,6 +917,7 @@ function onClickSetTheme() {
 
 //replace some heads for 'mobile portrait'
 function replaceSomeHeads(windowOrientation) {
+  return
   let b, p, useLongWords = false
   if (windowOrientation === undefined) {
     const mediaQuery = window.matchMedia('(orientation: landscape)')
@@ -1532,7 +1533,8 @@ async function getDynamicsAfterFetchFromLichess(arPlayerNames) {
         if (ratingAfter && ratingBefore) {
           const diff = ratingAfter - ratingBefore
           if (diff !== 0) {
-            let classRating = diff > 0 ? 'ratingPlus' : 'ratingMinus'
+            const classRatingPlus = isMobileDevice ? 'mobileRatingPlus' : 'ratingPlus'
+            const classRating = diff > 0 ? classRatingPlus : 'ratingMinus'
             let diffTag = (diff > 0 ? '+' : '') + `${diff}`
             diffTag = diff > 0 ? '<sup>' + diffTag + '</sup>' : '<sub>' + diffTag + '</sub>'
             diffTag = `<span class="${classRating}">${diffTag}</span>`
