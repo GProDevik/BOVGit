@@ -79,8 +79,8 @@ const DISCONNECTED_TEXT = '  (disconnected)'
 const sortSymbolAtHead = '↑' //&#8593
 // const onlineSymbolAtPlayer = '&#10004;' //check
 
-const onlineSymbolOnline = '&#9675;'	//not-filled circle
-// const onlineSymbolOnline = '&#10004;' //check
+// const onlineSymbolOnline = '&#9675;'	//not-filled circle
+const onlineSymbolOnline = '&#10004;' //check
 
 const onlineSymbolPlaying = '&#9679;'	//filled circle
 

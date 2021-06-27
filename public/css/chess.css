@@ -224,9 +224,8 @@ td {
 }
 
 .statusOnline{
-  font-size: large;
-  /* for symbol 'check'*/
-  /* font-size: small; */
+  /* font-size: large; */ /* for symbol 'circle'*/
+  font-size: x-small; /* for symbol 'check'*/
   color: gray;
 }
 
