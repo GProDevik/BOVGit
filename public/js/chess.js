@@ -1621,6 +1621,9 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
     return //non-possible, but ...
   }
 
+  const thisIsLichess = true
+  outMsgWait(thisIsLichess, true)
+
   let isError = false
   let allScore = ''
   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
@@ -1668,6 +1671,7 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
     }
   }
   allScore += isError ? '\nCannot get some data from Lichess.\nTry again later.' : ''
+  outMsgWait(thisIsLichess, false)
   alert(allScore)
 }
 
