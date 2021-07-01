@@ -219,6 +219,7 @@ td {
 }
 
 .ratingMinus{
+  /* font-size: small; */
   font-size: x-small;
   color: red;
 }

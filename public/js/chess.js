@@ -54,6 +54,7 @@ const root = {
     vueOnchangeAutoRefreshInterval() { onchangeAutoRefreshInterval() },
     vueOnClickSetTheme() { onClickSetTheme() },
     vueClearSettings() { clearSettings() },
+    vueRestoreStartGroups() { restoreStartGroups() },
     vueGoMainModeFromSettings() { goMainModeFromSettings() },
     vueButtonChangeTables() {
       changeTablesOrder()
@@ -106,8 +107,10 @@ const mapDefaultLichessPlayers = new Map([
   ['Thibault', 'Creator of Lichess.org'],
   ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway, GM'],
   ['Zhigalko_Sergei'],
+  ['Chess-Network'],
   ['Crest64'],
   ['Challenger_Spy'],
+  ['ShahMatKanal'],
   ['Shuvalov'],
   ['Pandochka'],
   [BOVGIT_playerName],
@@ -116,7 +119,6 @@ const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
   ['Hikaru'],
-  ['LachesisQ'],
   ['ChessQueen'],
   ['ChessNetwork'],
   ['ShahMatKanal'],
@@ -201,21 +203,25 @@ function scoreLichess(playerName) {
 /////////////////// groups of players /////////////////////////
 
 function initGroupObjs() {
-  groupObjs = [
-    {
-      name: 'Start',
-      lichessPlayerNames: lichessDefaultPlayers,
-      chessComPlayerNames: chessComDefaultPlayers
-    },
-    {
-      name: 'World top',
-      lichessPlayerNames: 'DrNykterstein',
-      chessComPlayerNames: 'MagnusCarlsen Hikaru LachesisQ'
-    },
-  ]
-  startGroupNum = groupObjs.length
-  groupNames = getArGroupNames()
-  currentGroupName = groupNames[0]
+  groupObjs = ['', ''] //
+  initStartGroups()
+}
+
+function initStartGroups() {
+  groupObjs[0] = {
+    name: 'Start 1',
+    lichessPlayerNames: lichessDefaultPlayers,
+    chessComPlayerNames: chessComDefaultPlayers
+  }
+  groupObjs[1] = {
+    name: 'Start 2: FIDE top',
+    lichessPlayerNames: 'DrNykterstein Bombegranate AnishGiri Alireza2003 AvalonGamemaster',
+    chessComPlayerNames: 'MagnusCarlsen ChefsHouse FabianoCaruana LevonAronian LachesisQ AnishGiri Grischuk gmwso Firouzja2003 LyonBeast'
+  }
+  startGroupNum = 2
+  currentGroupName = groupObjs[0].name
+  setLichessOrgPlayerNames(lichessDefaultPlayers)
+  setChessComPlayerNames(chessComDefaultPlayers)
 }
 
 function fillElementGroup() {
@@ -1408,10 +1414,9 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
           classLastOnline = 'lastOnlineBeforeToday'
         }
       }
-
       const firstPart = (firstName ? firstName + ' ' : '')
         + (lastName ? lastName : '')
-        + (location ? ', ' + location : '')
+        + (location ? ((firstName || lastName) ? ', ' : '') + location : '')
         + (fideRating ? ', FIDE ' + fideRating : '')
         + (playerTitle && !playerMyDesccription ? ', ' + playerTitle : '')
       playerHint += firstPart
@@ -1509,27 +1514,18 @@ async function getDynamicsAfterFetchFromLichess(arPlayerNames) {
     if (!jsonObjs || jsonObjs.length === 0) {
       return
     }
-    for (let tableCol of ['bullet', 'blitz', 'rapid', 'puzzle', 'rush']) {
+    for (let tableCol of ['bullet', 'blitz', 'rapid', 'puzzle']) {
       const isGames = (tableCol === 'bullet') || (tableCol === 'blitz') || (tableCol === 'rapid')
-      const notGamesKey = isGames ? '' : ((tableCol === 'rush') ? 'storm' : 'puzzle')
+      const key1 = (isGames ? 'games' : 'puzzles')
+      const key2 = (isGames ? tableCol : 'score')
+      const key3 = 'rp'
       const jsonObj = jsonObjs.find((item) => {
-        if (isGames) {
-          return item['games'] && item['games'][tableCol] && item['games'][tableCol]['rp']
-            ? true : false
-        } else {
-          return item[notGamesKey] && item[notGamesKey]['rp']
-            ? true : false
-        }
+        return item[key1] && item[key1][key2] && item[key1][key2][key3]
+          ? true : false
       })
       if (jsonObj) {
-        let ratingAfter, ratingBefore
-        if (isGames) {
-          ratingAfter = jsonObj.games[tableCol].rp.after
-          ratingBefore = jsonObj.games[tableCol].rp.before
-        } else {
-          ratingAfter = jsonObj[notGamesKey].rp.after
-          ratingBefore = jsonObj[notGamesKey].rp.before
-        }
+        const ratingAfter = jsonObj[key1][key2][key3].after
+        const ratingBefore = jsonObj[key1][key2][key3].before
         if (ratingAfter && ratingBefore) {
           const diff = ratingAfter - ratingBefore
           if (diff !== 0) {
@@ -2093,6 +2089,24 @@ function clearSettings() {
   alert('All settings are cleared.')
 }
 
+function restoreStartGroups() {
+
+  if (!confirm('All Start-groups will be restored.\n\nAre you sure ?')) {
+    return
+  }
+
+  initStartGroups()
+
+  const groupElement = document.getElementById('group')
+  groupElement.options[0].selected = true
+
+  refresh()
+  setDataToStorage()
+
+  alert('All Start-groups are restored.')
+  goMainModeFromSettings()
+}
+
 ///////////////////////////////////////////////////////////
 
 function setAutoRefresh() {
@@ -2224,7 +2238,7 @@ function setTheme() {
   const v = isDarkTheme ? '1' : '0'
   localStorage.setItem('DarkThemeChecked', v)
 
-  goMainModeFromSettings()
+  // goMainModeFromSettings()
 }
 
 function is_mobile_device() {

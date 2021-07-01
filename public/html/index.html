@@ -174,8 +174,12 @@
 
           <p>
             <input @click="vueClearSettings" class="buttonClearSettings" type="button"
-              value="Clear all settings and player names" id="buttonClearSettings"
-              title="Clear all settings and player names">
+              value="Clear all settings, player names, non-start groups" id="buttonClearSettings"
+              title="Clear all settings, player names, non-start groups">
+          </p>
+          <p>
+            <input @click="vueRestoreStartGroups" class="buttonRestoreStartGroups" type="button"
+              value="Restore all Start-groups" id="buttonRestoreStartGroups" title="Restore all Start-groups">
           </p>
 
           <fieldset>
@@ -192,8 +196,8 @@
               </li>
               <li><span class="click">Click</span> on the <span class="dotted">"↑↓" button</span> to change the order of
                 tables</li>
-              <li>For Lichess there are several types of <span class="dotted">player status</span> before his name in
-                table:
+              <li>For Lichess there are several types of <span class="dotted">player status</span> to the left of his
+                name in table:
                 <ul>
                   <li><span class="statusOnline">&#10004;</span> - online</li>
                   <li><span class="statusPlaying">&#9679;</span> - playing</li>
