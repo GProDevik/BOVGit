@@ -22,6 +22,7 @@ const root = {
   methods: {
     vueGroupAdd() { groupAdd() },
     vueGroupDel() { groupDel() },
+    vueGroupRestore() { groupRestore() },
     vueScoreLichess(playerName) { scoreLichess(playerName) },
     vueGoUserMode() { goUserMode() },
     vueRefresh() { refresh() },
@@ -101,6 +102,7 @@ const mapTimeControl = new Map([
   ['puzzle', 4],
   ['rush', 5]
 ])
+
 const BOVGIT_playerName = 'bovgit'
 const BOVGIT_description = 'Creator of this page :)'
 const mapDefaultLichessPlayers = new Map([
@@ -124,8 +126,21 @@ const mapDefaultChessComPlayers = new Map([
   ['ShahMatKanal'],
 ])
 const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
+const startGroupObjs = [
+  {
+    name: 'First',
+    lichessPlayerNames: lichessDefaultPlayers,
+    chessComPlayerNames: chessComDefaultPlayers
+  },
+  {
+    name: 'FIDE top',
+    lichessPlayerNames: 'DrNykterstein Bombegranate AnishGiri Alireza2003 AvalonGamemaster',
+    chessComPlayerNames: 'MagnusCarlsen ChefsHouse FabianoCaruana LevonAronian LachesisQ AnishGiri Grischuk gmwso Firouzja2003 LyonBeast'
+  }
+]
+const startGroupNum = startGroupObjs.length
 
-let groupObjs, startGroupNum, groupNames, currentGroupName
+let groupObjs, groupNames, currentGroupName
 initGroupObjs()
 
 //milliseconds for refresh table after 'await fetch'
@@ -203,22 +218,13 @@ function scoreLichess(playerName) {
 /////////////////// groups of players /////////////////////////
 
 function initGroupObjs() {
-  groupObjs = ['', ''] //
+  groupObjs = ['', '']
   initStartGroups()
 }
 
 function initStartGroups() {
-  groupObjs[0] = {
-    name: 'Start 1',
-    lichessPlayerNames: lichessDefaultPlayers,
-    chessComPlayerNames: chessComDefaultPlayers
-  }
-  groupObjs[1] = {
-    name: 'Start 2: FIDE top',
-    lichessPlayerNames: 'DrNykterstein Bombegranate AnishGiri Alireza2003 AvalonGamemaster',
-    chessComPlayerNames: 'MagnusCarlsen ChefsHouse FabianoCaruana LevonAronian LachesisQ AnishGiri Grischuk gmwso Firouzja2003 LyonBeast'
-  }
-  startGroupNum = 2
+  groupObjs[0] = startGroupObjs[0]
+  groupObjs[1] = startGroupObjs[1]
   currentGroupName = groupObjs[0].name
   setLichessOrgPlayerNames(lichessDefaultPlayers)
   setChessComPlayerNames(chessComDefaultPlayers)
@@ -308,7 +314,7 @@ function groupDel() {
   let groupName = currentGroupName
 
   const groupIndex = groupNames.indexOf(groupName, 0)
-  if (groupIndex > -1 && groupIndex < startGroupNum) {
+  if (isThisStartGroup(groupIndex)) {
     alert(`Group "${groupName}" cannot be deleted !`)
     return
   }
@@ -333,6 +339,34 @@ function groupDel() {
   setDataToStorage()
 
   alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
+}
+
+//restore current group
+function groupRestore() {
+
+  let groupName = currentGroupName
+
+  const groupIndex = groupNames.indexOf(groupName, 0)
+  if (!isThisStartGroup(groupIndex)) {
+    alert(`Group "${groupName}" cannot be restored !`)
+    return
+  }
+
+  if (!confirm(`Restore group "${groupName}" ?`)) {
+    return
+  }
+
+  setLichessOrgPlayerNames(startGroupObjs[groupIndex].lichessPlayerNames)
+  setChessComPlayerNames(startGroupObjs[groupIndex].chessComPlayerNames)
+  updateGroupObj()
+  refresh()
+  setDataToStorage()
+
+  alert(`Group "${groupName}" will be restored !`)
+}
+
+function isThisStartGroup(groupIndex) {
+  return (groupIndex > -1 && groupIndex < startGroupNum)
 }
 
 function clearUserOptionsForElementGroup() {
@@ -1764,7 +1798,7 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
 
       playerHint += META_FIDE
         + (playerTitle ? ', ' + playerTitle : '')
-      playerHint += (playerHint ? '\n' : '')
+      playerHint += (playerHint && playerHint !== META_FIDE ? '\n' : '')
         + 'reg. ' + createdAt
         + '\nlast online ' + lastOnline
       playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
@@ -2097,11 +2131,11 @@ function restoreStartGroups() {
 
   initStartGroups()
 
-  const groupElement = document.getElementById('group')
-  groupElement.options[0].selected = true
-
   refresh()
   setDataToStorage()
+
+  const groupElement = document.getElementById('group')
+  groupElement.options[0].selected = true
 
   alert('All Start-groups are restored.')
   goMainModeFromSettings()
