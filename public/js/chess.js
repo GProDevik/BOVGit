@@ -226,6 +226,7 @@ function initStartGroups() {
   groupObjs[0] = startGroupObjs[0]
   groupObjs[1] = startGroupObjs[1]
   currentGroupName = groupObjs[0].name
+  groupNames = getArGroupNames()
   setLichessOrgPlayerNames(lichessDefaultPlayers)
   setChessComPlayerNames(chessComDefaultPlayers)
 }
