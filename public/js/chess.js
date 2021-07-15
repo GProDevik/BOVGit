@@ -117,7 +117,6 @@ const mapDefaultLichessPlayers = new Map([
   ['Pandochka'],
   [BOVGIT_playerName],
 ])
-const lichessDefaultPlayers = getDefaultPlayersFromMap(mapDefaultLichessPlayers)
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
   ['Hikaru'],
@@ -125,21 +124,22 @@ const mapDefaultChessComPlayers = new Map([
   ['ChessNetwork'],
   ['ShahMatKanal'],
 ])
-const chessComDefaultPlayers = getDefaultPlayersFromMap(mapDefaultChessComPlayers)
 const startGroupObjs = [
   {
     name: '! FIDE top',
-    lichessPlayerNames: 'DrNykterstein Bombegranate AnishGiri Alireza2003 AvalonGamemaster',
-    chessComPlayerNames: 'MagnusCarlsen ChefsHouse FabianoCaruana LevonAronian LachesisQ AnishGiri Grischuk gmwso Firouzja2003 LyonBeast'
+    lichessPlayerNames: 'DrNykterstein Alireza2003 Bombegranate AnishGiri AvalonGamemaster',
+    chessComPlayerNames: 'MagnusCarlsen Firouzja2003 ChefsHouse FabianoCaruana LevonAronian LachesisQ AnishGiri Grischuk gmwso LyonBeast'
   },
   {
-    name: '! My group',
-    lichessPlayerNames: lichessDefaultPlayers,
-    chessComPlayerNames: chessComDefaultPlayers
+    name: '! custom',
+    lichessPlayerNames: getDefaultPlayersFromMap(mapDefaultLichessPlayers),
+    chessComPlayerNames: getDefaultPlayersFromMap(mapDefaultChessComPlayers)
   }
 ]
 const startGroupNum = startGroupObjs.length
 let currentGroupName = startGroupObjs[0].name
+const MAX_GROUPS_NUM = 10
+const MAX_GROUPNAME_LEN = 30
 let groupObjs, groupNames
 
 //milliseconds for refresh table after 'await fetch'
@@ -186,7 +186,6 @@ initGroupObjs()
 
 getDataFromStorage()
 
-// // clearWholeElementGroup()
 addAllOptionsToElementGroup(currentGroupName)
 setActiveInGroupElement(currentGroupName)
 
@@ -309,8 +308,6 @@ function getArGroupNames() {
 }
 
 function groupAdd() {
-  const MAX_GROUPS_NUM = 10
-  const MAX_GROUPNAME_LEN = 30
   let v
 
   if (getArGroupNames().length === MAX_GROUPS_NUM) {
@@ -323,13 +320,17 @@ function groupAdd() {
     return
   }
   if (groupName.length > MAX_GROUPNAME_LEN) {
-    alert(`The name must not exceed ${MAX_GROUPNAME_LEN} characters !`)
+    alert(`The name must not exceed ${MAX_GROUPNAME_LEN} symbols !`)
     return
   }
   v = groupName.toUpperCase()
   const groupObj = groupObjs.find(item => item.name.toUpperCase() === v)
   if (groupObj !== undefined) {
     alert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
+    return
+  }
+  if (groupName.includes('!')) {
+    alert(`The name must not include symbol "!".`)
     return
   }
 
@@ -2063,7 +2064,7 @@ function getDataFromStorage() {
 
     v = localStorage.getItem('LichessOrgPlayerNames')
     if (!v) {
-      v = startGroupObjs[0].lichessPlayerNames //lichessDefaultPlayers
+      v = startGroupObjs[0].lichessPlayerNames
     }
     if (v !== '') {
       setLichessOrgPlayerNames(v)
@@ -2071,7 +2072,7 @@ function getDataFromStorage() {
 
     v = localStorage.getItem('ChessComPlayerNames')
     if (!v) {
-      v = startGroupObjs[0].chessComPlayerNames //chessComDefaultPlayers
+      v = startGroupObjs[0].chessComPlayerNames
     }
     if (v !== '') {
       setChessComPlayerNames(v)
