@@ -108,14 +108,6 @@ const BOVGIT_description = 'Creator of this page :)'
 const mapDefaultLichessPlayers = new Map([
   ['Thibault', 'Creator of Lichess.org'],
   ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway, GM'],
-  ['Zhigalko_Sergei'],
-  ['Chess-Network'],
-  ['Crest64'],
-  ['Challenger_Spy'],
-  ['ShahMatKanal'],
-  ['Shuvalov'],
-  ['Pandochka'],
-  [BOVGIT_playerName],
 ])
 const mapDefaultChessComPlayers = new Map([
   ['Erik', 'Creator of Chess.com'],
@@ -132,7 +124,7 @@ const startGroupObjs = [
   },
   {
     name: '! custom',
-    lichessPlayerNames: getDefaultPlayersFromMap(mapDefaultLichessPlayers),
+    lichessPlayerNames: 'Thibault Zhigalko_Sergei Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka ' + BOVGIT_playerName,
     chessComPlayerNames: getDefaultPlayersFromMap(mapDefaultChessComPlayers)
   }
 ]
