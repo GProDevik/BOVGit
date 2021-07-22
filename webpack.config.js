@@ -9,7 +9,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'public/js'),
-    filename: 'chess-bundle.js'
+    filename: 'chessb.js'
   },
   mode: 'production'
 }
