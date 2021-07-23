@@ -1892,10 +1892,16 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
       const url = thisIsLichess ? urlHttpServiceLichess : urlHttpServiceChessCom
       let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS }).then(
         successResponse => {
-          if (successResponse.status != 200) { return null }
+          if (successResponse.status != 200) {
+            console.log(`getFetchResultsFromServer: ${name}, successResponse.status = ${successResponse.status}`)
+            return null
+          }
           else { return successResponse.json() }
         },
-        failResponse => { return null }
+        failResponse => {
+          console.log(`getFetchResultsFromServer: ${name}, failResponse = ${failResponse}`)
+          return null
+        }
       )
       jobs.push(job)
     }
