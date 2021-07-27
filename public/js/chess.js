@@ -1893,13 +1893,13 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
       let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS }).then(
         successResponse => {
           if (successResponse.status != 200) {
-            console.log(`getFetchResultsFromServer: ${name}, successResponse.status = ${successResponse.status}`)
+            // console.log(`getFetchResultsFromServer: ${name}, successResponse.status = ${successResponse.status}`)
             return null
           }
           else { return successResponse.json() }
         },
         failResponse => {
-          console.log(`getFetchResultsFromServer: ${name}, failResponse = ${failResponse}`)
+          // console.log(`getFetchResultsFromServer: ${name}, failResponse = ${failResponse}`)
           return null
         }
       )
