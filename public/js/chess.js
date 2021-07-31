@@ -1897,7 +1897,7 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
         },
         failResponse => { return null }
       )
-      jobs.push(job)
+      jobs.push(job) //
     }
   }
   let results = await Promise.all(jobs)
@@ -2305,7 +2305,7 @@ function setTheme() {
   const v = isDarkTheme ? '1' : '0'
   localStorage.setItem('DarkThemeChecked', v)
 
-  // goMainModeFromSettings()
+  goMainModeFromSettings()
 }
 
 function is_mobile_device() {
