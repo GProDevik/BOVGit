@@ -1793,8 +1793,7 @@ async function getProfileAfterFetchFromChessCom(arPlayerNames) {
   let profileResults = await getFetchResultsFromServer(false, arPlayerNames)
   profileResults.forEach((jsonObj, index) => {
     const playerName = arPlayerNames[index]
-    let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = ''
-    let playerHint = ''
+    let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = '', playerHint = ''
 
     //my own description ! ('Creator of ...')
     let v = mapDefaultChessComPlayers.get(playerName)
@@ -1897,7 +1896,7 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
         },
         failResponse => { return null }
       )
-      jobs.push(job) //
+      jobs.push(job)
     }
   }
   let results = await Promise.all(jobs)
@@ -2305,7 +2304,7 @@ function setTheme() {
   const v = isDarkTheme ? '1' : '0'
   localStorage.setItem('DarkThemeChecked', v)
 
-  goMainModeFromSettings()
+  // goMainModeFromSettings()
 }
 
 function is_mobile_device() {
