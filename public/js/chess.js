@@ -119,7 +119,7 @@ const mapDefaultChessComPlayers = new Map([
 const startGroupObjs = [
   {
     name: '! FIDE top',
-    lichessPlayerNames: 'DrNykterstein Alireza2003 Bombegranate AnishGiri AvalonGamemaster',
+    lichessPlayerNames: 'DrNykterstein Alireza2003 Bombegranate AnishGiri AvalonGamemaster Azerichessss Sergey_Karjakin Colchonero64 Vladimirovich9000',
     chessComPlayerNames: 'MagnusCarlsen Firouzja2003 ChefsHouse FabianoCaruana LevonAronian LachesisQ AnishGiri Grischuk gmwso LyonBeast'
   },
   {
