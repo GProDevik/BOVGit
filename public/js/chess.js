@@ -1,6 +1,8 @@
 //v2.0.0 2021-11-04
 'use strict'
 
+const isMobileDevice = is_mobile_device()
+
 // ------------------- V U E  (start) ------------------------
 
 const root = {
@@ -70,7 +72,6 @@ const vm = app.mount('#vue-mount')
 
 // ------------------- V U E  (end) ------------------------
 
-const isMobileDevice = is_mobile_device()
 const urlHttpServiceLichess = 'https://lichess.org/api/user/'
 const urlHttpServiceLichessStatus = 'https://lichess.org/api/users/status?ids='
 const urlHttpServiceLichessScore = 'https://lichess.org/api/crosstable/'
@@ -440,8 +441,8 @@ async function postRegistrationAjax() {
 
   if (response.ok) {
     const jsonObj = await response.json()
-    console.log('jsonObj: ' + new Date())
-    console.log(jsonObj)
+    out('jsonObj: ' + new Date())
+    out(jsonObj)
     if (jsonObj['errorMsg']) {
       let v = jsonObj['errorMsg']['message']
       if (v) {
@@ -490,8 +491,8 @@ async function postLoginAjax() {
 
   if (response.ok) {
     const jsonObj = await response.json()
-    console.log('jsonObj: ' + new Date())
-    console.log(jsonObj)
+    out('jsonObj: ' + new Date())
+    out(jsonObj)
     if (jsonObj['errorMsg']) {
       const v = jsonObj['errorMsg']['message']
       if (v) {
@@ -652,23 +653,23 @@ async function postSettingsAJAX() {
     })
     if (response.ok) {
       const jsonObj = await response.json()
-      console.log('jsonObj: ' + new Date())
-      console.log(jsonObj)
+      out('jsonObj: ' + new Date())
+      out(jsonObj)
       if (jsonObj['afterSendUserSettingsToServerAJAX']) {
         return //ok, send.
       }
-      console.log('Error occured during afterSendUserSettingsToServerAJAX.')
+      out('Error occured during afterSendUserSettingsToServerAJAX.')
       markUserAsDisconnected()
     } else {
-      console.log('Error occured during sendUserSettingsToServerAJAX.')
+      out('Error occured during sendUserSettingsToServerAJAX.')
     }
   } catch (err) {
     if (!isUserMarkedAsDisconnected()) {
       //alert('Network/Server error: ' + err.message)
       alert('Network/Server error')
     }
-    // console.log('FetchError during sendUserSettingsToServerAJAX:')
-    // console.log(err.message)
+    // out('FetchError during sendUserSettingsToServerAJAX:')
+    // out(err.message)
     markUserAsDisconnected()
   }
 }
@@ -682,8 +683,8 @@ async function checkAndMarkUserAsDisconnectedAJAX() {
   })
   if (response.ok) {
     const jsonObj = await response.json()
-    console.log('isUserLoggedAJAX: jsonObj: ' + new Date())
-    console.log(jsonObj)
+    out('isUserLoggedAJAX: jsonObj: ' + new Date())
+    out(jsonObj)
     const v = jsonObj['isUserLoggedAJAX']
     if (v) {
       if (v === '0') {
@@ -691,10 +692,10 @@ async function checkAndMarkUserAsDisconnectedAJAX() {
       }
       return
     }
-    console.log('Error occured during afterIsUserLoggedAJAX.')
+    out('Error occured during afterIsUserLoggedAJAX.')
     return
   }
-  console.log('Error occured during isUserLoggedAJAX.')
+  out('Error occured during isUserLoggedAJAX.')
 }
 
 function outputErrorMessage(msg) {
@@ -1286,7 +1287,7 @@ async function fillTableFromServer(thisIsLichess) {
   showTableContent(thisIsLichess, arPlayerNames)
 
   // } catch (err) {
-  //   console.log(`error: ${err}`)
+  //   out(`error: ${err}`)
   // }
   outMsgWait(thisIsLichess, false)
 }
@@ -1346,7 +1347,7 @@ function clearMetaText(arPlayerNames) {
 //     let playerName = arPlayerNames[index]
 //     if (jsonObj === null) {
 //       //player not found
-//       console.log(`${playerName} - lichess, response-error`) //: ${response.status}`)
+//       out(`${playerName} - lichess, response-error`) //: ${response.status}`)
 //       vm.vueArLichessPlayersBuf.push({
 //         // playerHTML: '<em>? ' + playerName + '</em>',
 //         playerHTML: '<em>' + playerName + '</em>',
@@ -1428,7 +1429,7 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
     body: playerNamesByComma
   })
   if (!response.ok) {
-    console.log(`status error: ${response.status} ${response.statusText} - getProfilesAfterFetchFromLichess`)
+    out(`status error: ${response.status} ${response.statusText} - getProfilesAfterFetchFromLichess`)
     return
   }
 
@@ -1440,7 +1441,7 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
     const jsonObj = arJsonObj.find(item => item.username.toUpperCase() === playerNameUpper)
     if (!jsonObj) {
       //player not found
-      console.log(`${playerName} - lichess, response.json error`) //: ${response.status}`)
+      out(`${playerName} - lichess, response.json error`) //: ${response.status}`)
       vm.vueArLichessPlayersBuf.push({
         // playerHTML: '<em>? ' + playerName + '</em>',
         playerHTML: '<em>' + playerName + '</em>',
@@ -1580,7 +1581,7 @@ async function getDynamicsAfterFetchFromLichess(arPlayerNames) {
   let dynamicsResults = await getFetchDynamicsFromLichess(arPlayerNames)
   dynamicsResults.forEach((jsonObjs, index) => {
     // let playerName = arPlayerNames[index]
-    // console.log(playerName + ' : getDynamicsAfterFetchFromLichess')
+    // out(playerName + ' : getDynamicsAfterFetchFromLichess')
     if (!jsonObjs || jsonObjs.length === 0) {
       return
     }
@@ -1728,11 +1729,11 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
           }
         } else {
           isError = true
-          console.log(`status error: ${response.status} ${response.statusText} - ${url}`)
+          out(`status error: ${response.status} ${response.statusText} - ${url}`)
         }
       } catch (err) {
         isError = true
-        console.log(`error: ${err} - ${url}`)
+        out(`error: ${err} - ${url}`)
       }
     }
   }
@@ -1857,7 +1858,7 @@ async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
 
     const fideRating = getJsonValue1(playerName, jsonObj, 'fide')
     const fideRatingString = fideRating ? `, FIDE ${fideRating}` : ''
-    // console.log(index)
+    // out(index)
     const playerHTML = vm.vueArChessComPlayersBuf[index].playerHTML.replace(META_FIDE, fideRatingString)
 
     const bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
@@ -1917,7 +1918,7 @@ function getJsonValue1(playerName, jsonObj, field1) {
     value = jsonObj[field1]
   }
   catch (err) {
-    //   console.log('Error in getJsonValue1(): playerName=' + playerName + ' ' + field1 + ': ' + err)
+    //   out('Error in getJsonValue1(): playerName=' + playerName + ' ' + field1 + ': ' + err)
   }
   return value
 }
@@ -1928,7 +1929,7 @@ function getJsonValue2(playerName, jsonObj, field1, field2) {
     value = jsonObj[field1][field2]
   }
   catch (err) {
-    //   console.log('Error in getJsonValue2(): playerName=' + playerName + ' ' + field1 + '.' + field2 + ': ' + err)
+    //   out('Error in getJsonValue2(): playerName=' + playerName + ' ' + field1 + '.' + field2 + ': ' + err)
   }
   return value
 }
@@ -1939,7 +1940,7 @@ function getJsonValue3(playerName, jsonObj, field1, field2, field3) {
     value = jsonObj[field1][field2][field3]
   }
   catch (err) {
-    //   console.log('Error in getJsonValue3(): playerName=' + playerName + ' ' + field1 + '.' + field2 + '.' + field3 + ': ' + err)
+    //   out('Error in getJsonValue3(): playerName=' + playerName + ' ' + field1 + '.' + field2 + '.' + field3 + ': ' + err)
   }
   return value
 }
@@ -2329,4 +2330,11 @@ function outMsgWait(thisIsLichess, show) {
 function getBeginOfLastDay() {
   const d = (new Date()) - 1000 * 60 * 60 * 24 //1 day before current
   return (new Date(d)).setHours(0, 0, 0, 0) //time 0:00:00,000
+}
+
+function out(msg) {
+  console.log(msg)
+  if (isMobileDevice) {
+    alert(msg) //for debug
+  }
 }
