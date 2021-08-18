@@ -1890,7 +1890,7 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
   for (let name of arPlayerNames) {
     if (name !== '') {
       const url = thisIsLichess ? urlHttpServiceLichess : urlHttpServiceChessCom
-      let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS }).then(
+      let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS, credentials: 'include' }).then(
         successResponse => {
           if (successResponse.status != 200) { return null }
           else { return successResponse.json() }
@@ -2333,8 +2333,11 @@ function getBeginOfLastDay() {
 }
 
 function out(msg) {
-  console.log(msg)
-  if (isMobileDevice) {
-    alert(msg) //for debug
-  }
+  // console.log(msg)
+  const dt = (new Date()).toLocaleString()
+  console.log(`${dt} - ${msg}`)
+
+  // if (isMobileDevice) {
+  //   alert(msg) //for debug
+  // }
 }
