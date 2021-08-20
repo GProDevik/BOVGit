@@ -1890,7 +1890,7 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
   for (let name of arPlayerNames) {
     if (name !== '') {
       const url = thisIsLichess ? urlHttpServiceLichess : urlHttpServiceChessCom
-      let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS, credentials: 'include' }).then(
+      let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS }).then(
         successResponse => {
           if (successResponse.status != 200) { return null }
           else { return successResponse.json() }
