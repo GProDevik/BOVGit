@@ -408,7 +408,7 @@ function isThisStartGroup(groupIndex) {
 
 function clearUserOptionsForElementGroup() {
   const groupElement = document.getElementById('group')
-  let opts = groupElement.options;
+  let opts = groupElement.options
   while (opts.length > startGroupNum) {
     opts[opts.length - 1] = null
   }
@@ -1784,69 +1784,127 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 // }
 
 async function getDataFromChessCom(arPlayerNames) {
-  await getProfileAfterFetchFromChessCom(arPlayerNames)
+  await getProfileAfterFetchFromChessCom1(arPlayerNames) //fast variant
+  // await getProfileAfterFetchFromChessCom2(arPlayerNames) //slow variant
   await getStatisticsAfterFetchFromChessCom(arPlayerNames)
 }
 
-async function getProfileAfterFetchFromChessCom(arPlayerNames) {
+async function getProfileAfterFetchFromChessCom1(arPlayerNames) {
 
-  const beginDate = getBeginOfLastDay()
-  let profileResults = await getFetchResultsFromServer(false, arPlayerNames)
-  profileResults.forEach((jsonObj, index) => {
-    const playerName = arPlayerNames[index]
-    let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = '', playerHint = ''
+  let arPlayerNamesBuf = [...arPlayerNames]
+  const beginLength = arPlayerNamesBuf.length
+  if (beginLength === 0) {
+    return
+  }
 
-    //my own description ! ('Creator of ...')
-    let v = mapDefaultChessComPlayers.get(playerName)
-    if (v) {
-      playerHint = v + '\n\n'
-    } else if (isPlayerMe(playerName)) {
-      playerHint = BOVGIT_description + '\n\n'
+  for (let i = 0; i < 5; i++) {
+    let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
+    arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
+    if (i > 0) {
+      out(`${i} iteration, chess.com (${arPlayerNamesBuf.length} elements from ${beginLength})`)
     }
-
-    playerURL = getJsonValue1(playerName, jsonObj, 'url')
-
-    if (playerURL === '' || playerURL === undefined) {
-      playerHTML = '<em>' + playerName + '</em>' //player not found
-    }
-    else {
-      //title (GM, IM, FM, ...)
-      v = getJsonValue1(playerName, jsonObj, 'title')
-      playerTitle = (v === undefined) ? '' : v + ' '
-
-      const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
-      const location = getJsonValue1(playerName, jsonObj, 'location')
-
-      v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
-      if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
-
-      v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login (seconds)
-      let classLastOnline = 'lastOnline'
-      if (v) {
-        lastOnline = getDateHHMM(v * 1000)
-        if (new Date(v * 1000) < beginDate) {
-          classLastOnline = 'lastOnlineBeforeToday'
-        }
+    let isOKAll = true
+    let profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
+    profileResults.forEach((jsonObj, index) => {
+      const playerName = arPlayerNamesBuf[index]
+      const isOK = fillPlayerHTMLChessCom(jsonObj, playerName)
+      if (isOK) {
+        arPlayerNamesBufIndex[index] = true //del element if it's OK
+      } else {
+        isOKAll = false
+        out(`not read: ${playerName}, chess.com`)
       }
-
-      playerHint += (name ? name : '')
-        + (location ? ', ' + location : '')
-
-      playerHint += META_FIDE
-        + (playerTitle ? ', ' + playerTitle : '')
-      playerHint += (playerHint && playerHint !== META_FIDE ? '\n' : '')
-        + 'reg. ' + createdAt
-        + '\nlast online ' + lastOnline
-      playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-        + onlineSymbol
-        + '<span class="playerTitle">' + playerTitle + ' </span>'
-        + '<strong>' + playerName + '</strong></a>'
-        + (lastOnline ? '<br><span class="' + classLastOnline + '">' + lastOnline + '</span>' : '')
+    })
+    if (isOKAll) {
+      break
     }
-    const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
-    vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
-  })
-  // await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+    for (let j = arPlayerNamesBufIndex.length - 1; j >= 0; j--) {
+      if (arPlayerNamesBufIndex[j]) {
+        arPlayerNamesBuf.splice(j, 1) //del element if it's OK
+      }
+    }
+  }
+}
+
+async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
+
+  for (let playerName of arPlayerNames) {
+    let response, jsonObj, playerURL = ''
+    try {
+      const url = urlHttpServiceChessCom + playerName
+      response = await fetch(url, { mode: modeCORS })
+      if (response.ok) {
+        jsonObj = await response.json()
+        playerURL = getJsonValue1(playerName, jsonObj, 'url')
+      } else {
+        out(playerName + ' - chess.com, response-error: ' + response.status)
+      }
+    } catch (err) {
+      out(playerName + ' - chess.com, fetch-error: ' + err)
+    } finally {
+      if (playerURL !== '' && playerURL !== undefined && playerURL !== null) {
+        fillPlayerHTMLChessCom(jsonObj, playerName)
+      }
+    }
+  }
+}
+
+function fillPlayerHTMLChessCom(jsonObj, playerName) {
+  let isOK = true
+  let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = '', playerHint = ''
+  const beginDate = getBeginOfLastDay()
+
+  //my own description ! ('Creator of ...')
+  let v = mapDefaultChessComPlayers.get(playerName)
+  if (v) {
+    playerHint = v + '\n\n'
+  } else if (isPlayerMe(playerName)) {
+    playerHint = BOVGIT_description + '\n\n'
+  }
+
+  playerURL = getJsonValue1(playerName, jsonObj, 'url')
+
+  if (playerURL === '' || playerURL === undefined) {
+    playerHTML = '<em>' + playerName + '</em>' //player not found
+    isOK = false
+  }
+  else {
+    //title (GM, IM, FM, ...)
+    v = getJsonValue1(playerName, jsonObj, 'title')
+    playerTitle = (v === undefined) ? '' : v + ' '
+
+    const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
+    const location = getJsonValue1(playerName, jsonObj, 'location')
+
+    v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
+    if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
+
+    v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login (seconds)
+    let classLastOnline = 'lastOnline'
+    if (v) {
+      lastOnline = getDateHHMM(v * 1000)
+      if (new Date(v * 1000) < beginDate) {
+        classLastOnline = 'lastOnlineBeforeToday'
+      }
+    }
+
+    playerHint += (name ? name : '')
+      + (location ? ', ' + location : '')
+
+    playerHint += META_FIDE
+      + (playerTitle ? ', ' + playerTitle : '')
+    playerHint += (playerHint && playerHint !== META_FIDE ? '\n' : '')
+      + 'reg. ' + createdAt
+      + '\nlast online ' + lastOnline
+    playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
+      + onlineSymbol
+      + '<span class="playerTitle">' + playerTitle + ' </span>'
+      + '<strong>' + playerName + '</strong></a>'
+      + (lastOnline ? '<br><span class="' + classLastOnline + '">' + lastOnline + '</span>' : '')
+  }
+  const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
+  vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+  return isOK
 }
 
 async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
@@ -1855,19 +1913,22 @@ async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
   let statResults = await getFetchResultsFromServer(false, arPlayerNames, '/stats')
   statResults.forEach((jsonObj, index) => {
     const playerName = arPlayerNames[index]
-
-    const fideRating = getJsonValue1(playerName, jsonObj, 'fide')
-    const fideRatingString = fideRating ? `, FIDE ${fideRating}` : ''
-    // out(index)
-    const playerHTML = vm.vueArChessComPlayersBuf[index].playerHTML.replace(META_FIDE, fideRatingString)
-
-    const bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
-    const blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
-    const rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
-    const puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
-    const rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
-    vm.vueArChessComPlayersBuf[index] = { playerHTML, playerName, bullet, blitz, rapid, puzzle, rush }
+    fillPlayerStatisticsChessCom(jsonObj, index, playerName)
   })
+}
+
+function fillPlayerStatisticsChessCom(jsonObj, index, playerName) {
+  const fideRating = getJsonValue1(playerName, jsonObj, 'fide')
+  const fideRatingString = fideRating ? `, FIDE ${fideRating}` : ''
+
+  const playerHTML = vm.vueArChessComPlayersBuf[index].playerHTML.replace(META_FIDE, fideRatingString)
+
+  const bullet = getJsonValue3(playerName, jsonObj, 'chess_bullet', 'last', 'rating')
+  const blitz = getJsonValue3(playerName, jsonObj, 'chess_blitz', 'last', 'rating')
+  const rapid = getJsonValue3(playerName, jsonObj, 'chess_rapid', 'last', 'rating')
+  const puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
+  const rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
+  vm.vueArChessComPlayersBuf[index] = { playerHTML, playerName, bullet, blitz, rapid, puzzle, rush }
 }
 
 async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl = '') {
