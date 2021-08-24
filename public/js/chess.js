@@ -1279,6 +1279,10 @@ async function fillTableFromServer(thisIsLichess) {
     await getDataFromLichess(arPlayerNames)
   } else {
     vm.vueArChessComPlayersBuf.length = 0
+    vm.vueArChessComPlayersBuf = vm.vueArChessComPlayersBuf.map((item, index) => {
+      const playerHTML = '', playerName = '', bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
+      vm.vueArChessComPlayersBuf[index] = { playerHTML, playerName, bullet, blitz, rapid, puzzle, rush }
+    })
     await getDataFromChessCom(arPlayerNames)
   }
 
@@ -1798,16 +1802,17 @@ async function getProfileAfterFetchFromChessCom1(arPlayerNames) {
   }
 
   for (let i = 0; i < 5; i++) {
-    let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
+    // let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
+    let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
-      out(`${i} iteration, chess.com (${arPlayerNamesBuf.length} elements from ${beginLength})`)
+      out(`i=${i}, chess.com, (${arPlayerNamesBuf.length} el. from ${beginLength})`)
     }
     let isOKAll = true
-    let profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
+    const profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
     profileResults.forEach((jsonObj, index) => {
       const playerName = arPlayerNamesBuf[index]
-      const isOK = fillPlayerHTMLChessCom(jsonObj, playerName)
+      const isOK = fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames)
       if (isOK) {
         arPlayerNamesBufIndex[index] = true //del element if it's OK
       } else {
@@ -1818,11 +1823,12 @@ async function getProfileAfterFetchFromChessCom1(arPlayerNames) {
     if (isOKAll) {
       break
     }
-    for (let j = arPlayerNamesBufIndex.length - 1; j >= 0; j--) {
-      if (arPlayerNamesBufIndex[j]) {
-        arPlayerNamesBuf.splice(j, 1) //del element if it's OK
-      }
-    }
+    // for (let j = arPlayerNamesBufIndex.length - 1; j >= 0; j--) {
+    //   if (arPlayerNamesBufIndex[j]) {
+    //     arPlayerNamesBuf.splice(j, 1) //del element if it's OK
+    //   }
+    // }
+    arPlayerNamesBuf = arPlayerNamesBuf.filter((item, index) => !arPlayerNamesBufIndex[index])
   }
 }
 
@@ -1849,8 +1855,8 @@ async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
   }
 }
 
-function fillPlayerHTMLChessCom(jsonObj, playerName) {
-  let isOK = true
+function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
+  let isOK = false
   let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = '', playerHint = ''
   const beginDate = getBeginOfLastDay()
 
@@ -1864,9 +1870,8 @@ function fillPlayerHTMLChessCom(jsonObj, playerName) {
 
   playerURL = getJsonValue1(playerName, jsonObj, 'url')
 
-  if (playerURL === '' || playerURL === undefined) {
+  if (playerURL === '' || playerURL === undefined || playerURL === null) {
     playerHTML = '<em>' + playerName + '</em>' //player not found
-    isOK = false
   }
   else {
     //title (GM, IM, FM, ...)
@@ -1890,7 +1895,6 @@ function fillPlayerHTMLChessCom(jsonObj, playerName) {
 
     playerHint += (name ? name : '')
       + (location ? ', ' + location : '')
-
     playerHint += META_FIDE
       + (playerTitle ? ', ' + playerTitle : '')
     playerHint += (playerHint && playerHint !== META_FIDE ? '\n' : '')
@@ -1901,9 +1905,15 @@ function fillPlayerHTMLChessCom(jsonObj, playerName) {
       + '<span class="playerTitle">' + playerTitle + ' </span>'
       + '<strong>' + playerName + '</strong></a>'
       + (lastOnline ? '<br><span class="' + classLastOnline + '">' + lastOnline + '</span>' : '')
+    isOK = true
   }
   const bullet = '', blitz = '', rapid = '', puzzle = '', rush = ''
-  vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+  // vm.vueArChessComPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
+  arPlayerNames.forEach((item, index) => { //for double names
+    if (item === playerName) {
+      vm.vueArChessComPlayersBuf[index] = { playerHTML, playerName, bullet, blitz, rapid, puzzle, rush }
+    }
+  })
   return isOK
 }
 
