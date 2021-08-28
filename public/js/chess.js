@@ -1802,8 +1802,8 @@ async function getProfileAfterFetchFromChessCom1(arPlayerNames) {
   }
 
   for (let i = 0; i < 5; i++) {
-    // let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
-    let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
+    let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
+    // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
       out(`i=${i}, chess.com, (${arPlayerNamesBuf.length} el. from ${beginLength})`)
