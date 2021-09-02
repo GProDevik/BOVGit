@@ -148,8 +148,8 @@ let intervalID, needRefresh
 let inputNode1, inputNode2, tableNode1, tableNode2
 inputNode1 = document.querySelector('#InputOrder1')
 inputNode2 = document.querySelector('#InputOrder2')
-tableNode1 = document.querySelector('#TableOrder1')
-tableNode2 = document.querySelector('#TableOrder2')
+tableNode1 = document.querySelector('#LichessTables')
+tableNode2 = document.querySelector('#ChessComTables')
 
 //MobileStyle
 if (isMobileDevice) {
