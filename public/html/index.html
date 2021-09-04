@@ -89,7 +89,9 @@
 
         <div id="Tables">
           <div id="LichessTables">
-            <div id="LichessTableRating" class="TableLichess showBlock">
+            <input @click="vueGotoLichessScore" class="buttonLichessScore" type="button" value="Score"
+              id="buttonLichessScore" title="Lichess Score">
+            <div id="LichessTableRating" class="TableLichessRatings showBlock">
               <table>
                 <thead class="THeadLichess">
                   <tr>
@@ -110,11 +112,12 @@
                     <td v-html="item.puzzle"></td>
                     <td v-html="item.rush"></td>
                     <!--
-                <td @click="vueScoreLichess(item.playerName)">{{item.bullet}}</td>
-                <td>{{item.blitz}}</td>
-                <td>{{item.rapid}}</td>
-                <td>{{item.puzzle}}</td>
-                <td>{{item.rush}}</td> -->
+                      <td @click="vueScoreLichess(item.playerName)">{{item.bullet}}</td>
+                      <td>{{item.blitz}}</td>
+                      <td>{{item.rapid}}</td>
+                      <td>{{item.puzzle}}</td>
+                      <td>{{item.rush}}</td>
+                    -->
                   </tr>
                 </tbody>
               </table>
@@ -137,7 +140,7 @@
                     <td v-html="item.playerHTML"></td>
                     <td v-html="item.show"></td>
                     <td v-html="item.opponent"></td>
-                    <td v-html="item.score"></td>
+                    <td>{{item.score}}</td>
                     <td v-html="item.result"></td>
                   </tr>
                 </tbody>
@@ -147,7 +150,7 @@
           </div>
 
           <div id="ChessComTables">
-            <div id="TableOrder2" class="TableChessCom showBlock">
+            <div id="TableOrder2" class="TableChessComRatings showBlock">
               <table>
                 <thead class="THeadChessCom">
                   <tr>
@@ -304,8 +307,8 @@
   <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.js"></script> -->
   <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.runtime.global.js"></script> -->
 
-  <!-- <script src="js/chess.js"></script> -->
-  <script src="js/chessb.js"></script>
+  <script src="js/chess.js"></script>
+  <!-- <script src="js/chessb.js"></script> -->
 
 </body>
 

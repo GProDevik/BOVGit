@@ -22,10 +22,11 @@ const root = {
     }
   },
   methods: {
+    vueScoreLichess(playerName) { scoreLichess(playerName) },
+    vueGotoLichessScore() { gotoLichessScore() },
     vueGroupAdd() { groupAdd() },
     vueGroupDel() { groupDel() },
     vueGroupRestore() { groupRestore() },
-    vueScoreLichess(playerName) { scoreLichess(playerName) },
     vueGoUserMode() { goUserMode() },
     vueRefresh() { refresh() },
     vueOnClickCheckLichess() {
@@ -203,6 +204,15 @@ if (needRefresh) {
 }
 
 /////////////////// show score: player vs opponents (Lichess) /////////////////////////
+
+function gotoLichessScore() {
+  const thisIsLichess = true
+  const arPlayerNames = getArPlayerNames(thisIsLichess)
+  if (arPlayerNames.length > 0) {
+    let playerName = arPlayerNames[0]
+    scoreLichess(playerName)
+  }
+}
 
 function scoreLichess(playerName) {
   const thisIsLichess = true
@@ -1237,7 +1247,7 @@ function refreshOne(thisIsLichess) {
 function refreshOneTable(thisIsLichess) {
   replaceSomeHeads()
 
-  const selectorTable = thisIsLichess ? '.TableLichess' : '.TableChessCom'
+  const selectorTable = thisIsLichess ? '.TableLichessRatings' : '.TableChessComRatings'
   const elem = document.querySelector(selectorTable)
   if (isCheckOfTable(thisIsLichess)) {
     if (elem.style.display !== 'block') {
