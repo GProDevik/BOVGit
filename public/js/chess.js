@@ -1811,12 +1811,17 @@ async function getProfileAfterFetchFromChessCom1(arPlayerNames) {
     return
   }
 
+  let milliSeconds = 200
   for (let i = 0; i < 5; i++) {
     let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
     // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
       out(`i=${i}, chess.com, (${arPlayerNamesBuf.length} el. from ${beginLength})`)
+
+      milliSeconds += 100 //increase delay
+      await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
+
     }
     let isOKAll = true
     const profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
