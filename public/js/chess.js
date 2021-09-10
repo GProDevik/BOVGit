@@ -19,6 +19,7 @@ const root = {
       vueArChessComPlayers: [],
       vueArLichessPlayersBuf: [],
       vueArChessComPlayersBuf: [],
+      vueArLichessScore1: [],
     }
   },
   methods: {
@@ -206,14 +207,15 @@ if (needRefresh) {
 /////////////////// show score: player vs opponents (Lichess) /////////////////////////
 
 function gotoLichessScore() {
-  const thisIsLichess = true
-  const arPlayerNames = getArPlayerNames(thisIsLichess)
-  if (arPlayerNames.length > 0) {
-    let playerName = arPlayerNames[0]
-    scoreLichess(playerName)
-  }
+  // const thisIsLichess = true
+  // const arPlayerNames = getArPlayerNames(thisIsLichess)
+  // if (arPlayerNames.length > 0) {
+  //   let playerName = arPlayerNames[0]
+  //   scoreLichess(playerName)
+  // }
 }
 
+//double-click from cell 'bullet'
 function scoreLichess(playerName) {
   const thisIsLichess = true
   const arPlayerNames = getArPlayerNames(thisIsLichess)
@@ -1811,17 +1813,15 @@ async function getProfileAfterFetchFromChessCom1(arPlayerNames) {
     return
   }
 
-  let milliSeconds = 200
+  let milliSeconds = 300
   for (let i = 0; i < 5; i++) {
     let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
     // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
       out(`i=${i}, chess.com, (${arPlayerNamesBuf.length} el. from ${beginLength})`)
-
-      milliSeconds += 100 //increase delay
+      milliSeconds += 200 //increase delay
       await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
-
     }
     let isOKAll = true
     const profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
