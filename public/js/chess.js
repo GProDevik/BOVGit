@@ -1800,54 +1800,14 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 // }
 
 async function getDataFromChessCom(arPlayerNames) {
-  await getProfileAfterFetchFromChessCom1(arPlayerNames) //fast variant
-  // await getProfileAfterFetchFromChessCom2(arPlayerNames) //slow variant
-  await getStatisticsAfterFetchFromChessCom(arPlayerNames)
+  // await getProfileAfterFetchFromChessCom1(arPlayerNames) //fast variant
+  await getProfileAfterFetchFromChessCom2(arPlayerNames) //slow variant
+  // await getStatisticsAfterFetchFromChessCom1(arPlayerNames)
+  await getStatisticsAfterFetchFromChessCom2(arPlayerNames)
 }
 
+//without delay (but with 'no data fetch')
 async function getProfileAfterFetchFromChessCom1(arPlayerNames) {
-
-  let arPlayerNamesBuf = [...arPlayerNames]
-  const beginLength = arPlayerNamesBuf.length
-  if (beginLength === 0) {
-    return
-  }
-
-  let milliSeconds = 300
-  for (let i = 0; i < 5; i++) {
-    let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
-    // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
-    arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
-    if (i > 0) {
-      out(`i=${i}, chess.com, (${arPlayerNamesBuf.length} el. from ${beginLength})`)
-      milliSeconds += 200 //increase delay
-      await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
-    }
-    let isOKAll = true
-    const profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
-    profileResults.forEach((jsonObj, index) => {
-      const playerName = arPlayerNamesBuf[index]
-      const isOK = fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames)
-      if (isOK) {
-        arPlayerNamesBufIndex[index] = true //del element if it's OK
-      } else {
-        isOKAll = false
-        out(`not read: ${playerName}, chess.com`)
-      }
-    })
-    if (isOKAll) {
-      break
-    }
-    // for (let j = arPlayerNamesBufIndex.length - 1; j >= 0; j--) {
-    //   if (arPlayerNamesBufIndex[j]) {
-    //     arPlayerNamesBuf.splice(j, 1) //del element if it's OK
-    //   }
-    // }
-    arPlayerNamesBuf = arPlayerNamesBuf.filter((item, index) => !arPlayerNamesBufIndex[index])
-  }
-}
-
-async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
 
   for (let playerName of arPlayerNames) {
     let response, jsonObj, playerURL = ''
@@ -1867,6 +1827,44 @@ async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
         fillPlayerHTMLChessCom(jsonObj, playerName)
       }
     }
+  }
+}
+
+//with delay (new!)
+async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
+  let arPlayerNamesBuf = [...arPlayerNames]
+  const beginLength = arPlayerNamesBuf.length
+  if (beginLength === 0) {
+    return
+  }
+
+  let milliSeconds = 200
+  for (let i = 0; i < 5; i++) {
+    let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
+    // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
+    arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
+    if (i > 0) {
+      out(`i=${i}, chess.com profile, (${arPlayerNamesBuf.length} el. from ${beginLength})`)
+      milliSeconds += 100 //increase delay
+      await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
+    }
+    let isOKAll = true
+    const profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
+    profileResults.forEach((jsonObj, index) => {
+      const playerName = arPlayerNamesBuf[index]
+      // out(index + 'profile: ' + playerName) // debug
+      const isOK = fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames)
+      if (isOK) {
+        arPlayerNamesBufIndex[index] = true //del element if it's OK
+      } else {
+        isOKAll = false
+        out(`not read profile: ${playerName}, chess.com`)
+      }
+    })
+    if (isOKAll) {
+      break
+    }
+    arPlayerNamesBuf = arPlayerNamesBuf.filter((item, index) => !arPlayerNamesBufIndex[index])
   }
 }
 
@@ -1932,14 +1930,52 @@ function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
   return isOK
 }
 
-async function getStatisticsAfterFetchFromChessCom(arPlayerNames) {
-
-  //get statistics for player
+//without delay (with errors)
+async function getStatisticsAfterFetchFromChessCom1(arPlayerNames) {
   let statResults = await getFetchResultsFromServer(false, arPlayerNames, '/stats')
   statResults.forEach((jsonObj, index) => {
     const playerName = arPlayerNames[index]
     fillPlayerStatisticsChessCom(jsonObj, index, playerName)
   })
+}
+
+//with delay (new!)
+async function getStatisticsAfterFetchFromChessCom2(arPlayerNames) {
+  let arPlayerNamesBuf = [...arPlayerNames]
+  const beginLength = arPlayerNamesBuf.length
+  if (beginLength === 0) {
+    return
+  }
+
+  let milliSeconds = 200
+  for (let i = 0; i < 5; i++) {
+    let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
+    // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
+    arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
+    if (i > 0) {
+      out(`i=${i}, chess.com stats, (want call ${arPlayerNamesBuf.length} el. from ${beginLength})`)
+      milliSeconds += 100 //increase delay
+      await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
+    }
+    let isOKAll = true
+    const statResults = await getFetchResultsFromServer(false, arPlayerNamesBuf, '/stats')
+    statResults.forEach((jsonObj, index) => {
+      const playerName = arPlayerNamesBuf[index]
+      // out(index + 'stats: ' + playerName) // debug
+      if (jsonObj !== null) {
+        const mainIndex = arPlayerNames.indexOf(playerName)
+        fillPlayerStatisticsChessCom(jsonObj, mainIndex, playerName)
+        arPlayerNamesBufIndex[index] = true //del element if it's OK
+      } else {
+        isOKAll = false
+        out(`not read stats: ${playerName}, chess.com`)
+      }
+    })
+    if (isOKAll) {
+      break
+    }
+    arPlayerNamesBuf = arPlayerNamesBuf.filter((item, index) => !arPlayerNamesBufIndex[index])
+  }
 }
 
 function fillPlayerStatisticsChessCom(jsonObj, index, playerName) {
