@@ -1950,7 +1950,6 @@ async function getStatisticsAfterFetchFromChessCom2(arPlayerNames) {
   let milliSeconds = 200
   for (let i = 0; i < 5; i++) {
     let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
-    // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
       out(`i=${i}, chess.com stats, (want call ${arPlayerNamesBuf.length} el. from ${beginLength})`)
@@ -1961,7 +1960,6 @@ async function getStatisticsAfterFetchFromChessCom2(arPlayerNames) {
     const statResults = await getFetchResultsFromServer(false, arPlayerNamesBuf, '/stats')
     statResults.forEach((jsonObj, index) => {
       const playerName = arPlayerNamesBuf[index]
-      // out(index + 'stats: ' + playerName) // debug
       if (jsonObj !== null) {
         const mainIndex = arPlayerNames.indexOf(playerName)
         fillPlayerStatisticsChessCom(jsonObj, mainIndex, playerName)
