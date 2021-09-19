@@ -108,27 +108,26 @@ const mapTimeControl = new Map([
 
 const BOVGIT_playerName = 'bovgit'
 const BOVGIT_description = 'Creator of this page :)'
-const mapDefaultLichessPlayers = new Map([
+const mapLichessPlayersDescription = new Map([
   ['Thibault', 'Creator of Lichess.org'],
-  ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway, GM'],
+  ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway, FIDE 2882, GM'],
+  ['AvalonGamemaster', '? Maxime Vachier-Lagrave, France, GM'],
 ])
-const mapDefaultChessComPlayers = new Map([
+const mapChessComPlayersDescription = new Map([
   ['Erik', 'Creator of Chess.com'],
-  ['Hikaru'],
-  ['ChessQueen'],
-  ['ChessNetwork'],
-  ['ShahMatKanal'],
+  ['MagnusCarlsen', 'World champion'],
 ])
 const startGroupObjs = [
   {
     name: '! FIDE top',
-    lichessPlayerNames: 'DrNykterstein Alireza2003 Bombegranate AnishGiri AvalonGamemaster', // Azerichessss Sergey_Karjakin Colchonero64 Vladimirovich9000
+    // Azerichessss Sergey_Karjakin Colchonero64 Vladimirovich9000
+    lichessPlayerNames: 'DrNykterstein Alireza2003 Bombegranate AnishGiri AvalonGamemaster',
     chessComPlayerNames: 'MagnusCarlsen Firouzja2003 ChefsHouse FabianoCaruana LevonAronian LachesisQ AnishGiri Grischuk gmwso LyonBeast'
   },
   {
     name: '! custom',
     lichessPlayerNames: 'Thibault Zhigalko_Sergei Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka ' + BOVGIT_playerName,
-    chessComPlayerNames: getDefaultPlayersFromMap(mapDefaultChessComPlayers)
+    chessComPlayerNames: 'Erik Hikaru ChessQueen ChessNetwork ShahMatKanal'
   }
 ]
 const startGroupNum = startGroupObjs.length
@@ -1380,7 +1379,7 @@ function clearMetaText(arPlayerNames) {
 
 //       //playerHint
 //       let playerHint = ''
-//       let playerMyDesccription = mapDefaultLichessPlayers.get(playerName)
+//       let playerMyDesccription = mapLichessPlayersDescription.get(playerName)
 //       if (playerMyDesccription) {
 //         playerHint = playerMyDesccription + '\n\n'
 //       } else if (isPlayerMe(playerName)) {
@@ -1474,7 +1473,7 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
 
       //playerHint
       let playerHint = ''
-      let playerMyDesccription = mapDefaultLichessPlayers.get(playerName)
+      let playerMyDesccription = mapLichessPlayersDescription.get(playerName)
       if (playerMyDesccription) {
         playerHint = playerMyDesccription + '\n\n'
       } else if (isPlayerMe(playerName)) {
@@ -1844,8 +1843,8 @@ async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
     // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
-      out(`i=${i}, chess.com profile, (${arPlayerNamesBuf.length} el. from ${beginLength})`)
       milliSeconds += 100 //increase delay
+      out(`i=${i}, chess.com profile, ${arPlayerNamesBuf.length} el. from ${beginLength}, delay ${milliSeconds}`)
       await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
     }
     let isOKAll = true
@@ -1874,7 +1873,7 @@ function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
   const beginDate = getBeginOfLastDay()
 
   //my own description ! ('Creator of ...')
-  let v = mapDefaultChessComPlayers.get(playerName)
+  let v = mapChessComPlayersDescription.get(playerName)
   if (v) {
     playerHint = v + '\n\n'
   } else if (isPlayerMe(playerName)) {
@@ -1952,8 +1951,8 @@ async function getStatisticsAfterFetchFromChessCom2(arPlayerNames) {
     let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
-      out(`i=${i}, chess.com stats, (want call ${arPlayerNamesBuf.length} el. from ${beginLength})`)
       milliSeconds += 100 //increase delay
+      out(`i=${i}, chess.com stats, ${arPlayerNamesBuf.length} el. from ${beginLength}, delay ${milliSeconds}`)
       await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
     }
     let isOKAll = true
