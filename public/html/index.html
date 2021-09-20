@@ -32,6 +32,16 @@
 <body>
   <div id="vue-mount">
 
+    <dialog id="modalDialog">
+      <div id="modalDialogHead"></div>
+      <br>
+      <div id="modalDialogText"></div>
+      <br>
+      <div class="modalDialogHideButton">
+        <button id="modalDialogHide">Close</button>
+      </div>
+    </dialog>
+
     <div id="bodyStyle" class="PCStyle">
 
       <header>
@@ -85,14 +95,13 @@
               placeholder="Player names on Chess.com, separated by spaces">
           </label>
 
-          <center><span class="msgChangePlayerList">You can edit player lists !</span></center>
+          <center><span class="msgHint">You can edit player lists !</span></center>
 
         </form>
 
         <div id="Tables">
           <div id="LichessTables">
-            <input @click="vueGotoLichessScore" class="buttonLichessScore" type="button" value="Score >>"
-              id="buttonLichessScore" title="Lichess Score">
+            <span class="msgHint">Click on the rating to see the score !</span>
             <div id="LichessTableRating" class="TableLichessRatings showBlock">
               <table>
                 <thead class="THeadLichess">
@@ -109,10 +118,10 @@
                   <tr v-for="(item, name, index) in vueArLichessPlayers" :key="index">
                     <td v-html="item.playerHTML"></td>
                     <td v-html="item.bullet" @click="vueScoreLichess(item.playerName)"></td>
-                    <td v-html="item.blitz"></td>
-                    <td v-html="item.rapid"></td>
-                    <td v-html="item.puzzle"></td>
-                    <td v-html="item.rush"></td>
+                    <td v-html="item.blitz" @click="vueScoreLichess(item.playerName)"></td>
+                    <td v-html="item.rapid" @click="vueScoreLichess(item.playerName)"></td>
+                    <td v-html="item.puzzle" @click="vueScoreLichess(item.playerName)"></td>
+                    <td v-html="item.rush" @click="vueScoreLichess(item.playerName)"></td>
                     <!--
                       <td @click="vueScoreLichess(item.playerName)">{{item.bullet}}</td>
                       <td>{{item.blitz}}</td>
@@ -120,47 +129,6 @@
                       <td>{{item.puzzle}}</td>
                       <td>{{item.rush}}</td>
                     -->
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- ------------------------------------------- -->
-            <div id="LichessTableScore1" class="hiddenBlock">
-              <table>
-                <thead class="THeadLichessScore1">
-                  <tr>
-                    <th>Lichess</th>
-                    <th>Show score</th>
-                  </tr>
-                </thead>
-                <tbody class="TBodyLichessScore1">
-                  <tr v-for="(item, name, index) in vueArLichessScore1" :key="index">
-                    <td v-html="item.playerHTML"></td>
-                    <td v-html="item.show"></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- =========================================== -->
-            <div id="LichessTableScore" class="hiddenBlock">
-              <table>
-                <thead class="THeadLichessScore">
-                  <tr>
-                    <th @click="vueRefreshLichess" class="THeadPlayerLichessScore leftTopOfTable">Lichess</th>
-                    <th>show</th>
-                    <th>opponent</th>
-                    <th>score</th>
-                    <th>result</th>
-                  </tr>
-                </thead>
-                <tbody class="TBodyLichessScore">
-                  <tr v-for="(item, name, index) in vueArLichessScore" :key="index">
-                    <td v-html="item.playerHTML"></td>
-                    <td v-html="item.opponent"></td>
-                    <td>{{item.score}}</td>
-                    <td v-html="item.result"></td>
                   </tr>
                 </tbody>
               </table>

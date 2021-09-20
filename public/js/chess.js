@@ -19,12 +19,10 @@ const root = {
       vueArChessComPlayers: [],
       vueArLichessPlayersBuf: [],
       vueArChessComPlayersBuf: [],
-      vueArLichessScore1: [],
     }
   },
   methods: {
     vueScoreLichess(playerName) { scoreLichess(playerName) },
-    vueGotoLichessScore() { gotoLichessScore() },
     vueGroupAdd() { groupAdd() },
     vueGroupDel() { groupDel() },
     vueGroupRestore() { groupRestore() },
@@ -96,7 +94,7 @@ const onlineSymbolStreaming = '&#127908;' //microphone
 const META_FIDE = '@FIDE@'
 const META_STATUS_TEXT = '@STATUS-TEXT@'
 const META_STATUS_SYMBOL = '@STATUS-SYMBOL@'
-const META_SCORE = '@SCORE-TEXT@'
+// const META_SCORE = '@SCORE-TEXT@'
 const mapTimeControl = new Map([
   ['player', 0],
   ['bullet', 1],
@@ -109,11 +107,13 @@ const mapTimeControl = new Map([
 const BOVGIT_playerName = 'bovgit'
 const BOVGIT_description = 'Creator of this page :)'
 const mapLichessPlayersDescription = new Map([
+  [BOVGIT_playerName, BOVGIT_description],
   ['Thibault', 'Creator of Lichess.org'],
   ['DrNykterstein', 'World champion\n\nMagnus Carlsen, Norway, FIDE 2882, GM'],
   ['AvalonGamemaster', '? Maxime Vachier-Lagrave, France, GM'],
 ])
 const mapChessComPlayersDescription = new Map([
+  [BOVGIT_playerName, BOVGIT_description],
   ['Erik', 'Creator of Chess.com'],
   ['MagnusCarlsen', 'World champion'],
 ])
@@ -126,7 +126,7 @@ const startGroupObjs = [
   },
   {
     name: '! custom',
-    lichessPlayerNames: 'Thibault Zhigalko_Sergei Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka ' + BOVGIT_playerName,
+    lichessPlayerNames: 'Thibault Zhigalko_Sergei Benefactorr Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka ' + BOVGIT_playerName,
     chessComPlayerNames: 'Erik Hikaru ChessQueen ChessNetwork ShahMatKanal'
   }
 ]
@@ -159,6 +159,9 @@ if (isMobileDevice) {
 }
 
 // ------------- On-Click ---------------
+
+const modalDialog = document.getElementById('modalDialog');
+document.getElementById('modalDialogHide').onclick = () => modalDialog.close()
 
 document.querySelector('#group').onchange = () => onchangeSelectGroup()
 
@@ -205,16 +208,7 @@ if (needRefresh) {
 
 /////////////////// show score: player vs opponents (Lichess) /////////////////////////
 
-function gotoLichessScore() {
-  // const thisIsLichess = true
-  // const arPlayerNames = getArPlayerNames(thisIsLichess)
-  // if (arPlayerNames.length > 0) {
-  //   let playerName = arPlayerNames[0]
-  //   scoreLichess(playerName)
-  // }
-}
-
-//double-click from cell 'bullet'
+//click from rating's cell
 function scoreLichess(playerName) {
   const thisIsLichess = true
   const arPlayerNames = getArPlayerNames(thisIsLichess)
@@ -1248,7 +1242,9 @@ function refreshOne(thisIsLichess) {
 function refreshOneTable(thisIsLichess) {
   replaceSomeHeads()
 
-  const selectorTable = thisIsLichess ? '.TableLichessRatings' : '.TableChessComRatings'
+  // const selectorTable = thisIsLichess ? '.TableLichessRatings' : '.TableChessComRatings'
+  const selectorTable = thisIsLichess ? '#LichessTables' : '.TableChessComRatings'
+
   const elem = document.querySelector(selectorTable)
   if (isCheckOfTable(thisIsLichess)) {
     if (elem.style.display !== 'block') {
@@ -1350,7 +1346,7 @@ function clearMetaText(arPlayerNames) {
   arPlayerNames.forEach((item, index) => {
     let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML.replace(META_STATUS_TEXT, '')
     playerHTML = playerHTML.replace(META_STATUS_SYMBOL, '')
-    playerHTML = playerHTML.replace(META_SCORE, '')
+    // playerHTML = playerHTML.replace(META_SCORE, '')
     vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML
   })
 }
@@ -1476,8 +1472,6 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
       let playerMyDesccription = mapLichessPlayersDescription.get(playerName)
       if (playerMyDesccription) {
         playerHint = playerMyDesccription + '\n\n'
-      } else if (isPlayerMe(playerName)) {
-        playerHint = BOVGIT_description + '\n\n'
       }
 
       const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
@@ -1739,8 +1733,17 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
                 oppoScore = users[username]
               }
             }
-            const addSpaces = '_'.repeat(maxNameLength - oppoName.length + 2)
-            allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore}\n`
+
+            const diff = myScore - oppoScore
+            let diffTag = (diff > 0 ? '+' : '') + `${diff}`
+            if (diff !== 0) {
+              const classScore = diff > 0 ? 'scorePlus' : 'scoreMinus'
+              diffTag = `<span class="${classScore}">${diffTag}</span>`
+            }
+
+            const delimiter = '_'
+            const addSpaces = delimiter.repeat(maxNameLength - oppoName.length + 2)
+            allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}<br>`
           }
         } else {
           isError = true
@@ -1752,9 +1755,10 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
       }
     }
   }
-  allScore += isError ? '\nCannot get some data from Lichess.\nTry again later.' : ''
+  allScore += isError ? '<br>Cannot get some data from Lichess.<br>Try again later.' : ''
   outMsgWait(thisIsLichess, false)
-  alert(allScore)
+
+  myAlert(allScore, 'Score between players:')
 }
 
 //fetch(url).then((response) => {return response.json()}).then((jsonObj) => {...
@@ -1840,7 +1844,6 @@ async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
   let milliSeconds = 200
   for (let i = 0; i < 5; i++) {
     let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
-    // let arPlayerNamesBufIndex = arPlayerNamesBuf.slice() //copy
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
       milliSeconds += 100 //increase delay
@@ -1851,7 +1854,6 @@ async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
     const profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
     profileResults.forEach((jsonObj, index) => {
       const playerName = arPlayerNamesBuf[index]
-      // out(index + 'profile: ' + playerName) // debug
       const isOK = fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames)
       if (isOK) {
         arPlayerNamesBufIndex[index] = true //del element if it's OK
@@ -1876,8 +1878,6 @@ function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
   let v = mapChessComPlayersDescription.get(playerName)
   if (v) {
     playerHint = v + '\n\n'
-  } else if (isPlayerMe(playerName)) {
-    playerHint = BOVGIT_description + '\n\n'
   }
 
   playerURL = getJsonValue1(playerName, jsonObj, 'url')
@@ -1896,7 +1896,7 @@ function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
     v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
     if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
 
-    v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login (seconds)
+    v = getJsonValue1(playerName, jsonObj, 'last_online') //date&time of last login (seconds instead of milliseconds !)
     let classLastOnline = 'lastOnline'
     if (v) {
       lastOnline = getDateHHMM(v * 1000)
@@ -2263,7 +2263,7 @@ function clearSettings() {
   setAutoRefreshInterval('')
   setCheckDarkTheme(false)
 
-  //leave first fixed groups (Start, World Top)
+  //leave first fixed groups (FIDE Top, ...)
   clearGroupSettings()
 
   if (isFirstChessCom) {
@@ -2402,10 +2402,6 @@ function getDefaultPlayersFromMap(mapPlayers) {
   return s.trim()
 }
 
-function isPlayerMe(playerName) {
-  return playerName.toUpperCase() === BOVGIT_playerName.toUpperCase()
-}
-
 ///////////////////////////////////////////////////////////
 
 function setTheme() {
@@ -2459,4 +2455,15 @@ function out(msg) {
   // if (isMobileDevice) {
   //   alert(msg) //for debug
   // }
+}
+
+//on mobile device in native alert() is too large head of msg
+function myAlert(msg = '', head = '') {
+  const modalDialogHead = document.getElementById('modalDialogHead')
+  modalDialogHead.innerHTML = head
+
+  const modalDialogText = document.getElementById('modalDialogText')
+  modalDialogText.innerHTML = msg
+
+  modalDialog.showModal()
 }
