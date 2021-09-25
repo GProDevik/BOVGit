@@ -156,6 +156,7 @@ tableNode2 = document.querySelector('#ChessComTables')
 if (isMobileDevice) {
   document.querySelector('#bodyStyle').setAttribute("class", "mobileStyle")
   document.querySelector('.projectName').setAttribute("class", "projectName projectNameDifMobile")
+  document.querySelector('#modalDialog').setAttribute("class", "modalDialogMobileStyle")
 }
 
 // ------------- On-Click ---------------
@@ -309,7 +310,7 @@ function groupAdd() {
   let v
 
   if (getArGroupNames().length === MAX_GROUPS_NUM) {
-    alert(`${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !`)
+    myAlert(`${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !`)
     return
   }
 
@@ -318,17 +319,17 @@ function groupAdd() {
     return
   }
   if (groupName.length > MAX_GROUPNAME_LEN) {
-    alert(`The name must not exceed ${MAX_GROUPNAME_LEN} symbols !`)
+    myAlert(`The name must not exceed ${MAX_GROUPNAME_LEN} symbols !`)
     return
   }
   v = groupName.toUpperCase()
   const groupObj = groupObjs.find(item => item.name.toUpperCase() === v)
   if (groupObj !== undefined) {
-    alert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
+    myAlert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
     return
   }
   if (groupName.includes('!')) {
-    alert(`The name must not include symbol "!".`)
+    myAlert(`The name must not include symbol "!".`)
     return
   }
 
@@ -344,7 +345,7 @@ function groupAdd() {
   addOptionToSelectElement(groupElement, currentGroupName, currentGroupName)
 
   setDataToStorage()
-  alert(`It's created group "${groupName}" with the current lists of players.\n\nChange player lists !`)
+  myAlert(`It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !`)
 }
 
 //del current group
@@ -354,7 +355,7 @@ function groupDel() {
 
   const groupIndex = groupNames.indexOf(groupName, 0)
   if (isThisStartGroup(groupIndex)) {
-    alert(`Group "${groupName}" cannot be deleted !`)
+    myAlert(`Group "${groupName}" cannot be deleted !`)
     return
   }
 
@@ -375,7 +376,7 @@ function groupDel() {
   setChessComPlayerNames(groupObjs[0].chessComPlayerNames)
   refresh()
 
-  alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
+  myAlert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
 }
 
 //restore current group
@@ -385,7 +386,7 @@ function groupRestore() {
 
   const groupIndex = groupNames.indexOf(groupName, 0)
   if (!isThisStartGroup(groupIndex)) {
-    alert(`Group "${groupName}" cannot be restored !`)
+    myAlert(`Group "${groupName}" cannot be restored !`)
     return
   }
 
@@ -404,7 +405,7 @@ function groupRestore() {
   setLichessOrgPlayerNames(startGroupObjs[groupIndex].lichessPlayerNames)
   setChessComPlayerNames(startGroupObjs[groupIndex].chessComPlayerNames)
   refresh()
-  alert(`Group "${groupName}" will be restored !`)
+  myAlert(`Group "${groupName}" will be restored !`)
 }
 
 function isThisStartGroup(groupIndex) {
@@ -1240,7 +1241,7 @@ function refreshOne(thisIsLichess) {
 }
 
 function refreshOneTable(thisIsLichess) {
-  replaceSomeHeads()
+  // replaceSomeHeads()
 
   // const selectorTable = thisIsLichess ? '.TableLichessRatings' : '.TableChessComRatings'
   const selectorTable = thisIsLichess ? '#LichessTables' : '.TableChessComRatings'
@@ -2125,7 +2126,7 @@ function goMainModeFromSettings() {
   if (s !== '') {
     let n = parseInt(s, 10)
     if (isNaN(n) || !(Number.isInteger(n) && n >= 0 && n <= 9999)) {
-      alert('Interval must be between 0 and 9999 !')
+      myAlert('Interval must be between 0 and 9999 !')
       return
     }
     s = n.toString(10)
@@ -2275,7 +2276,7 @@ function clearSettings() {
   setAutoRefresh()
   setTheme()
 
-  alert('All settings are cleared.')
+  myAlert('All settings are cleared.')
 }
 
 function restoreStartGroups() {
@@ -2289,7 +2290,7 @@ function restoreStartGroups() {
 
   refresh()
 
-  alert('All Start-groups are restored.')
+  myAlert('All Start-groups are restored.')
   goMainModeFromSettings()
 }
 
@@ -2453,17 +2454,17 @@ function out(msg) {
   console.log(`${dt} - ${msg}`)
 
   // if (isMobileDevice) {
-  //   alert(msg) //for debug
+  //   myAlert(msg) //for debug
   // }
 }
 
 //on mobile device in native alert() is too large head of msg
 function myAlert(msg = '', head = '') {
   const modalDialogHead = document.getElementById('modalDialogHead')
-  modalDialogHead.innerHTML = head
+  modalDialogHead.innerHTML = head.replaceAll('\n', '<br>')
 
   const modalDialogText = document.getElementById('modalDialogText')
-  modalDialogText.innerHTML = msg
+  modalDialogText.innerHTML = msg.replaceAll('\n', '<br>')
 
   modalDialog.showModal()
 }

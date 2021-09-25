@@ -227,14 +227,6 @@ td {
   color: red;
 }
 
-#modalDialogHead{
-  text-align: center;
-}
-
-.modalDialogHideButton{
-  text-align: right;
-}
-
 .statusOnline{
   /* font-size: large; */ /* for symbol 'circle'*/
   font-size: x-small; /* for symbol 'check'*/
@@ -340,5 +332,18 @@ fieldset {
   font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
   border-collapse: collapse;
   border: 1px solid black;
-  background-color: gainsboro;
+  /* background-color: gainsboro; */
+  background-color: lightgray;
+}
+
+.modalDialogMobileStyle {
+  font-size: small;
+}
+
+.alignCenter{
+  text-align: center;
+}
+
+.alignRight{
+  text-align: right;
 }
