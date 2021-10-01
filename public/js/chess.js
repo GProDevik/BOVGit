@@ -2435,11 +2435,24 @@ function is_mobile_device() {
 function outMsgWait(thisIsLichess, show) {
   const defColor = 'white'
   const waitColor = '#ffe4b5' //light-yellow (or as "background-color: moccasin ;")
+  let el
   if (thisIsLichess && isCheckLichess()) {
-    document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+    // document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+    el = document.querySelector('#elemTextLichessOrgPlayerNames')
   }
   if (!thisIsLichess && isCheckChessCom()) {
-    document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+    // document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+    el = document.querySelector('#elemTextChessComPlayerNames')
+  }
+  if (el) {
+    el.style.backgroundColor = (show ? waitColor : defColor)
+    if (show) {
+      el.style.backgroundColor = waitColor
+      el.setAttribute("class", "inputText waitAnimation")
+    } else {
+      el.style.backgroundColor = defColor
+      el.setAttribute("class", "inputText")
+    }
   }
 }
 

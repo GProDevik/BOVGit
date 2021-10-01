@@ -347,3 +347,19 @@ fieldset {
 .alignRight{
   text-align: right;
 }
+
+.waitAnimation {
+  animation-duration: 2s;
+  animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+    background-color: '#ffe4b5';
+  }
+  to {
+    /* background-color: white; */
+    /* background-color: springgreen; */
+    background-color: turquoise;
+  }
+}
