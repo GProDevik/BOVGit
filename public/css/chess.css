@@ -349,7 +349,7 @@ fieldset {
 }
 
 .waitAnimation {
-  animation-duration: 2s;
+  animation-duration: 1s;
   animation-name: slidein;
 }
 
@@ -358,8 +358,11 @@ fieldset {
     background-color: '#ffe4b5';
   }
   to {
-    /* background-color: white; */
+    background-color: white;
     /* background-color: springgreen; */
-    background-color: turquoise;
+    /* background-color: turquoise; */
+    /* background-color: coral; */
+    /* background-color: darkgoldenrod; */
+    /* background-color: darksalmon; */
   }
 }

@@ -126,7 +126,8 @@ const startGroupObjs = [
   },
   {
     name: '! custom',
-    lichessPlayerNames: 'Thibault Zhigalko_Sergei Benefactorr Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka ' + BOVGIT_playerName,
+    lichessPlayerNames: 'Thibault Zhigalko_Sergei Benefactorr Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka',
+    // + BOVGIT_playerName,
     chessComPlayerNames: 'Erik Hikaru ChessQueen ChessNetwork ShahMatKanal'
   }
 ]
