@@ -104,6 +104,7 @@ const mapTimeControl = new Map([
   ['rush', 5]
 ])
 
+const streamersGroupName = '! streamers online'
 const BOVGIT_playerName = 'bovgit'
 const BOVGIT_description = 'Creator of this page :)'
 const mapLichessPlayersDescription = new Map([
@@ -129,6 +130,11 @@ const startGroupObjs = [
     lichessPlayerNames: 'Thibault Zhigalko_Sergei Benefactorr Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka',
     // + BOVGIT_playerName,
     chessComPlayerNames: 'Erik Hikaru ChessQueen ChessNetwork ShahMatKanal'
+  },
+  {
+    name: streamersGroupName,
+    lichessPlayerNames: 'streamers online',
+    chessComPlayerNames: ''
   }
 ]
 const startGroupNum = startGroupObjs.length
@@ -162,10 +168,10 @@ if (isMobileDevice) {
 
 // ------------- On-Click ---------------
 
+document.querySelector('#group').onchange = () => onchangeSelectGroup()
+
 const modalDialog = document.getElementById('modalDialog');
 document.getElementById('modalDialogHide').onclick = () => modalDialog.close()
-
-document.querySelector('#group').onchange = () => onchangeSelectGroup()
 
 //login
 document.querySelector('#buttonPostRegistration').onclick = () => postRegistration()
@@ -210,7 +216,7 @@ if (needRefresh) {
 
 /////////////////// show score: player vs opponents (Lichess) /////////////////////////
 
-//click from rating's cell
+//click on rating cell
 function scoreLichess(playerName) {
   const thisIsLichess = true
   const arPlayerNames = getArPlayerNames(thisIsLichess)
@@ -311,7 +317,7 @@ function groupAdd() {
   let v
 
   if (getArGroupNames().length === MAX_GROUPS_NUM) {
-    myAlert(`${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !`)
+    alert(`${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !`)
     return
   }
 
@@ -320,17 +326,17 @@ function groupAdd() {
     return
   }
   if (groupName.length > MAX_GROUPNAME_LEN) {
-    myAlert(`The name must not exceed ${MAX_GROUPNAME_LEN} symbols !`)
+    alert(`The name must not exceed ${MAX_GROUPNAME_LEN} symbols !`)
     return
   }
   v = groupName.toUpperCase()
   const groupObj = groupObjs.find(item => item.name.toUpperCase() === v)
   if (groupObj !== undefined) {
-    myAlert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
+    alert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
     return
   }
   if (groupName.includes('!')) {
-    myAlert(`The name must not include symbol "!".`)
+    alert(`The name must not include symbol "!".`)
     return
   }
 
@@ -346,7 +352,7 @@ function groupAdd() {
   addOptionToSelectElement(groupElement, currentGroupName, currentGroupName)
 
   setDataToStorage()
-  myAlert(`It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !`)
+  alert(`It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !`)
 }
 
 //del current group
@@ -356,7 +362,7 @@ function groupDel() {
 
   const groupIndex = groupNames.indexOf(groupName, 0)
   if (isThisStartGroup(groupIndex)) {
-    myAlert(`Group "${groupName}" cannot be deleted !`)
+    alert(`Group "${groupName}" cannot be deleted !`)
     return
   }
 
@@ -377,7 +383,7 @@ function groupDel() {
   setChessComPlayerNames(groupObjs[0].chessComPlayerNames)
   refresh()
 
-  myAlert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
+  alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
 }
 
 //restore current group
@@ -387,7 +393,7 @@ function groupRestore() {
 
   const groupIndex = groupNames.indexOf(groupName, 0)
   if (!isThisStartGroup(groupIndex)) {
-    myAlert(`Group "${groupName}" cannot be restored !`)
+    alert(`Group "${groupName}" cannot be restored !`)
     return
   }
 
@@ -406,7 +412,7 @@ function groupRestore() {
   setLichessOrgPlayerNames(startGroupObjs[groupIndex].lichessPlayerNames)
   setChessComPlayerNames(startGroupObjs[groupIndex].chessComPlayerNames)
   refresh()
-  myAlert(`Group "${groupName}" will be restored !`)
+  alert(`Group "${groupName}" will be restored !`)
 }
 
 function isThisStartGroup(groupIndex) {
@@ -1353,85 +1359,6 @@ function clearMetaText(arPlayerNames) {
   })
 }
 
-// //N queries for N players
-// async function getProfileAfterFetchFromLichess(arPlayerNames) {
-//   let profileResults = await getFetchResultsFromServer(true, arPlayerNames)
-//   profileResults.forEach((jsonObj, index) => {
-//     let playerName = arPlayerNames[index]
-//     if (jsonObj === null) {
-//       //player not found
-//       out(`${playerName} - lichess, response-error`) //: ${response.status}`)
-//       vm.vueArLichessPlayersBuf.push({
-//         // playerHTML: '<em>? ' + playerName + '</em>',
-//         playerHTML: '<em>' + playerName + '</em>',
-//         playerName, bullet: '', blitz: '', rapid: '', puzzle: '', rush: ''
-//       })
-//     } else {
-//       // const isOnline = getJsonValue1(playerName, jsonObj, 'online')
-//       //const onlineSymbol = isOnline ? onlineSymbolAtPlayer + ' ' : ''
-//       let v
-
-//       //playerTitle: title of player (GM, IM, FM, ...)
-//       let playerTitle = getJsonValue1(playerName, jsonObj, 'title')
-//       playerTitle = (playerTitle === undefined) ? '' : playerTitle + ' '
-
-//       //playerHint
-//       let playerHint = ''
-//       let playerMyDesccription = mapLichessPlayersDescription.get(playerName)
-//       if (playerMyDesccription) {
-//         playerHint = playerMyDesccription + '\n\n'
-//       } else if (isPlayerMe(playerName)) {
-//         playerHint = BOVGIT_description + '\n\n'
-//       }
-
-//       const firstName = getJsonValue2(playerName, jsonObj, 'profile', 'firstName')
-//       const lastName = getJsonValue2(playerName, jsonObj, 'profile', 'lastName')
-//       const location = getJsonValue2(playerName, jsonObj, 'profile', 'location')
-//       const fideRating = getJsonValue2(playerName, jsonObj, 'profile', 'fideRating')
-//       const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
-//       const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
-
-//       let createdAt = '' //registration date
-//       v = getJsonValue1(playerName, jsonObj, 'createdAt')
-//       if (v) { createdAt = (new Date(v)).getFullYear() }
-
-//       let lastOnline = '' //date&time of last login (milliseconds)
-//       v = getJsonValue1(playerName, jsonObj, 'seenAt')
-//       if (v) { lastOnline = getDateHHMM(v) }
-
-//       const firstPart = (firstName ? firstName + ' ' : '')
-//         + (lastName ? lastName : '')
-//         + (location ? ', ' + location : '')
-//         + (fideRating ? ', FIDE ' + fideRating : '')
-//         + (playerTitle && !playerMyDesccription ? ', ' + playerTitle : '')
-//       playerHint += firstPart
-//         + (firstPart ? '\n' : '')
-//         + (createdAt ? 'reg. ' + createdAt : '')
-//         + (lastOnline ? '\nlast online ' + lastOnline : '')
-//         + '\n' + META_STATUS_TEXT
-//         + (bio ? '\n' + bio.replaceAll('"', '\'') : '') // (") - called error
-//         + (links ? '\n' + links : '')
-
-//       //playerHTML (href !)
-//       const playerURL = getJsonValue1(playerName, jsonObj, 'url')
-//       let playerHTML = '<a href="' + playerURL + '" target="_blank" title="' + playerHint + '">'
-//         + META_STATUS_SYMBOL // onlineSymbol
-//         + '<span class="playerTitle">' + playerTitle + ' </span>'
-//         + '<strong>' + playerName + '</strong></a>'
-//         // + (lastOnline ? '<br><span class="lastOnline">' + lastOnline + '</span>' : '')
-
-//       const bullet = getJsonValue3(playerName, jsonObj, 'perfs', 'bullet', 'rating')
-//       const blitz = getJsonValue3(playerName, jsonObj, 'perfs', 'blitz', 'rating')
-//       const rapid = getJsonValue3(playerName, jsonObj, 'perfs', 'rapid', 'rating')
-//       const puzzle = getJsonValue3(playerName, jsonObj, 'perfs', 'puzzle', 'rating')
-//       const rush = getJsonValue3(playerName, jsonObj, 'perfs', 'storm', 'score') //rush (max)
-
-//       vm.vueArLichessPlayersBuf.push({ playerHTML, playerName, bullet, blitz, rapid, puzzle, rush })
-//     }
-//   })
-// }
-//
-
 //one query for many players
 async function getProfilesAfterFetchFromLichess(arPlayerNames) {
 
@@ -1592,7 +1519,6 @@ async function getDynamicsAfterFetchFromLichess(arPlayerNames) {
   let dynamicsResults = await getFetchDynamicsFromLichess(arPlayerNames)
   dynamicsResults.forEach((jsonObjs, index) => {
     // let playerName = arPlayerNames[index]
-    // out(playerName + ' : getDynamicsAfterFetchFromLichess')
     if (!jsonObjs || jsonObjs.length === 0) {
       return
     }
@@ -1626,14 +1552,22 @@ async function getDynamicsAfterFetchFromLichess(arPlayerNames) {
   })
 }
 
+//await fetch().then()
 async function getFetchDynamicsFromLichess(arPlayerNames) {
   let jobs = []
+  let milliSeconds = 0
   for (let playerName of arPlayerNames) {
     const url = `${urlHttpServiceLichess}${playerName}/activity`
+
+    milliSeconds += 30
+    await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+
     let job = fetch(url, { mode: modeCORS }).then(
       successResponse => {
         if (successResponse.status != 200) { return null }
-        else { return successResponse.json() }
+        else {
+          return successResponse.json()
+        }
       },
       failResponse => { return null }
     )
@@ -1642,56 +1576,6 @@ async function getFetchDynamicsFromLichess(arPlayerNames) {
   let results = await Promise.all(jobs)
   return results
 }
-
-// async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
-//   const index = arPlayerNames.indexOf(myName)
-//   if (index === -1) { return } //non-possible, but ...
-//   let allScore = ''
-//   let scoreResults = await getFetchScoreFromLichess(arPlayerNames, myName)
-//   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
-//   scoreResults.forEach((jsonObj) => {
-//     if (jsonObj) {
-//       //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
-//       let myGetName = '', myScore = 0, oppoName = '', oppoScore = 0
-//       let users = jsonObj.users
-//       for (let username in users) {
-//         if (username.toUpperCase() === myName.toUpperCase()) {
-//           myGetName = username
-//           myScore = users[username]
-//         } else {
-//           oppoName = username
-//           oppoScore = users[username]
-//         }
-//       }
-//       // const addSpaces = ' '.repeat(maxNameLength - oppoName.length + 2)
-//       const addSpaces = '_'.repeat(maxNameLength - oppoName.length + 2)
-//       allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore}\n`
-//       // allScore += `${myGetName} - ${oppoName}-   ${myScore} : ${oppoScore}\n`
-//     }
-//   })
-//   alert(allScore)
-// }
-
-// async function getFetchScoreFromLichess(arPlayerNames, playerName) {
-//   let jobs = []
-//   for (let opponentName of arPlayerNames) {
-//     if (opponentName !== playerName) {
-//       const url = `${urlHttpServiceLichessScore}${playerName}/${opponentName}`
-//       let job = fetch(url, { mode: modeCORS }).then(
-//         successResponse => {
-//           if (successResponse.status != 200) { return null }
-//           else { return successResponse.json() }
-//         },
-//         failResponse => { return null }
-//       )
-//       jobs.push(job)
-//     }
-//   }
-//   let results = await Promise.all(jobs)
-//   return results
-// }
-
-////////////////////////////////////////////
 
 async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   const index = arPlayerNames.indexOf(myName)
@@ -1702,23 +1586,24 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   const thisIsLichess = true
   outMsgWait(thisIsLichess, true)
 
+  const isFirefox = isBrowserFirefox()
   let isError = false
   let allScore = ''
   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
-  // let milliSeconds = 1000
+  let milliSeconds = 0
   for (let opponentName of arPlayerNames) {
     if (opponentName !== myName) {
       const url = `${urlHttpServiceLichessScore}${myName}/${opponentName}`
 
-      // milliSeconds += 10
-      // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+      milliSeconds += 60
+      await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
 
       try {
         const response = await fetch(url)
         if (response.ok) {
 
-          // milliSeconds += 10
-          // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+          milliSeconds += 50
+          await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
 
           const jsonObj = await response.json()
           //{ error: "Too many requests. Try again later." }
@@ -1738,14 +1623,14 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 
             const diff = myScore - oppoScore
             let diffTag = (diff > 0 ? '+' : '') + `${diff}`
-            if (diff !== 0) {
+            if (diff !== 0 && !isFirefox) {
               const classScore = diff > 0 ? 'scorePlus' : 'scoreMinus'
               diffTag = `<span class="${classScore}">${diffTag}</span>`
             }
 
             const delimiter = '_'
             const addSpaces = delimiter.repeat(maxNameLength - oppoName.length + 2)
-            allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}<br>`
+            allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}\n`
           }
         } else {
           isError = true
@@ -1757,111 +1642,62 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
       }
     }
   }
-  allScore += isError ? '<br>Cannot get some data from Lichess.<br>Try again later.' : ''
+  // allScore += isError ? '\nCannot get some data from Lichess.\nTry again later (Too Many Requests).' : ''
+  allScore += isError ? '\nLichess says: "Too many requests from your ip-address."\nTry again later.' : ''
   outMsgWait(thisIsLichess, false)
 
   myAlert(allScore, 'Score between players:')
 }
 
-//fetch(url).then((response) => {return response.json()}).then((jsonObj) => {...
-// function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
-//   const index = arPlayerNames.indexOf(myName)
-//   if (index === -1) { return } //non-possible, but ...
-//   let allScore = ''
-//   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
-//   for (let opponentName of arPlayerNames) {
-//     if (opponentName !== myName) {
-//       const url = `${ urlHttpServiceLichessScore }${ myName } / ${ opponentName }`
-//       fetch(url)
-//         .then((response) => {
-//           return response.json()
-//         })
-//         .then((jsonObj) => {
-//           //{ error: "Too many requests. Try again later." }
-//           // if (jsonObj && !jsonObj['error']) {
-//           //{"users":{"bovgit":16.5,"maia1":12.5},"nbGames":29}
-//           let myGetName = '', myScore = 0, oppoName = '', oppoScore = 0
-//           let users = jsonObj.users
-//           for (let username in users) {
-//             if (username.toUpperCase() === myName.toUpperCase()) {
-//               myGetName = username
-//               myScore = users[username]
-//             } else {
-//               oppoName = username
-//               oppoScore = users[username]
-//             }
-//           }
-//           .catch((e) => console.error(e))
-//
-//           // const addSpaces = ' '.repeat(maxNameLength - oppoName.length + 2)
-//           const addSpaces = '_'.repeat(maxNameLength - oppoName.length + 2)
-//           allScore += `${ myGetName } - ${ oppoName } ${ addSpaces }   ${ myScore } : ${ oppoScore }\n`
-//           // allScore += `${ myGetName } - ${ oppoName } - ${ myScore } : ${ oppoScore }\n`
-//           // }
-//         })
-//     }
-//   }
-//   alert(allScore)
-// }
-
 async function getDataFromChessCom(arPlayerNames) {
-  // await getProfileAfterFetchFromChessCom1(arPlayerNames) //fast variant
-  await getProfileAfterFetchFromChessCom2(arPlayerNames) //slow variant
-  // await getStatisticsAfterFetchFromChessCom1(arPlayerNames)
-  await getStatisticsAfterFetchFromChessCom2(arPlayerNames)
+  let isProfile = true //get profile
+  await getProfileOrStatisticsFromChessCom(arPlayerNames, isProfile)
+
+  isProfile = false //get statistics
+  await getProfileOrStatisticsFromChessCom(arPlayerNames, isProfile)
 }
 
-//without delay (but with 'no data fetch')
-async function getProfileAfterFetchFromChessCom1(arPlayerNames) {
-
-  for (let playerName of arPlayerNames) {
-    let response, jsonObj, playerURL = ''
-    try {
-      const url = urlHttpServiceChessCom + playerName
-      response = await fetch(url, { mode: modeCORS })
-      if (response.ok) {
-        jsonObj = await response.json()
-        playerURL = getJsonValue1(playerName, jsonObj, 'url')
-      } else {
-        out(playerName + ' - chess.com, response-error: ' + response.status)
-      }
-    } catch (err) {
-      out(playerName + ' - chess.com, fetch-error: ' + err)
-    } finally {
-      if (playerURL !== '' && playerURL !== undefined && playerURL !== null) {
-        fillPlayerHTMLChessCom(jsonObj, playerName)
-      }
-    }
-  }
-}
-
-//with delay (new!)
-async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
+//isProfile: true - get Profile, false - get Statistics
+async function getProfileOrStatisticsFromChessCom(arPlayerNames, isProfile) {
   let arPlayerNamesBuf = [...arPlayerNames]
   const beginLength = arPlayerNamesBuf.length
   if (beginLength === 0) {
     return
   }
 
+  const modeWord = isProfile ? 'profile' : 'statistics'
   let milliSeconds = 200
-  for (let i = 0; i < 5; i++) {
+  const N = 6
+  for (let i = 0; i < N; i++) {
     let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
       milliSeconds += 100 //increase delay
-      out(`i=${i}, chess.com profile, ${arPlayerNamesBuf.length} el. from ${beginLength}, delay ${milliSeconds}`)
+      out(`step ${i + 1} / ${N}, chess.com ${modeWord}, ${arPlayerNamesBuf.length} el. from ${beginLength}, delay ${milliSeconds}`)
       await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
     }
     let isOKAll = true
-    const profileResults = await getFetchResultsFromServer(false, arPlayerNamesBuf)
-    profileResults.forEach((jsonObj, index) => {
+    const afterUrl = isProfile ? '' : '/stats'
+    const results = await getFetchResultsFromServer(false, arPlayerNamesBuf, afterUrl)
+    results.forEach((jsonObj, index) => {
       const playerName = arPlayerNamesBuf[index]
-      const isOK = fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames)
+      let isOK = false
+
+      if (isProfile) {
+        isOK = fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames)
+      } else {
+        if (jsonObj !== null) {
+          const mainIndex = arPlayerNames.indexOf(playerName)
+          fillPlayerStatisticsChessCom(jsonObj, mainIndex, playerName)
+          isOK = true
+        }
+      }
+
       if (isOK) {
         arPlayerNamesBufIndex[index] = true //del element if it's OK
       } else {
         isOKAll = false
-        out(`not read profile: ${playerName}, chess.com`)
+        out(`not read ${modeWord}: ${playerName}, chess.com`)
       }
     })
     if (isOKAll) {
@@ -1869,6 +1705,40 @@ async function getProfileAfterFetchFromChessCom2(arPlayerNames) {
     }
     arPlayerNamesBuf = arPlayerNamesBuf.filter((item, index) => !arPlayerNamesBufIndex[index])
   }
+}
+
+async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl = '') {
+
+  //LICHESS
+  //    https://lichess.org/api#section/Introduction/Endpoint
+  //    All requests are rate limited using various strategies, to ensure the API remains responsive for everyone.
+  //    Only make one request at a time.
+  //    If you receive an HTTP response with a 429 status, please wait a full minute before resuming API usage.
+  //CHESS.COM
+  //    HTTP Responses
+  //    200 = "enjoy your JSON"
+  //    301 = if the URL you requested is bad, but we know where it should be; your client should remember and correct this to use the new URL in future requests
+  //    304 = if your client supports "ETag/If-None-Match" or "Last-Modified/If-Modified-Since" caching headers and the data have not changed since the last request
+  //    404 = we try to tell you if the URL is malformed or the data requested is just not available (e.g., a username for a user that does not exist)
+  //    410 = we know for certain that no data will ever be available at the URL you requested; your client should not request this URL again
+  //    429 = we are refusing to interpret your request due to rate limits; see "Rate Limiting" above
+
+  let jobs = []
+  for (let name of arPlayerNames) {
+    if (name !== '') {
+      const url = thisIsLichess ? urlHttpServiceLichess : urlHttpServiceChessCom
+      let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS }).then(
+        successResponse => {
+          if (successResponse.status != 200) { return null }
+          else { return successResponse.json() }
+        },
+        failResponse => { return null }
+      )
+      jobs.push(job)
+    }
+  }
+  let results = await Promise.all(jobs)
+  return results
 }
 
 function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
@@ -1931,52 +1801,6 @@ function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
   return isOK
 }
 
-//without delay (with errors)
-async function getStatisticsAfterFetchFromChessCom1(arPlayerNames) {
-  let statResults = await getFetchResultsFromServer(false, arPlayerNames, '/stats')
-  statResults.forEach((jsonObj, index) => {
-    const playerName = arPlayerNames[index]
-    fillPlayerStatisticsChessCom(jsonObj, index, playerName)
-  })
-}
-
-//with delay (new!)
-async function getStatisticsAfterFetchFromChessCom2(arPlayerNames) {
-  let arPlayerNamesBuf = [...arPlayerNames]
-  const beginLength = arPlayerNamesBuf.length
-  if (beginLength === 0) {
-    return
-  }
-
-  let milliSeconds = 200
-  for (let i = 0; i < 5; i++) {
-    let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
-    arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
-    if (i > 0) {
-      milliSeconds += 100 //increase delay
-      out(`i=${i}, chess.com stats, ${arPlayerNamesBuf.length} el. from ${beginLength}, delay ${milliSeconds}`)
-      await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
-    }
-    let isOKAll = true
-    const statResults = await getFetchResultsFromServer(false, arPlayerNamesBuf, '/stats')
-    statResults.forEach((jsonObj, index) => {
-      const playerName = arPlayerNamesBuf[index]
-      if (jsonObj !== null) {
-        const mainIndex = arPlayerNames.indexOf(playerName)
-        fillPlayerStatisticsChessCom(jsonObj, mainIndex, playerName)
-        arPlayerNamesBufIndex[index] = true //del element if it's OK
-      } else {
-        isOKAll = false
-        out(`not read stats: ${playerName}, chess.com`)
-      }
-    })
-    if (isOKAll) {
-      break
-    }
-    arPlayerNamesBuf = arPlayerNamesBuf.filter((item, index) => !arPlayerNamesBufIndex[index])
-  }
-}
-
 function fillPlayerStatisticsChessCom(jsonObj, index, playerName) {
   const fideRating = getJsonValue1(playerName, jsonObj, 'fide')
   const fideRatingString = fideRating ? `, FIDE ${fideRating}` : ''
@@ -1989,40 +1813,6 @@ function fillPlayerStatisticsChessCom(jsonObj, index, playerName) {
   const puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
   const rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
   vm.vueArChessComPlayersBuf[index] = { playerHTML, playerName, bullet, blitz, rapid, puzzle, rush }
-}
-
-async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl = '') {
-
-  //LICHESS
-  //    https://lichess.org/api#section/Introduction/Endpoint
-  //    All requests are rate limited using various strategies, to ensure the API remains responsive for everyone.
-  //    Only make one request at a time.
-  //    If you receive an HTTP response with a 429 status, please wait a full minute before resuming API usage.
-  //CHESS.COM
-  //    HTTP Responses
-  //    200 = "enjoy your JSON"
-  //    301 = if the URL you requested is bad, but we know where it should be; your client should remember and correct this to use the new URL in future requests
-  //    304 = if your client supports "ETag/If-None-Match" or "Last-Modified/If-Modified-Since" caching headers and the data have not changed since the last request
-  //    404 = we try to tell you if the URL is malformed or the data requested is just not available (e.g., a username for a user that does not exist)
-  //    410 = we know for certain that no data will ever be available at the URL you requested; your client should not request this URL again
-  //    429 = we are refusing to interpret your request due to rate limits; see "Rate Limiting" above
-
-  let jobs = []
-  for (let name of arPlayerNames) {
-    if (name !== '') {
-      const url = thisIsLichess ? urlHttpServiceLichess : urlHttpServiceChessCom
-      let job = fetch(`${url}${name}${afterUrl}`, { mode: modeCORS }).then(
-        successResponse => {
-          if (successResponse.status != 200) { return null }
-          else { return successResponse.json() }
-        },
-        failResponse => { return null }
-      )
-      jobs.push(job)
-    }
-  }
-  let results = await Promise.all(jobs)
-  return results
 }
 
 //delete seconds from date: "14.11.2021, 11:25:17" --> "14.11.2021 11:25"
@@ -2127,7 +1917,7 @@ function goMainModeFromSettings() {
   if (s !== '') {
     let n = parseInt(s, 10)
     if (isNaN(n) || !(Number.isInteger(n) && n >= 0 && n <= 9999)) {
-      myAlert('Interval must be between 0 and 9999 !')
+      alert('Interval must be between 0 and 9999 !')
       return
     }
     s = n.toString(10)
@@ -2277,7 +2067,7 @@ function clearSettings() {
   setAutoRefresh()
   setTheme()
 
-  myAlert('All settings are cleared.')
+  alert('All settings are cleared.')
 }
 
 function restoreStartGroups() {
@@ -2291,7 +2081,7 @@ function restoreStartGroups() {
 
   refresh()
 
-  myAlert('All Start-groups are restored.')
+  alert('All Start-groups are restored.')
   goMainModeFromSettings()
 }
 
@@ -2463,17 +2253,24 @@ function getBeginOfLastDay() {
 }
 
 function out(msg) {
-  // console.log(msg)
   const dt = (new Date()).toLocaleString()
   console.log(`${dt} - ${msg}`)
 
   // if (isMobileDevice) {
-  //   myAlert(msg) //for debug
+  //   alert(msg) //for debug
   // }
 }
 
 //on mobile device in native alert() is too large head of msg
 function myAlert(msg = '', head = '') {
+
+  //Firefox not support Dialog: 'Dialog.showModal is not a function'
+  if (isBrowserFirefox()) {
+    let myMsg = (head ? head + '\n\n' : '') + msg
+    alert(myMsg)
+    return
+  }
+
   const modalDialogHead = document.getElementById('modalDialogHead')
   modalDialogHead.innerHTML = head.replaceAll('\n', '<br>')
 
@@ -2481,4 +2278,9 @@ function myAlert(msg = '', head = '') {
   modalDialogText.innerHTML = msg.replaceAll('\n', '<br>')
 
   modalDialog.showModal()
+}
+
+function isBrowserFirefox() {
+  const userAgent = navigator.userAgent.toLowerCase()
+  return (userAgent.indexOf("firefox") > -1)
 }
