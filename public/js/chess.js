@@ -1552,15 +1552,16 @@ async function getDynamicsAfterFetchFromLichess(arPlayerNames) {
   })
 }
 
-//await fetch().then()
 async function getFetchDynamicsFromLichess(arPlayerNames) {
   let jobs = []
-  let milliSeconds = 0
+  // let milliSeconds = 150
+  // let delta = 0
   for (let playerName of arPlayerNames) {
     const url = `${urlHttpServiceLichess}${playerName}/activity`
 
-    milliSeconds += 30
-    await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+    // milliSeconds += ++delta
+    // out(milliSeconds)
+    // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
 
     let job = fetch(url, { mode: modeCORS }).then(
       successResponse => {
@@ -1590,20 +1591,22 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   let isError = false
   let allScore = ''
   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
-  let milliSeconds = 0
+  // let milliSeconds = 80
+  // let delta = 1
   for (let opponentName of arPlayerNames) {
     if (opponentName !== myName) {
       const url = `${urlHttpServiceLichessScore}${myName}/${opponentName}`
 
-      milliSeconds += 60
-      await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+      // milliSeconds += ++delta
+      // out(milliSeconds)
+      // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
 
       try {
         const response = await fetch(url)
         if (response.ok) {
 
-          milliSeconds += 50
-          await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
+          // milliSeconds += ++delta
+          // await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds))
 
           const jsonObj = await response.json()
           //{ error: "Too many requests. Try again later." }
