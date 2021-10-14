@@ -75,6 +75,7 @@ const vm = app.mount('#vue-mount')
 const urlHttpServiceLichess = 'https://lichess.org/api/user/'
 const urlHttpServiceLichessStatus = 'https://lichess.org/api/users/status?ids='
 const urlHttpServiceLichessScore = 'https://lichess.org/api/crosstable/'
+const urlHttpServiceLichessStreamersOnline = 'https://lichess.org/streamer/live'
 const urlHttpServiceChessCom = 'https://api.chess.com/pub/player/'
 const modeCORS = 'cors' //mode for fetch
 const useAJAX = true //for exchange data between server & client
@@ -104,7 +105,7 @@ const mapTimeControl = new Map([
   ['rush', 5]
 ])
 
-const streamersGroupName = '! streamers online'
+const streamOnlineGroupName = '! streamers online'
 const BOVGIT_playerName = 'bovgit'
 const BOVGIT_description = 'Creator of this page :)'
 const mapLichessPlayersDescription = new Map([
@@ -132,8 +133,8 @@ const startGroupObjs = [
     chessComPlayerNames: 'Erik Hikaru ChessQueen ChessNetwork ShahMatKanal'
   },
   {
-    name: streamersGroupName,
-    lichessPlayerNames: 'streamers online',
+    name: streamOnlineGroupName,
+    lichessPlayerNames: 'streamersOnline', //must be begin value
     chessComPlayerNames: ''
   }
 ]
@@ -300,7 +301,17 @@ function onchangeSelectGroup() {
     setLichessOrgPlayerNames(groupObj.lichessPlayerNames)
     setChessComPlayerNames(groupObj.chessComPlayerNames)
   }
+  if (currentGroupName === streamOnlineGroupName) {
+    //fillStreamOnlineGroup()
+  }
   refresh()
+}
+
+//streamers online
+function fillStreamOnlineGroup() {
+  //Lichess:
+  const thisIsLichess = true
+  await getStreamersOnlineAfterFetchFromLichess(thisIsLichess)
 }
 
 function updateGroupObj() {
@@ -1455,6 +1466,30 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
     }
   })
 }
+
+async function getStreamersOnlineAfterFetchFromLichess(thisIsLichess) {
+  let results = await getFetchStreamersOnlineFromLichess()
+  let arPlayerNames = results[0].map(item => item.name)
+  //if (arPlayerNames.length = 0) { }
+  const playerNamesBySpace = arPlayerNames.join(' ')
+  fillTableFromServer(thisIsLichess)
+}
+
+async function getFetchStreamersOnlineFromLichess() {
+  let jobs = []
+  const url = `${urlHttpServiceLichessStreamersOnline}`
+  let job = fetch(url, { mode: modeCORS }).then(
+    successResponse => {
+      if (successResponse.status != 200) { return null }
+      else { return successResponse.json() }
+    },
+    failResponse => { return null }
+  )
+  jobs.push(job)
+  let results = await Promise.all(jobs)
+  return results
+}
+
 
 async function getStatusAfterFetchFromLichess(arPlayerNames) {
   let statusResults = await getFetchStatusFromLichess(arPlayerNames)
