@@ -75,7 +75,7 @@ const vm = app.mount('#vue-mount')
 const urlHttpServiceLichess = 'https://lichess.org/api/user/'
 const urlHttpServiceLichessStatus = 'https://lichess.org/api/users/status?ids='
 const urlHttpServiceLichessScore = 'https://lichess.org/api/crosstable/'
-const urlHttpServiceLichessStreamersOnline = 'https://lichess.org/streamer/live'
+// const urlHttpServiceLichessStreamersOnline = 'https://lichess.org/streamer/live'
 const urlHttpServiceChessCom = 'https://api.chess.com/pub/player/'
 const modeCORS = 'cors' //mode for fetch
 const useAJAX = true //for exchange data between server & client
@@ -105,7 +105,7 @@ const mapTimeControl = new Map([
   ['rush', 5]
 ])
 
-const streamOnlineGroupName = '! streamers online'
+// const streamOnlineGroupName = '! streamers online'
 const BOVGIT_playerName = 'bovgit'
 const BOVGIT_description = 'Creator of this page :)'
 const mapLichessPlayersDescription = new Map([
@@ -131,12 +131,13 @@ const startGroupObjs = [
     lichessPlayerNames: 'Thibault Zhigalko_Sergei Benefactorr Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka',
     // + BOVGIT_playerName,
     chessComPlayerNames: 'Erik Hikaru ChessQueen ChessNetwork ShahMatKanal'
-  },
-  {
-    name: streamOnlineGroupName,
-    lichessPlayerNames: 'streamersOnline', //must be begin value
-    chessComPlayerNames: ''
   }
+  // ,
+  // {
+  //   name: streamOnlineGroupName,
+  //   lichessPlayerNames: 'streamersOnline', //must be begin value
+  //   chessComPlayerNames: ''
+  // }
 ]
 const startGroupNum = startGroupObjs.length
 let currentGroupName = startGroupObjs[0].name
@@ -301,17 +302,10 @@ function onchangeSelectGroup() {
     setLichessOrgPlayerNames(groupObj.lichessPlayerNames)
     setChessComPlayerNames(groupObj.chessComPlayerNames)
   }
-  if (currentGroupName === streamOnlineGroupName) {
-    //fillStreamOnlineGroup()
-  }
+  // if (currentGroupName === streamOnlineGroupName) {
+  //   getStreamersOnlineAfterFetchFromLichess() //Lichess: streamers online
+  // }
   refresh()
-}
-
-//streamers online
-function fillStreamOnlineGroup() {
-  //Lichess:
-  const thisIsLichess = true
-  await getStreamersOnlineAfterFetchFromLichess(thisIsLichess)
 }
 
 function updateGroupObj() {
@@ -1467,27 +1461,41 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
   })
 }
 
-async function getStreamersOnlineAfterFetchFromLichess(thisIsLichess) {
-  let results = await getFetchStreamersOnlineFromLichess()
-  let arPlayerNames = results[0].map(item => item.name)
-  //if (arPlayerNames.length = 0) { }
-  const playerNamesBySpace = arPlayerNames.join(' ')
-  fillTableFromServer(thisIsLichess)
+async function getStreamersOnlineAfterFetchFromLichess() {
+
+  // // let results = await getFetchStreamersOnlineFromLichess()
+  // // if (results[0] !== null) {
+  // //   let arPlayerNames = results[0].map(item => item.name)
+  // //   const playerNamesBySpace = arPlayerNames.join(' ')
+  // //   setLichessOrgPlayerNames(playerNamesBySpace)
+  // //   onchangeLichessPlayerNames()
+  // // }
+
+  // const response = await fetch(urlHttpServiceLichessStreamersOnline) //, { mode: modeCORS })
+  // if (response.ok) {
+  //   const arJsonObj = await response.json()
+  //   if (arJsonObj) {
+  //     let arPlayerNames = arJsonObj.map(item => item.name)
+  //     const playerNamesBySpace = arPlayerNames.join(' ')
+  //     setLichessOrgPlayerNames(playerNamesBySpace)
+  //     onchangeLichessPlayerNames()
+  //   }
+  // }
 }
 
 async function getFetchStreamersOnlineFromLichess() {
-  let jobs = []
-  const url = `${urlHttpServiceLichessStreamersOnline}`
-  let job = fetch(url, { mode: modeCORS }).then(
-    successResponse => {
-      if (successResponse.status != 200) { return null }
-      else { return successResponse.json() }
-    },
-    failResponse => { return null }
-  )
-  jobs.push(job)
-  let results = await Promise.all(jobs)
-  return results
+  // let jobs = []
+  // const url = `${urlHttpServiceLichessStreamersOnline}`
+  // let job = fetch(url, { mode: modeCORS }).then(
+  //   successResponse => {
+  //     if (successResponse.status != 200) { return null }
+  //     else { return successResponse.json() }
+  //   },
+  //   failResponse => { return null }
+  // )
+  // jobs.push(job)
+  // let results = await Promise.all(jobs)
+  // return results
 }
 
 
