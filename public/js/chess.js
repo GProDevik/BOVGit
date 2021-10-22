@@ -2282,13 +2282,14 @@ function outMsgWait(thisIsLichess, show) {
     el = document.querySelector('#elemTextChessComPlayerNames')
   }
   if (el) {
-    el.style.backgroundColor = (show ? waitColor : defColor)
+    // el.style.backgroundColor = (show ? waitColor : defColor)
     if (show) {
       el.style.backgroundColor = waitColor
       el.setAttribute("class", "inputText waitAnimation")
     } else {
       el.style.backgroundColor = defColor
-      el.setAttribute("class", "inputText")
+      el.setAttribute("class", "inputText waitAnimation2")
+      // el.setAttribute("class", "inputText")
     }
   }
 }

@@ -359,20 +359,34 @@ fieldset {
 }
 
 .waitAnimation {
-  animation-duration: 1s;
+  animation-duration: 5s;
   animation-name: slidein;
 }
 
 @keyframes slidein {
   from {
-    background-color: '#ffe4b5';
+    /* background-color: '#ffe4b5'; */
+    background-color: white;
   }
   to {
+    /* background-color: '#ffe4b5'; */
+    /* background-color: white; */
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.waitAnimation2 {
+  animation-duration: 5s;
+  animation-name: slidein2;
+}
+
+@keyframes slidein2 {
+  from {
+    /* background-color: '#ffe4b5'; */
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  to {
+    /* background-color: '#ffe4b5'; */
     background-color: white;
-    /* background-color: springgreen; */
-    /* background-color: turquoise; */
-    /* background-color: coral; */
-    /* background-color: darkgoldenrod; */
-    /* background-color: darksalmon; */
   }
 }
