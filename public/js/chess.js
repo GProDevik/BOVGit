@@ -2282,7 +2282,6 @@ function outMsgWait(thisIsLichess, show) {
     el = document.querySelector('#elemTextChessComPlayerNames')
   }
   if (el) {
-    // el.style.backgroundColor = (show ? waitColor : defColor)
     if (show) {
       el.style.backgroundColor = waitColor
       el.setAttribute("class", "inputText waitAnimation")
@@ -2313,7 +2312,7 @@ function myAlert(msg = '', head = '') {
 
   //Firefox not support Dialog: 'Dialog.showModal is not a function'
   if (isBrowserFirefox()) {
-    let myMsg = (head ? head + '\n\n' : '') + msg
+    const myMsg = (head ? head + '\n\n' : '') + msg
     alert(myMsg)
     return
   }

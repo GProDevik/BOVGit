@@ -328,15 +328,6 @@ fieldset {
   color: gray;
 }
 
-#myDialog {
-  font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
-  border-collapse: collapse;
-  border: 1px solid black;
-  background-color: blue;
-  color: black;
-}
-
-
 #modalDialog {
   font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
   border-collapse: collapse;
