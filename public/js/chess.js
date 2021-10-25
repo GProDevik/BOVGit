@@ -2272,6 +2272,7 @@ function is_mobile_device() {
 function outMsgWait(thisIsLichess, show) {
   const defColor = 'white'
   const waitColor = '#ffe4b5' //light-yellow (or as "background-color: moccasin ;")
+  const symbolWaitID = thisIsLichess ? '#LichessWait' : '#ChessComWait'
   let el
   if (thisIsLichess && isCheckLichess()) {
     // document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
@@ -2283,12 +2284,14 @@ function outMsgWait(thisIsLichess, show) {
   }
   if (el) {
     if (show) {
+      document.querySelector(symbolWaitID).setAttribute("class", "showBlock")
       el.style.backgroundColor = waitColor
       el.setAttribute("class", "inputText waitAnimation")
     } else {
       el.style.backgroundColor = defColor
       el.setAttribute("class", "inputText waitAnimation2")
       // el.setAttribute("class", "inputText")
+      document.querySelector(symbolWaitID).setAttribute("class", "hiddenBlock")
     }
   }
 }
