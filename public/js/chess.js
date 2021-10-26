@@ -1378,7 +1378,7 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
     return
   }
 
-  const beginDate = getBeginOfLastDay()
+  const beginDate = getBeginOfYesterday()
 
   const arJsonObj = await response.json() //array with non-guaranted order
   arPlayerNames.forEach((playerName, index) => {
@@ -1790,7 +1790,7 @@ async function getFetchResultsFromServer(thisIsLichess, arPlayerNames, afterUrl 
 function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
   let isOK = false
   let playerURL = '', onlineSymbol = '', playerTitle = '', playerHTML = '', createdAt = '', lastOnline = '', playerHint = ''
-  const beginDate = getBeginOfLastDay()
+  const beginDate = getBeginOfYesterday()
 
   //my own description ! ('Creator of ...')
   let v = mapChessComPlayersDescription.get(playerName)
@@ -1859,14 +1859,6 @@ function fillPlayerStatisticsChessCom(jsonObj, index, playerName) {
   const puzzle = getJsonValue3(playerName, jsonObj, 'tactics', 'highest', 'rating')
   const rush = getJsonValue3(playerName, jsonObj, 'puzzle_rush', 'best', 'score') //rush (max)
   vm.vueArChessComPlayersBuf[index] = { playerHTML, playerName, bullet, blitz, rapid, puzzle, rush }
-}
-
-//delete seconds from date: "14.11.2021, 11:25:17" --> "14.11.2021 11:25"
-function getDateHHMM(milliseconds) {
-  let lastOnline = (new Date(milliseconds)).toLocaleString() //14.11.2021, 11:25:17
-  // lastOnline = lastOnline.replace(',', '') //del comma
-  lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
-  return lastOnline
 }
 
 function getJsonValue1(playerName, jsonObj, field1) {
@@ -2296,7 +2288,40 @@ function outMsgWait(thisIsLichess, show) {
   }
 }
 
-function getBeginOfLastDay() {
+// //delete seconds from date: "14.11.2021, 11:25:17" --> "14.11.2021, 11:25"
+// function getDateHHMM(milliseconds) {
+//   let lastOnline = (new Date(milliseconds)).toLocaleString() //14.11.2021, 11:25:17
+//   // lastOnline = lastOnline.replace(',', '') //del comma
+//   lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
+//   return lastOnline
+// }
+
+//getTodayHHMM: delete seconds from date & add 'today': "14.11.2021, 11:25:17" --> "today 11:25"
+function getDateHHMM(milliseconds) {
+
+  let d = (new Date())
+  const beginOfToday = (new Date(d)).setHours(0, 0, 0, 0) //time 0:00:00,000
+
+  d = d - 1000 * 60 * 60 * 24 //1 day before current
+  const beginOfYesterday = (new Date(d)).setHours(0, 0, 0, 0) //time 0:00:00,000
+
+  const dp = (new Date(milliseconds))
+  let lastOnline = dp.toLocaleString() //14.11.2021, 11:25:17
+  lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
+  if (dp >= beginOfToday) {
+    lastOnline = 'today' + lastOnline.slice(10, 17) //today, 11:25
+  } else if (dp >= beginOfYesterday) {
+    lastOnline = 'yesterday' + lastOnline.slice(10, 17) //yesterday, 11:25
+  }
+  return lastOnline
+}
+
+function getBeginOfToday() {
+  const d = (new Date())
+  return (new Date(d)).setHours(0, 0, 0, 0) //time 0:00:00,000
+}
+
+function getBeginOfYesterday() {
   const d = (new Date()) - 1000 * 60 * 60 * 24 //1 day before current
   return (new Date(d)).setHours(0, 0, 0, 0) //time 0:00:00,000
 }
