@@ -2285,6 +2285,8 @@ function outMsgWait(thisIsLichess, show) {
       // el.setAttribute("class", "inputText")
       document.querySelector(symbolWaitID).setAttribute("class", "hiddenBlock")
     }
+    document.querySelector('#msgHintEdit').setAttribute("class", "msgHint msgHintWaitAnimation")
+    document.querySelector('#msgHintScore').setAttribute("class", "msgHint msgHintWaitAnimation")
   }
 }
 

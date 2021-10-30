@@ -84,12 +84,6 @@ html {
   margin-right: 2vw;
 }
 
-.inputTextTest {
-  font-size: medium;
-  width: 50%;
-  margin-left: 1vw;
-}
-
 /* -------- Table ----------- */
 
  table {
@@ -322,11 +316,7 @@ fieldset {
   font-size: medium;
 }
 
-.msgHint {
-  font-size: small;
-  font-style: italic;
-  color: gray;
-}
+/* ------------------------ */
 
 #modalDialog {
   font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
@@ -350,7 +340,7 @@ fieldset {
 }
 
 .waitAnimation {
-  animation-duration: 5s;
+  animation-duration: 4s;
   animation-name: slidein;
 }
 
@@ -367,7 +357,7 @@ fieldset {
 }
 
 .waitAnimation2 {
-  animation-duration: 5s;
+  animation-duration: 4s;
   animation-name: slidein2;
 }
 
@@ -377,7 +367,30 @@ fieldset {
     background-color: rgba(0, 0, 0, 0.5);
   }
   to {
-    /* background-color: '#ffe4b5'; */
     background-color: white;
+  }
+}
+
+/* -------- msgHint ---------------- */
+
+.msgHint {
+  font-size: small;
+  font-style: italic;
+  color: gray;
+}
+
+.msgHintWaitAnimation {
+  animation-duration: 4s;
+  animation-name: slideMsgHint;
+}
+
+@keyframes slideMsgHint {
+  from {
+    font-size: xx-small;
+    font-style: italic;
+  }
+  to {
+    font-size: small;
+    font-style: italic;
   }
 }
