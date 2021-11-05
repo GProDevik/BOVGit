@@ -1438,7 +1438,8 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
         + (createdAt ? 'reg. ' + createdAt : '')
         + (lastOnline ? '\nlast online ' + lastOnline : '')
         + '\n' + META_STATUS_TEXT
-        + (bio ? '\n' + bio.replaceAll('"', '\'') : '') // (") - called error
+        // + (bio ? '\n' + bio.replaceAll('"', '\'') : '') // (") - called error
+        + (bio ? '\n' + myReplaceAll(bio, '"', "'") : '') // (") - called error
         + (links ? '\n' + links : '')
 
       //playerHTML (href !)
@@ -2348,10 +2349,12 @@ function myAlert(msg = '', head = '') {
   }
 
   const modalDialogHead = document.getElementById('modalDialogHead')
-  modalDialogHead.innerHTML = head.replaceAll('\n', '<br>')
+  // modalDialogHead.innerHTML = head.replaceAll('\n', '<br>')
+  modalDialogHead.innerHTML = myReplaceAll(head, '\n', '<br>')
 
   const modalDialogText = document.getElementById('modalDialogText')
-  modalDialogText.innerHTML = msg.replaceAll('\n', '<br>')
+  // modalDialogText.innerHTML = msg.replaceAll('\n', '<br>')
+  modalDialogText.innerHTML = myReplaceAll(msg, '\n', '<br>')
 
   modalDialog.showModal()
 }
@@ -2360,3 +2363,8 @@ function isBrowserFirefox() {
   const userAgent = navigator.userAgent.toLowerCase()
   return (userAgent.indexOf("firefox") > -1)
 }
+
+function myReplaceAll(s, s1, s2) {
+  return s.replace(new RegExp(s1, 'g'), s2)
+}
+

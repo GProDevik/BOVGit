@@ -322,7 +322,8 @@ fieldset {
   font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
   border-collapse: collapse;
   /* border: 1px solid black; */
-  border: 1px dotted black;
+  /* border: 1px dotted black; */
+  border: 1px dotted white;
   background-color: lightgray;
 }
   /* background-color: gainsboro; */
