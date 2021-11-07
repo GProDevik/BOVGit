@@ -1677,7 +1677,11 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 
             const delimiter = '_'
             const addSpaces = delimiter.repeat(maxNameLength - oppoName.length + 2)
-            allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}\n`
+            if (isFirefox) {
+              allScore += `X - ${oppoName} ${addSpaces} ${myScore} : ${oppoScore} = ${diffTag}\n`
+            } else {
+              allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}\n`
+            }
           }
         } else {
           isError = true
@@ -1692,8 +1696,9 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   // allScore += isError ? '\nCannot get some data from Lichess.\nTry again later (Too Many Requests).' : ''
   allScore += isError ? '\nLichess says: "Too many requests from your ip-address."\nTry again later.' : ''
   outMsgWait(thisIsLichess, false)
+  const head = isFirefox ? `Score (X is ${myName} ):` : `Score between players:`
 
-  myAlert(allScore, 'Score between players:')
+  myAlert(allScore, head)
 }
 
 async function getDataFromChessCom(arPlayerNames) {
