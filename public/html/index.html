@@ -62,7 +62,7 @@
         <div id="groupLine">
           <p>
             <center>
-              Group:
+              <span id="GroupText">Group:</span>
               <select id="group" class="select"></select>
               <input @click="vueGroupAdd" class="buttonGroup" type="button" value="add" id="buttonGroupAdd"
                 title="Add group">
@@ -177,6 +177,10 @@
             title="Settings">
           <input @click="vueButtonChangeTables" class="buttonChangeTables" type="button" value="↑↓"
             id="buttonChangeTables" title="Change tables order">
+          <select class="Lang" id="langSelect" name="langSelect">
+            <option value="EN">EN</option>
+            <option value="RU">RU</option>
+          </select>
         </section>
 
       </main>
@@ -304,8 +308,8 @@
   <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.js"></script> -->
   <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.runtime.global.js"></script> -->
 
-  <!-- <script src="js/chess.js"></script> -->
-  <script src="js/chessb.js"></script>
+  <script src="js/chess.js"></script>
+  <!-- <script src="js/chessb.js"></script> -->
 
 </body>
 

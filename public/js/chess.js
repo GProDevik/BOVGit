@@ -1,6 +1,9 @@
 //v2.0.0 2021-11-04
 'use strict'
 
+let langEN = 'EN', langRU = 'RU'
+let curLang = langEN
+
 const isMobileDevice = is_mobile_device()
 
 // ------------------- V U E  (start) ------------------------
@@ -170,10 +173,12 @@ if (isMobileDevice) {
 
 // ------------- On-Click ---------------
 
-document.querySelector('#group').onchange = () => onchangeSelectGroup()
-
 const modalDialog = document.getElementById('modalDialog');
 document.getElementById('modalDialogHide').onclick = () => modalDialog.close()
+
+document.querySelector('#group').onchange = () => onchangeSelectGroup()
+
+document.querySelector('#langSelect').onchange = () => changeLang()
 
 //login
 document.querySelector('#buttonPostRegistration').onclick = () => postRegistration()
@@ -1990,6 +1995,12 @@ function setElementNonVisible(elem) {
 function getDataFromStorage() {
   let v
 
+  //switch to saved lang
+  v = localStorage.getItem('Lang')
+  curLang = (!v || v === '' || v === langEN) ? langEN : langRU
+  document.getElementById('langSelect').value = curLang
+  changeLang()
+
   v = localStorage.getItem('currentGroupName')
   if (!v) {
     v = currentGroupName
@@ -2373,3 +2384,36 @@ function myReplaceAll(s, s1, s2) {
   return s.replace(new RegExp(s1, 'g'), s2)
 }
 
+//////////////////////// L A N G ///////////////////////////////////////////////////
+
+function setCurLang() {
+  const elem = document.getElementById('langSelect')
+  const sel = elem.selectedIndex
+  curLang = (sel === -1 || elem.options[sel].text === langEN) ? langEN : langRU
+}
+
+function isLangRu() {
+  return (curLang === langRU)
+}
+
+function changeLang() {
+  setCurLang()
+  localStorage.setItem('Lang', curLang)
+
+  const e = !isLangRu()
+  document.querySelector('.projectName').textContent = e ? 'Player ratings / score' : 'Рейтинги / счет игрока'
+
+  document.querySelector('#GroupText').textContent = e ? 'Group:' : 'Группа:'
+
+  document.querySelector('#buttonGroupAdd').value = e ? 'add' : ' + '
+  document.querySelector('#buttonGroupAdd').title = e ? 'Add group' : 'Добавить группу'
+
+  document.querySelector('#buttonGroupRestore').value = e ? 'restore' : '↻' //'восст-ть'
+  document.querySelector('#buttonGroupRestore').title = e ? 'Restore group' : 'Восстановить группу'
+
+  document.querySelector('#buttonGroupDel').value = e ? 'del' : ' - '
+  document.querySelector('#buttonGroupDel').title = e ? 'Delete group' : 'Удалить группу'
+
+  document.querySelector('#buttonSettings').value = e ? 'Settings' : 'Настройки'
+  document.querySelector('#buttonSettings').title = e ? 'Settings' : 'Настройки'
+}
