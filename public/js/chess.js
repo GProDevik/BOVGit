@@ -71,6 +71,9 @@ const root = {
   },
 }
 const app = Vue.createApp(root)
+app.component('vue-component-tips', {
+  template: vueTemplateTips()
+})
 const vm = app.mount('#vue-mount')
 
 // ------------------- V U E  (end) ------------------------
@@ -167,7 +170,7 @@ tableNode2 = document.querySelector('#ChessComTables')
 //MobileStyle
 if (isMobileDevice) {
   document.querySelector('#bodyStyle').setAttribute("class", "mobileStyle")
-  document.querySelector('.projectName').setAttribute("class", "projectName projectNameDifMobile")
+  document.querySelector('#projectName').setAttribute("class", "projectName projectNameDifMobile")
   document.querySelector('#modalDialog').setAttribute("class", "modalDialogMobileStyle")
 }
 
@@ -2328,9 +2331,9 @@ function getDateHHMM(milliseconds) {
   let lastOnline = dp.toLocaleString() //14.11.2021, 11:25:17
   lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
   if (dp >= beginOfToday) {
-    lastOnline = 'today' + lastOnline.slice(10, 17) //today, 11:25
+    lastOnline = (!isLangRu() ? 'today' : 'сегодня') + lastOnline.slice(10, 17) //today, 11:25
   } else if (dp >= beginOfYesterday) {
-    lastOnline = 'yesterday' + lastOnline.slice(10, 17) //yesterday, 11:25
+    lastOnline = (!isLangRu() ? 'yesterday' : 'вчера') + lastOnline.slice(10, 17) //yesterday, 11:25
   }
   return lastOnline
 }
@@ -2365,11 +2368,9 @@ function myAlert(msg = '', head = '') {
   }
 
   const modalDialogHead = document.getElementById('modalDialogHead')
-  // modalDialogHead.innerHTML = head.replaceAll('\n', '<br>')
   modalDialogHead.innerHTML = myReplaceAll(head, '\n', '<br>')
 
   const modalDialogText = document.getElementById('modalDialogText')
-  // modalDialogText.innerHTML = msg.replaceAll('\n', '<br>')
   modalDialogText.innerHTML = myReplaceAll(msg, '\n', '<br>')
 
   modalDialog.showModal()
@@ -2397,12 +2398,15 @@ function isLangRu() {
 }
 
 function changeLang() {
+  let el, v
   setCurLang()
   localStorage.setItem('Lang', curLang)
 
   const e = !isLangRu()
-  document.querySelector('.projectName').textContent = e ? 'Player ratings / score' : 'Рейтинги / счет игрока'
+  document.querySelector('#projectName').textContent = e ? 'Player ratings / score' : 'Рейтинги / счет игрока'
+  document.querySelector('#projectName').title = e ? 'Refresh all tables' : 'Обновить все таблицы'
 
+  //Groups
   document.querySelector('#GroupText').textContent = e ? 'Group:' : 'Группа:'
 
   document.querySelector('#buttonGroupAdd').value = e ? 'add' : ' + '
@@ -2414,6 +2418,133 @@ function changeLang() {
   document.querySelector('#buttonGroupDel').value = e ? 'del' : ' - '
   document.querySelector('#buttonGroupDel').title = e ? 'Delete group' : 'Удалить группу'
 
+  //Input text
+  document.querySelector('#elemCheckLichess').title =
+    e ? 'Make visible or unvisible Lichess table' : 'Сделать видимой или невидимой таблицу Lichess'
+  document.querySelector('#buttonLichessRefresh').title = e ? 'Refresh Lichess table' : 'Обновить таблицу Lichess'
+  el = document.querySelector('#elemTextLichessOrgPlayerNames')
+  el.title = el.placeholder = e ? 'Enter names of players on Lichess, separated by spaces' :
+    'Введите имена игроков Lichess, разделенные пробелами'
+
+  document.querySelector('#elemCheckChessCom').title =
+    e ? 'Make visible or unvisible Chess.com table' : 'Сделать видимой или невидимой таблицу Chess.com'
+  document.querySelector('#buttonChessComRefresh').title = e ? 'Refresh Chess.com table' : 'Обновить таблицу Chess.com'
+  el = document.querySelector('#elemTextChessComPlayerNames')
+  el.title = el.placeholder = e ? 'Enter names of players on Chess.com, separated by spaces' :
+    'Введите имена игроков Chess.com, разделенные пробелами'
+
+  document.querySelector('#msgHintEdit').textContent =
+    e ? 'You can edit player lists !' : 'Вы можете редактировать списки игроков !'
+  document.querySelector('#msgHintScore').textContent =
+    e ? 'Click on the rating to see the score !' : 'Кликните по рейтингу для просмотра счета !'
+
+  //Table
+  document.querySelector('.THeadbulletLichess').textContent = e ? 'bullet' : 'пуля'
+  document.querySelector('.THeadblitzLichess').textContent = e ? 'blitz' : 'блиц'
+  document.querySelector('.THeadrapidLichess').textContent = e ? 'rapid' : 'рапид'
+  document.querySelector('.THeadpuzzleLichess').textContent = e ? 'puzzle' : 'задачи'
+  document.querySelector('.THeadrushLichess').textContent = e ? 'storm' : 'штурм'
+
+  document.querySelector('.THeadbulletChessCom').textContent = e ? 'bullet' : 'пуля'
+  document.querySelector('.THeadblitzChessCom').textContent = e ? 'blitz' : 'блиц'
+  document.querySelector('.THeadrapidChessCom').textContent = e ? 'rapid' : 'рапид'
+  document.querySelector('.THeadpuzzleChessCom').textContent = e ? 'puzzle' : 'задачи'
+  document.querySelector('.THeadrushChessCom').textContent = e ? 'rush' : 'штурм'
+
+  //Settings
   document.querySelector('#buttonSettings').value = e ? 'Settings' : 'Настройки'
-  document.querySelector('#buttonSettings').title = e ? 'Settings' : 'Настройки'
+  document.querySelector('#buttonSettings').title = e ? 'Settings' : 'Настройки и подсказки'
+  document.querySelector('#buttonChangeTables').title = e ? 'Change tables order' : 'Поменять порядок таблиц'
+
+  document.querySelector('#legendSettings').textContent = e ? 'Settings' : 'Настройки'
+  document.querySelector('#AutoRefresh').textContent =
+    e ? 'AutoRefresh Interval in minutes (0 - no AutoRefresh): ' :
+      'Интервал автообновления в минутах (0 - нет автообновления): '
+  document.querySelector('#DarkThemeText').textContent = e ? 'Dark theme' : 'Темная тема'
+
+  el = document.querySelector('#buttonClearSettings')
+  el.value = el.title = e ? 'Clear all settings, player lists, non-start groups' :
+    'Очистить все настройки, списки игроков, не-стартовые группы'
+
+  el = document.querySelector('#buttonRestoreStartGroups')
+  el.value = el.title = e ? 'Restore all start-groups' : 'Восстановить все стартовые группы'
+
+  el = document.querySelector('#buttonReturnToMainFromSettings')
+  el.value = el.title = e ? 'Return' : 'Возврат'
+
+  //tips
+  document.querySelector('#tipsEN').setAttribute("class", e ? 'showBlock' : 'hiddenBlock')
+  document.querySelector('#tipsRU').setAttribute("class", e ? 'hiddenBlock' : 'showBlock')
+
+  //e-mail
+  document.querySelector('#hrefEMail').textContent = e ? '(e-mail)' : '(эл.почта)'
+  document.querySelector('#hrefVideo').textContent = ' ' + (e ? '(Video-Help)' : '(Видео-Демо)')
+}
+
+// EN / RU templates for 'Tips'
+function vueTemplateTips() {
+  return `
+    <fieldset id="tipsEN" class="showBlock">
+    <legend><em><strong>Tips</strong></em></legend>
+    <ul>
+      <li><span class="click">Click</span> on the <span class="dotted">text "Player ratings/score"</span>
+        to refresh all tables
+      </li>
+      <li><span class="click">Click</span> on the <span class="dotted">heading "Lichess"</span> to refresh the
+        Lichess table and sort by player list</li>
+      <li><span class="click">Click</span> on the <span class="dotted">heading "Chess.com"</span> to refresh the
+        Chess.com table and sort by player list</li>
+      <li><span class="click">Click</span> on <span class="dotted">any other heading</span> to sort by rating
+      </li>
+      <li><span class="click">Click</span> on the <span class="dotted">"↑↓" button</span> to change the order of
+        tables</li>
+      <li>For Lichess there are several types of <span class="dotted">player status</span> to the left of his
+        name in table:
+        <ul>
+          <li><span class="statusOnline">&#10004;</span> - online</li>
+          <li><span class="statusPlaying">&#9679;</span> - playing</li>
+          <li><span class="statusStreaming">&#127908;</span> - streaming</li>
+        </ul>
+      </li>
+      <li>
+        If you <span class="click">hover the mouse over </span><span class="dotted">the player in table</span>,
+        a pop-up window will appear with an <span class="dotted">information about player</span>
+      </li>
+      <li>
+        Green and red values in the rating table - are a change in the <span class="dotted">rating of the last
+          game day</span> in comparison with the <span class="dotted">rating of the previous game day</span>.
+      </li>
+    </ul>
+    </fieldset>
+
+    <fieldset id="tipsRU" class="hiddenBlock">
+    <legend><em><strong>Подсказки</strong></em></legend>
+    <ul>
+      <li><span class="click">Кликните</span> на <span class="dotted">тексте "Рейтинги / счет игрока" </span>
+        для обновления всех таблиц</li>
+      <li><span class="click">Кликните</span> на <span class="dotted">заголовке "Lichess" </span>
+        для обновления таблицы Lichess и упорядочивания ее по списку игроков</li>
+      <li><span class="click">Кликните</span> на <span class="dotted">заголовке "Chess.com" </span>
+        для обновления таблицы Chess.com и упорядочивания ее по списку игроков</li>
+      <li><span class="click">Кликните</span> на <span class="dotted">на других заголовках </span>
+        для упорядочивания таблицы по соответствующему рейтингу</li>
+      <li><span class="click">Кликните</span> на <span class="dotted">кнопке "↑↓"</span>, чтобы поменять порядок таблиц</li>
+      <li>Для Lichess отображаются несколько типов <span class="dotted">статусов игрока</span> слева от его имени в таблице:
+        <ul>
+          <li><span class="statusOnline">&#10004;</span> - онлайн</li>
+          <li><span class="statusPlaying">&#9679;</span> - сейчас играет</li>
+          <li><span class="statusStreaming">&#127908;</span> - сейчас стримит</li>
+        </ul>
+      </li>
+      <li>
+        <span class="click">При наведении</span> курсора мыши над <span class="dotted">именем игрока в таблице</span>,
+        появится подсказка с <span class="dotted">информацией об игроке из его профиля</span>
+      </li>
+      <li>
+        Зеленые и красные значения в таблице рейтингов - это изменение <span class="dotted">
+          рейтинга последнего игрового дня</span> в сравнении с <span class="dotted">рейтингом предыдущего игрового дня</span>.
+      </li>
+    </ul>
+    </fieldset>
+`
 }

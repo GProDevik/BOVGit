@@ -53,7 +53,8 @@
           <span class="currentUsername">{{vueCurrentUsername}}</span>
         </div> -->
 
-        <div @click="vueRefresh" class="projectName projectNameDifPC" title="Refresh all tables">Player ratings / score
+        <div @click="vueRefresh" id="projectName" class="projectName projectNameDifPC" title="Refresh all tables">Player
+          ratings / score
         </div>
       </header>
 
@@ -188,9 +189,9 @@
       <section class="sectionSettingsArea hiddenBlock">
         <form>
           <fieldset>
-            <legend><em><strong>Settings</strong></em></legend>
+            <legend><em><strong><span id="legendSettings">Settings</span></strong></em></legend>
             <label for="elemAutoRefreshInterval">
-              AutoRefresh Interval in minutes (0 - not AutoRefresh):
+              <span id="AutoRefresh">AutoRefresh Interval in minutes (0 - no AutoRefresh):</span>
               <input @change="vueOnchangeAutoRefreshInterval" v-model="vueAutoRefreshInterval" type="text" size="10"
                 id="elemAutoRefreshInterval" name="elemAutoRefreshInterval"
                 title="Enter AutoRefresh Interval in minutes">
@@ -199,7 +200,7 @@
               <label for="elemCheckDarkTheme">
                 <input @click="vueOnClickSetTheme" v-model="vueCheckDarkTheme" class="inputCheckSettings"
                   type="checkbox" id="elemCheckDarkTheme" name="elemCheckDarkTheme">
-                Dark theme
+                <span id="DarkThemeText">Dark theme</span>
               </label>
             </p>
           </fieldset>
@@ -214,44 +215,8 @@
               value="Restore all start-groups" id="buttonRestoreStartGroups" title="Restore all start-groups">
           </p>
 
-          <fieldset>
-            <legend><em><strong>Tips</strong></em></legend>
-            <ul>
-              <li><span class="click">Click</span> on the <span class="dotted">text "Player ratings/score"</span>
-                to refresh all tables
-              </li>
-              <li><span class="click">Click</span> on the <span class="dotted">heading "Lichess"</span> to refresh the
-                Lichess table and sort by player list</li>
-              <li><span class="click">Click</span> on the <span class="dotted">heading "Chess.com"</span> to refresh the
-                Chess.com table and sort by player list</li>
-              <li><span class="click">Click</span> on <span class="dotted">any other heading</span> to sort by rating
-              </li>
-              <li><span class="click">Click</span> on the <span class="dotted">"↑↓" button</span> to change the order of
-                tables</li>
-              <li>For Lichess there are several types of <span class="dotted">player status</span> to the left of his
-                name in table:
-                <ul>
-                  <li><span class="statusOnline">&#10004;</span> - online</li>
-                  <li><span class="statusPlaying">&#9679;</span> - playing</li>
-                  <li><span class="statusStreaming">&#127908;</span> - streaming</li>
-                </ul>
-              </li>
-              <li>
-                If you <span class="click">hover the mouse over </span><span class="dotted">the player in table</span>,
-                a pop-up window will appear with an <span class="dotted">information about player</span>
-              </li>
-              <li>
-                Green and red values in the rating table - are a change in the <span class="dotted">rating of the last
-                  game day</span> in comparison with the <span class="dotted">rating of the previous game day</span>.
-              </li>
+          <vue-component-tips></vue-component-tips>
 
-              <!-- <li><span class="click">Click</span> on <span class="dotted">User button and then
-                  Registration/Lichess</span> to
-                save the player names and other settings to the server. These settings will be available for all your
-                devices!
-              </li> -->
-            </ul>
-          </fieldset>
         </form>
         <br>
         <input @click="vueGoMainModeFromSettings" class="buttonSettings" type="button" value="Go to main page"
@@ -294,8 +259,12 @@
       <footer>
         <br>
         bovgit © 2021
-        <a href="mailto:bovgit@gmail.com?subject=Player ratings/score on chess sites">(e-mail)</a>
-        <a href="https://archive.org/details/demo-PlayerRatings1" target="_blank"> (Video-Help)</a>
+        <a href="mailto:bovgit@gmail.com?subject=Player ratings/score on chess sites">
+          <span id="hrefEMail">(e-mail)</span>
+        </a>
+        <a href="https://archive.org/details/demo-PlayerRatings1" target="_blank">
+          <span id="hrefVideo"> (Video-Help)</span>
+        </a>
       </footer>
 
     </div>
@@ -308,8 +277,8 @@
   <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.js"></script> -->
   <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.runtime.global.js"></script> -->
 
-  <script src="js/chess.js"></script>
-  <!-- <script src="js/chessb.js"></script> -->
+  <!-- <script src="js/chess.js"></script> -->
+  <script src="js/chessb.js"></script>
 
 </body>
 
