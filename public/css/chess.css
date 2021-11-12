@@ -226,6 +226,15 @@ td {
   color: red;
 }
 
+.colorGreen{
+  color: green;
+}
+
+.colorRed{
+  color: red;
+}
+
+
 .statusOnline{
   /* font-size: large; */ /* for symbol 'circle'*/
   font-size: x-small; /* for symbol 'check'*/
@@ -383,7 +392,8 @@ fieldset {
   font-size: small;
   font-style: italic;
   color: gray;
-}
+    text-align: left;
+  }
 
 .msgHintWaitAnimation {
   animation-duration: 4s;
@@ -394,9 +404,11 @@ fieldset {
   from {
     font-size: xx-small;
     font-style: italic;
+    /* text-align: center; */
   }
   to {
     font-size: small;
     font-style: italic;
+    /* text-align: left; */
   }
 }

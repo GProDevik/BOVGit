@@ -40,7 +40,7 @@
       <div id="modalDialogText"></div>
       <br>
       <div class="alignRight">
-        <button id="modalDialogHide">Close</button>
+        <button id="modalDialogHide">OK</button>
       </div>
     </dialog>
 
@@ -53,8 +53,8 @@
           <span class="currentUsername">{{vueCurrentUsername}}</span>
         </div> -->
 
-        <div @click="vueRefresh" id="projectName" class="projectName projectNameDifPC" title="Refresh all tables">Player
-          ratings / score
+        <div @click="vueRefresh" id="projectName" class="projectName projectNameDifPC" title="Refresh all tables">
+          Ratings / score (↺ ♞ ♟)
         </div>
       </header>
 
@@ -63,13 +63,13 @@
         <div id="groupLine">
           <p>
             <center>
-              <span id="GroupText">Group:</span>
+              <span id="GroupText">Group: </span>
               <select id="group" class="select"></select>
-              <input @click="vueGroupAdd" class="buttonGroup" type="button" value="add" id="buttonGroupAdd"
+              <input @click="vueGroupAdd" class="buttonGroup" type="button" value=" + " id="buttonGroupAdd"
                 title="Add group">
-              <input @click="vueGroupRestore" class="buttonGroup" type="button" value="restore" id="buttonGroupRestore"
+              <input @click="vueGroupRestore" class="buttonGroup" type="button" value=" ↻ " id="buttonGroupRestore"
                 title="Restore group">
-              <input @click="vueGroupDel" class="buttonGroup" type="button" value="del" id="buttonGroupDel"
+              <input @click="vueGroupDel" class="buttonGroup" type="button" value=" - " id="buttonGroupDel"
                 title="Delete group">
             </center>
           </p>
@@ -79,7 +79,7 @@
           <label id="InputOrder1" class="oneLine" for="elemTextLichessOrgPlayerNames">
             <input @click="vueOnClickCheckLichess" v-model="vueCheckLichess" class="inputCheck" type="checkbox"
               id="elemCheckLichess" name="elemCheckLichess" title="Make visible/unvisible Lichess table">
-            <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
+            <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺ ♞" id="buttonLichessRefresh"
               title="Refresh Lichess table">
             <input @change="vueOnchangeLichessPlayerNames" v-model="vueLichessOrgPlayerNames" class="inputText"
               type="text" id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames" maxlength="250"
@@ -91,8 +91,8 @@
           <label id="InputOrder2" class="oneLine" for="elemTextChessComPlayerNames">
             <input @click="vueOnClickCheckChessCom" v-model="vueCheckChessCom" class="inputCheck" type="checkbox"
               id="elemCheckChessCom" name="elemCheckChessCom" title="Make visible/unvisible Chess.com table">
-            <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh"
-              title="Refresh Chess.com table">
+            <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺ ♟"
+              id="buttonChessComRefresh" title="Refresh Chess.com table">
             <input @change="vueOnchangeChessComPlayerNames" v-model="vueChessComPlayerNames" class="inputText"
               type="text" id="elemTextChessComPlayerNames" name="elemTextChessComPlayerNames" maxlength="250"
               title="Enter names of players on Chess.com, separated by spaces"
@@ -113,7 +113,7 @@
               <table>
                 <thead class="THeadLichess">
                   <tr>
-                    <th @click="vueRefreshLichess" class="THeadPlayerLichess leftTopOfTable">Lichess</th>
+                    <th @click="vueRefreshLichess" class="THeadPlayerLichess leftTopOfTable">♞ Lichess</th>
                     <th @click="vueSortBulletLichess" class="THeadbulletLichess">bullet</th>
                     <th @click="vueSortBlitzLichess" class="THeadblitzLichess">blitz</th>
                     <th @click="vueSortRapidLichess" class="THeadrapidLichess">rapid</th>
@@ -148,7 +148,7 @@
               <table>
                 <thead class="THeadChessCom">
                   <tr>
-                    <th @click="vueRefreshChessCom" class="THeadPlayerChessCom leftTopOfTable">Chess.com</th>
+                    <th @click="vueRefreshChessCom" class="THeadPlayerChessCom leftTopOfTable">♟ Chess.com</th>
                     <th @click="vueSortBulletChessCom" class="THeadbulletChessCom">bullet</th>
                     <th @click="vueSortBlitzChessCom" class="THeadblitzChessCom">blitz</th>
                     <th @click="vueSortRapidChessCom" class="THeadrapidChessCom">rapid</th>
@@ -200,15 +200,15 @@
               <label for="elemCheckDarkTheme">
                 <input @click="vueOnClickSetTheme" v-model="vueCheckDarkTheme" class="inputCheckSettings"
                   type="checkbox" id="elemCheckDarkTheme" name="elemCheckDarkTheme">
-                <span id="DarkThemeText">Dark theme</span>
+                <span id="DarkThemeText"> Dark theme</span>
               </label>
             </p>
           </fieldset>
 
           <p>
             <input @click="vueClearSettings" class="buttonClearSettings" type="button"
-              value="Clear all settings, player names, non-start groups" id="buttonClearSettings"
-              title="Clear all settings, player names, non-start groups">
+              value="Clear all settings, non-start groups" id="buttonClearSettings"
+              title="Clear all settings, non-start groups">
           </p>
           <p>
             <input @click="vueRestoreStartGroups" class="buttonRestoreStartGroups" type="button"
@@ -258,13 +258,15 @@
 
       <footer>
         <br>
-        bovgit © 2021
+        bovgit © 2021 |
         <a href="mailto:bovgit@gmail.com?subject=Player ratings/score on chess sites">
-          <span id="hrefEMail">(e-mail)</span>
+          <span id="hrefEMail">(e-mail)</span> |
         </a>
         <a href="https://archive.org/details/demo-PlayerRatings1" target="_blank">
-          <span id="hrefVideo"> (Video-Help)</span>
+          <span id="hrefVideo"> (Video-Help)</span> |
         </a>
+        <a href="https://lichess.org/" target="_blank"> ♞ Lichess | </a>
+        <a href="https://www.chess.com/" target="_blank"> ♟ Chess.com </a>
       </footer>
 
     </div>

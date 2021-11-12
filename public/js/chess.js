@@ -136,7 +136,7 @@ const startGroupObjs = [
     name: '! custom',
     lichessPlayerNames: 'Thibault Zhigalko_Sergei Benefactorr Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka',
     // + BOVGIT_playerName,
-    chessComPlayerNames: 'Erik Hikaru ChessQueen ChessNetwork ShahMatKanal'
+    chessComPlayerNames: 'Erik Hikaru VladDobrov ChessQueen ChessNetwork ShahMatKanal'
   }
   // ,
   // {
@@ -327,29 +327,44 @@ function getArGroupNames() {
 }
 
 function groupAdd() {
-  let v
+  let v, msg
 
   if (getArGroupNames().length === MAX_GROUPS_NUM) {
-    alert(`${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !`)
+    // alert(`${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !`)
+    const msg = isLangEn() ?
+      `${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !` :
+      `${MAX_GROUPS_NUM} групп уже создано.\n\nЭто максимум !`
+    alert(msg)
     return
   }
 
-  const groupName = prompt('Input name of new group:', '')
+  msg = isLangEn() ? `Input name of new group:` : `Введите имя новой группы:`
+  const groupName = prompt(msg, '')
   if (groupName === null || groupName === '') {
     return
   }
   if (groupName.length > MAX_GROUPNAME_LEN) {
-    alert(`The name must not exceed ${MAX_GROUPNAME_LEN} symbols !`)
+    // alert(`The name must not exceed ${MAX_GROUPNAME_LEN} symbols !`)
+    msg = isLangEn() ?
+      `The name must not exceed ${MAX_GROUPNAME_LEN} symbols !` :
+      `Длина имени не должна превышать ${MAX_GROUPNAME_LEN} символов !`
+    alert(msg)
     return
   }
   v = groupName.toUpperCase()
   const groupObj = groupObjs.find(item => item.name.toUpperCase() === v)
   if (groupObj !== undefined) {
-    alert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
+    // alert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
+    msg = isLangEn() ?
+      `Group "${groupName}" already exists.\n\nPlease enter an another name !` :
+      `Группа "${groupName}" уже есть.\n\nПожалуйста, введите другое имя !`
+    alert(msg)
     return
   }
   if (groupName.includes('!')) {
-    alert(`The name must not include symbol "!".`)
+    // alert(`The name must not include symbol "!".`)
+    msg = isLangEn() ? `The name must not include symbol "!".` : `Имя не должно содержать символ  "!".`
+    alert(msg)
     return
   }
 
@@ -365,21 +380,29 @@ function groupAdd() {
   addOptionToSelectElement(groupElement, currentGroupName, currentGroupName)
 
   setDataToStorage()
-  alert(`It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !`)
+  // alert(`It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !`)
+  msg = isLangEn() ?
+    `It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !` :
+    `Создана группа "${groupName}"\nс текущими списками игроков.\n\nВнесите свои изменения в списки созданной группы!`
+  alert(msg)
 }
 
 //del current group
 function groupDel() {
 
-  let groupName = currentGroupName
+  let msg, groupName = currentGroupName
 
   const groupIndex = groupNames.indexOf(groupName, 0)
   if (isThisStartGroup(groupIndex)) {
-    alert(`Group "${groupName}" cannot be deleted !`)
+    // alert(`Group "${groupName}" cannot be deleted !`)
+    msg = isLangEn() ? `Group "${groupName}" cannot be deleted !` : `Группу "${groupName}" нельзя удалять !`
+    alert(msg)
     return
   }
 
-  if (!confirm(`Delete group "${groupName}" ?`)) {
+  // msg = `Delete group "${groupName}" ?`
+  msg = isLangEn() ? `Delete group "${groupName}" ?` : `Удалить группу "${groupName}" ?`
+  if (!confirm(msg)) {
     return
   }
 
@@ -396,21 +419,33 @@ function groupDel() {
   setChessComPlayerNames(groupObjs[0].chessComPlayerNames)
   refresh()
 
-  alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
+  // alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
+  msg = isLangEn() ?
+    `Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !` :
+    `Группа "${groupName}" удалена.\n\nТекущая группа теперь: "${currentGroupName}" !`
+  alert(msg)
 }
 
 //restore current group
 function groupRestore() {
 
-  let groupName = currentGroupName
+  let msg, groupName = currentGroupName
 
   const groupIndex = groupNames.indexOf(groupName, 0)
   if (!isThisStartGroup(groupIndex)) {
-    alert(`Group "${groupName}" cannot be restored !`)
+    // alert(`Group "${groupName}" cannot be restored !`)
+    msg = isLangEn() ?
+      `Group "${groupName}" cannot be restored because it is not start-group !` :
+      `Группу "${groupName}" нельзя восстановить , так как она не является стартовой группой !`
+    alert(msg)
     return
   }
 
-  if (!confirm(`Restore group "${groupName}" ?`)) {
+  // msg = `Restore group "${groupName}" ?`
+  msg = isLangEn() ?
+    `Restore initial value of the group "${groupName}" ?` :
+    `Восстановить начальное значение группы "${groupName}" ?`
+  if (!confirm(msg)) {
     return
   }
 
@@ -425,7 +460,11 @@ function groupRestore() {
   setLichessOrgPlayerNames(startGroupObjs[groupIndex].lichessPlayerNames)
   setChessComPlayerNames(startGroupObjs[groupIndex].chessComPlayerNames)
   refresh()
-  alert(`Group "${groupName}" will be restored !`)
+  // alert(`Group "${groupName}" will be restored !`)
+  msg = isLangEn() ?
+    `Group "${groupName}" is restored !` :
+    `Группа "${groupName}" восстановлена !`
+  alert(msg)
 }
 
 function isThisStartGroup(groupIndex) {
@@ -1521,10 +1560,22 @@ async function getStatusAfterFetchFromLichess(arPlayerNames) {
 
         //META_STATUS_TEXT
         let s = patron ? 'Patron. ' : ''
-        s += online || streaming || playing ? 'Now: ' : ''
-        s += playing ? 'playing, ' : ''
-        s += streaming ? 'streaming, ' : ''
-        s += online && !streaming && !playing ? 'online, ' : ''
+
+        const e = isLangEn()
+        const stNow = e ? 'Now' : 'Сейчас'
+        const stPlaying = e ? 'playing' : 'играет'
+        const stStreaming = e ? 'streaming' : 'стримит'
+        const stOnline = e ? 'online' : 'онлайн'
+
+        // s += online || streaming || playing ? 'Now: ' : ''
+        // s += playing ? 'playing, ' : ''
+        // s += streaming ? 'streaming, ' : ''
+        // s += online && !streaming && !playing ? 'online, ' : ''
+        s += online || streaming || playing ? (stNow + ' ') : ''
+        s += playing ? (stPlaying + ', ') : ''
+        s += streaming ? (stStreaming + ', ') : ''
+        s += online && !streaming && !playing ? (stOnline + ', ') : ''
+
         s = s.trim()
         if (s[s.length - 1] === ',') {
           s = s.slice(0, s.length - 1) + '.' //del last symbol (comma)
@@ -1701,11 +1752,17 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
       }
     }
   }
-  // allScore += isError ? '\nCannot get some data from Lichess.\nTry again later (Too Many Requests).' : ''
-  allScore += isError ? '\nLichess says: "Too many requests from your ip-address."\nTry again later.' : ''
   outMsgWait(thisIsLichess, false)
-  const head = isFirefox ? `Score (X is ${myName} ):` : `Score between players:`
 
+  let head
+  if (isLangEn()) {
+    // // allScore += isError ? '\nCannot get some data from Lichess.\nTry again later (Too Many Requests).' : ''
+    allScore += isError ? '\nLichess says: "Too many requests from your ip-address."\nTry again later.' : ''
+    head = isFirefox ? `Score (X is ${myName} ):` : `Score between players:`
+  } else {
+    allScore += isError ? '\nLichess сообщает: "Слишком много запросов с вашего ip-адреса."\nПовторите запрос немного позже.' : ''
+    head = isFirefox ? `Счет (X это ${myName}):` : `Счет между игроками:`
+  }
   myAlert(allScore, head)
 }
 
@@ -2103,8 +2160,10 @@ function setFirstChessComToStorage() {
 }
 
 function clearSettings() {
-
-  if (!confirm('All settings will be cleared.\n\nAre you sure ?')) {
+  let msg
+  msg = isLangEn() ? 'All settings will be cleared.\n\nAre you sure ?' :
+    'Все настройки будут сброшены.\n\nВы уверены ?'
+  if (!confirm(msg)) {
     return
   }
 
@@ -2125,12 +2184,20 @@ function clearSettings() {
   setAutoRefresh()
   setTheme()
 
-  alert('All settings are cleared.')
+  msg = isLangEn() ? 'All settings are cleared.' : 'Все настройки сброшены.'
+  alert(msg)
+
+  curLang = langEN
+  document.getElementById('langSelect').value = curLang
+  changeLang()
 }
 
 function restoreStartGroups() {
+  let msg
 
-  if (!confirm('All Start-groups will be restored.\n\nAre you sure ?')) {
+  msg = isLangEn() ? 'All Start-groups will be restored.\n\nAre you sure ?' :
+    'Во всех стартовых группах\nбудут восстановлены начальные значения.\n\nВы уверены ?'
+  if (!confirm(msg)) {
     return
   }
 
@@ -2139,7 +2206,8 @@ function restoreStartGroups() {
 
   refresh()
 
-  alert('All Start-groups are restored.')
+  msg = isLangEn() ? 'All Start-groups are restored.' : 'Все стартовые группы восстановлены.'
+  alert(msg)
   goMainModeFromSettings()
 }
 
@@ -2281,29 +2349,40 @@ function is_mobile_device() {
   return devices.test(navigator.userAgent) ? true : false
 }
 
-function outMsgWait(thisIsLichess, show) {
+function outMsgWait(thisIsLichess, showWait) {
   const defColor = 'white'
   const waitColor = '#ffe4b5' //light-yellow (or as "background-color: moccasin ;")
   const symbolWaitID = thisIsLichess ? '#LichessWait' : '#ChessComWait'
-  let el
+
+  let buttonRefreshValueDef, buttonRefreshValueWait
+
+  let el, elr
   if (thisIsLichess && isCheckLichess()) {
-    // document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+    // document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (showWait ? waitColor : defColor)
     el = document.querySelector('#elemTextLichessOrgPlayerNames')
+    elr = document.querySelector('#buttonLichessRefresh')
+    buttonRefreshValueDef = "↺ ♞"
+    buttonRefreshValueWait = "⌛ ♞"
   }
   if (!thisIsLichess && isCheckChessCom()) {
-    // document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (show ? waitColor : defColor)
+    // document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (showWait ? waitColor : defColor)
     el = document.querySelector('#elemTextChessComPlayerNames')
+    elr = document.querySelector('#buttonChessComRefresh')
+    buttonRefreshValueDef = "↺ ♟"
+    buttonRefreshValueWait = "⌛ ♟"
   }
   if (el) {
-    if (show) {
-      document.querySelector(symbolWaitID).setAttribute("class", "showBlock")
+    if (showWait) {
+      // document.querySelector(symbolWaitID).setAttribute("class", "showBlock")
       el.style.backgroundColor = waitColor
       el.setAttribute("class", "inputText waitAnimation")
+      elr.value = buttonRefreshValueWait
     } else {
       el.style.backgroundColor = defColor
       el.setAttribute("class", "inputText waitAnimation2")
-      // el.setAttribute("class", "inputText")
-      document.querySelector(symbolWaitID).setAttribute("class", "hiddenBlock")
+      // // el.setAttribute("class", "inputText")
+      // document.querySelector(symbolWaitID).setAttribute("class", "hiddenBlock")
+      elr.value = buttonRefreshValueDef
     }
     document.querySelector('#msgHintEdit').setAttribute("class", "msgHint msgHintWaitAnimation")
     document.querySelector('#msgHintScore').setAttribute("class", "msgHint msgHintWaitAnimation")
@@ -2331,9 +2410,9 @@ function getDateHHMM(milliseconds) {
   let lastOnline = dp.toLocaleString() //14.11.2021, 11:25:17
   lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
   if (dp >= beginOfToday) {
-    lastOnline = (!isLangRu() ? 'today' : 'сегодня') + lastOnline.slice(10, 17) //today, 11:25
+    lastOnline = (isLangEn() ? 'today' : 'сегодня') + lastOnline.slice(10, 17) //today, 11:25
   } else if (dp >= beginOfYesterday) {
-    lastOnline = (!isLangRu() ? 'yesterday' : 'вчера') + lastOnline.slice(10, 17) //yesterday, 11:25
+    lastOnline = (isLangEn() ? 'yesterday' : 'вчера') + lastOnline.slice(10, 17) //yesterday, 11:25
   }
   return lastOnline
 }
@@ -2385,12 +2464,16 @@ function myReplaceAll(s, s1, s2) {
   return s.replace(new RegExp(s1, 'g'), s2)
 }
 
-//////////////////////// L A N G ///////////////////////////////////////////////////
+//////////////////////// L A N G U A G E ///////////////////////////////////////////////////
 
 function setCurLang() {
   const elem = document.getElementById('langSelect')
   const sel = elem.selectedIndex
   curLang = (sel === -1 || elem.options[sel].text === langEN) ? langEN : langRU
+}
+
+function isLangEn() {
+  return (curLang === langEN)
 }
 
 function isLangRu() {
@@ -2403,19 +2486,18 @@ function changeLang() {
   localStorage.setItem('Lang', curLang)
 
   const e = !isLangRu()
-  document.querySelector('#projectName').textContent = e ? 'Player ratings / score' : 'Рейтинги / счет игрока'
+
+  document.querySelector('#projectName').textContent =
+    e ? 'Ratings / score (↺ ♞ ♟)' : 'Рейтинги / счет (↺ ♞ ♟)'
   document.querySelector('#projectName').title = e ? 'Refresh all tables' : 'Обновить все таблицы'
 
   //Groups
-  document.querySelector('#GroupText').textContent = e ? 'Group:' : 'Группа:'
+  document.querySelector('#GroupText').textContent = e ? 'Group: ' : 'Группа: '
 
-  document.querySelector('#buttonGroupAdd').value = e ? 'add' : ' + '
   document.querySelector('#buttonGroupAdd').title = e ? 'Add group' : 'Добавить группу'
 
-  document.querySelector('#buttonGroupRestore').value = e ? 'restore' : '↻' //'восст-ть'
   document.querySelector('#buttonGroupRestore').title = e ? 'Restore group' : 'Восстановить группу'
 
-  document.querySelector('#buttonGroupDel').value = e ? 'del' : ' - '
   document.querySelector('#buttonGroupDel').title = e ? 'Delete group' : 'Удалить группу'
 
   //Input text
@@ -2460,11 +2542,11 @@ function changeLang() {
   document.querySelector('#AutoRefresh').textContent =
     e ? 'AutoRefresh Interval in minutes (0 - no AutoRefresh): ' :
       'Интервал автообновления в минутах (0 - нет автообновления): '
-  document.querySelector('#DarkThemeText').textContent = e ? 'Dark theme' : 'Темная тема'
+  document.querySelector('#DarkThemeText').textContent = e ? ' Dark theme ' : ' Темная тема'
 
   el = document.querySelector('#buttonClearSettings')
-  el.value = el.title = e ? 'Clear all settings, player lists, non-start groups' :
-    'Очистить все настройки, списки игроков, не-стартовые группы'
+  el.value = el.title = e ? 'Clear all settings, non-start groups' :
+    'Очистить все настройки, не-стартовые группы'
 
   el = document.querySelector('#buttonRestoreStartGroups')
   el.value = el.title = e ? 'Restore all start-groups' : 'Восстановить все стартовые группы'
@@ -2490,9 +2572,9 @@ function vueTemplateTips() {
       <li><span class="click">Click</span> on the <span class="dotted">text "Player ratings/score"</span>
         to refresh all tables
       </li>
-      <li><span class="click">Click</span> on the <span class="dotted">heading "Lichess"</span> to refresh the
+      <li><span class="click">Click</span> on the <span class="dotted">heading "♞ Lichess"</span> to refresh the
         Lichess table and sort by player list</li>
-      <li><span class="click">Click</span> on the <span class="dotted">heading "Chess.com"</span> to refresh the
+      <li><span class="click">Click</span> on the <span class="dotted">heading "♟ Chess.com"</span> to refresh the
         Chess.com table and sort by player list</li>
       <li><span class="click">Click</span> on <span class="dotted">any other heading</span> to sort by rating
       </li>
@@ -2511,7 +2593,7 @@ function vueTemplateTips() {
         a pop-up window will appear with an <span class="dotted">information about player</span>
       </li>
       <li>
-        Green and red values in the rating table - are a change in the <span class="dotted">rating of the last
+      <span class="colorGreen">Green</span> and <span class="colorRed">red</span> values in the rating table - are a change in the <span class="dotted">rating of the last
           game day</span> in comparison with the <span class="dotted">rating of the previous game day</span>.
       </li>
     </ul>
@@ -2522,9 +2604,9 @@ function vueTemplateTips() {
     <ul>
       <li><span class="click">Кликните</span> на <span class="dotted">тексте "Рейтинги / счет игрока" </span>
         для обновления всех таблиц</li>
-      <li><span class="click">Кликните</span> на <span class="dotted">заголовке "Lichess" </span>
+      <li><span class="click">Кликните</span> на <span class="dotted">заголовке "♞ Lichess" </span>
         для обновления таблицы Lichess и упорядочивания ее по списку игроков</li>
-      <li><span class="click">Кликните</span> на <span class="dotted">заголовке "Chess.com" </span>
+      <li><span class="click">Кликните</span> на <span class="dotted">заголовке "♟ Chess.com" </span>
         для обновления таблицы Chess.com и упорядочивания ее по списку игроков</li>
       <li><span class="click">Кликните</span> на <span class="dotted">на других заголовках </span>
         для упорядочивания таблицы по соответствующему рейтингу</li>
@@ -2541,7 +2623,7 @@ function vueTemplateTips() {
         появится подсказка с <span class="dotted">информацией об игроке из его профиля</span>
       </li>
       <li>
-        Зеленые и красные значения в таблице рейтингов - это изменение <span class="dotted">
+      <span class="colorGreen">Зеленые</span> и <span class="colorRed">красные</span> значения в таблице рейтингов - это изменение <span class="dotted">
           рейтинга последнего игрового дня</span> в сравнении с <span class="dotted">рейтингом предыдущего игрового дня</span>.
       </li>
     </ul>
