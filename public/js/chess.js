@@ -2487,17 +2487,13 @@ function changeLang() {
 
   const e = !isLangRu()
 
-  document.querySelector('#projectName').textContent =
-    e ? 'Ratings / score (↺ ♞ ♟)' : 'Рейтинги / счет (↺ ♞ ♟)'
+  document.querySelector('#projectName').textContent = e ? 'Rating, score: ↺ ♞♟' : 'Рейтинг, счет: ↺ ♞♟'
   document.querySelector('#projectName').title = e ? 'Refresh all tables' : 'Обновить все таблицы'
 
   //Groups
   document.querySelector('#GroupText').textContent = e ? 'Group: ' : 'Группа: '
-
   document.querySelector('#buttonGroupAdd').title = e ? 'Add group' : 'Добавить группу'
-
   document.querySelector('#buttonGroupRestore').title = e ? 'Restore group' : 'Восстановить группу'
-
   document.querySelector('#buttonGroupDel').title = e ? 'Delete group' : 'Удалить группу'
 
   //Input text
