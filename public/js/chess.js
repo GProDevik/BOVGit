@@ -81,7 +81,7 @@ const vm = app.mount('#vue-mount')
 const urlHttpServiceLichess = 'https://lichess.org/api/user/'
 const urlHttpServiceLichessStatus = 'https://lichess.org/api/users/status?ids='
 const urlHttpServiceLichessScore = 'https://lichess.org/api/crosstable/'
-// const urlHttpServiceLichessStreamersOnline = 'https://lichess.org/streamer/live'
+const urlHttpServiceLichessStreamersOnline = 'https://lichess.org/streamer/live/'
 const urlHttpServiceChessCom = 'https://api.chess.com/pub/player/'
 const modeCORS = 'cors' //mode for fetch
 const useAJAX = true //for exchange data between server & client
@@ -111,7 +111,7 @@ const mapTimeControl = new Map([
   ['rush', 5]
 ])
 
-// const streamOnlineGroupName = '! streamers online'
+const streamOnlineGroupName = '! streamers online'
 const BOVGIT_playerName = 'bovgit'
 const BOVGIT_description = 'Creator of this page :)'
 const mapLichessPlayersDescription = new Map([
@@ -138,8 +138,7 @@ const startGroupObjs = [
     // + BOVGIT_playerName,
     chessComPlayerNames: 'Erik Hikaru VladDobrov ChessQueen ChessNetwork ShahMatKanal'
   }
-  // ,
-  // {
+  // , {
   //   name: streamOnlineGroupName,
   //   lichessPlayerNames: 'streamersOnline', //must be begin value
   //   chessComPlayerNames: ''
@@ -310,9 +309,9 @@ function onchangeSelectGroup() {
     setLichessOrgPlayerNames(groupObj.lichessPlayerNames)
     setChessComPlayerNames(groupObj.chessComPlayerNames)
   }
-  // if (currentGroupName === streamOnlineGroupName) {
-  //   getStreamersOnlineAfterFetchFromLichess() //Lichess: streamers online
-  // }
+  if (currentGroupName === streamOnlineGroupName) {
+    getStreamersOnlineAfterFetchFromLichess() //Lichess: streamers online
+  }
   refresh()
 }
 
@@ -401,7 +400,9 @@ function groupDel() {
   }
 
   // msg = `Delete group "${groupName}" ?`
-  msg = isLangEn() ? `Delete group "${groupName}" ?` : `Удалить группу "${groupName}" ?`
+  msg = isLangEn() ?
+    `Delete group "${groupName}" ?` :
+    `После удаления нельзя будет восстановить эту группу.\n\nУдалить группу "${groupName}" ?`
   if (!confirm(msg)) {
     return
   }
@@ -421,8 +422,8 @@ function groupDel() {
 
   // alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
   msg = isLangEn() ?
-    `Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !` :
-    `Группа "${groupName}" удалена.\n\nТекущая группа теперь: "${currentGroupName}" !`
+    `Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}".` :
+    `Группа "${groupName}" удалена.\n\nТекущая группа теперь: "${currentGroupName}".`
   alert(msg)
 }
 
@@ -444,7 +445,7 @@ function groupRestore() {
   // msg = `Restore group "${groupName}" ?`
   msg = isLangEn() ?
     `Restore initial value of the group "${groupName}" ?` :
-    `Восстановить начальное значение группы "${groupName}" ?`
+    `Восстановить начальный состав игроков группы "${groupName}" ?`
   if (!confirm(msg)) {
     return
   }
@@ -1511,24 +1512,28 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
 
 async function getStreamersOnlineAfterFetchFromLichess() {
 
-  // // let results = await getFetchStreamersOnlineFromLichess()
-  // // if (results[0] !== null) {
-  // //   let arPlayerNames = results[0].map(item => item.name)
-  // //   const playerNamesBySpace = arPlayerNames.join(' ')
-  // //   setLichessOrgPlayerNames(playerNamesBySpace)
-  // //   onchangeLichessPlayerNames()
-  // // }
-
-  // const response = await fetch(urlHttpServiceLichessStreamersOnline) //, { mode: modeCORS })
-  // if (response.ok) {
-  //   const arJsonObj = await response.json()
-  //   if (arJsonObj) {
-  //     let arPlayerNames = arJsonObj.map(item => item.name)
-  //     const playerNamesBySpace = arPlayerNames.join(' ')
-  //     setLichessOrgPlayerNames(playerNamesBySpace)
-  //     onchangeLichessPlayerNames()
-  //   }
+  // let results = await getFetchStreamersOnlineFromLichess()
+  // if (results[0] !== null) {
+  //   let arPlayerNames = results[0].map(item => item.name)
+  //   const playerNamesBySpace = arPlayerNames.join(' ')
+  //   setLichessOrgPlayerNames(playerNamesBySpace)
+  //   onchangeLichessPlayerNames()
   // }
+
+  try {
+    const response = await fetch(urlHttpServiceLichessStreamersOnline, { mode: modeCORS })
+    if (response.ok) {
+      const arJsonObj = await response.json()
+      if (arJsonObj) {
+        let arPlayerNames = arJsonObj.map(item => item.name)
+        const playerNamesBySpace = arPlayerNames.join(' ')
+        setLichessOrgPlayerNames(playerNamesBySpace)
+        onchangeLichessPlayerNames()
+      }
+    }
+  } catch (e) {
+    out(`getStreamersOnlineAfterFetchFromLichess(), error: ${e}`)
+  }
 }
 
 async function getFetchStreamersOnlineFromLichess() {
@@ -2565,7 +2570,7 @@ function vueTemplateTips() {
     <fieldset id="tipsEN" class="showBlock">
     <legend><em><strong>Tips</strong></em></legend>
     <ul>
-      <li><span class="click">Click</span> on the <span class="dotted">text "Player ratings/score"</span>
+      <li><span class="click">Click</span> on the <span class="dotted">button "Player ratings/score"</span>
         to refresh all tables
       </li>
       <li><span class="click">Click</span> on the <span class="dotted">heading "♞ Lichess"</span> to refresh the
@@ -2598,13 +2603,13 @@ function vueTemplateTips() {
     <fieldset id="tipsRU" class="hiddenBlock">
     <legend><em><strong>Подсказки</strong></em></legend>
     <ul>
-      <li><span class="click">Кликните</span> на <span class="dotted">тексте "Рейтинги / счет игрока" </span>
+      <li><span class="click">Кликните</span> на <span class="dotted">кнопке "Рейтинги / счет игрока" </span>
         для обновления всех таблиц</li>
       <li><span class="click">Кликните</span> на <span class="dotted">заголовке "♞ Lichess" </span>
         для обновления таблицы Lichess и упорядочивания ее по списку игроков</li>
       <li><span class="click">Кликните</span> на <span class="dotted">заголовке "♟ Chess.com" </span>
         для обновления таблицы Chess.com и упорядочивания ее по списку игроков</li>
-      <li><span class="click">Кликните</span> на <span class="dotted">на других заголовках </span>
+      <li><span class="click">Кликните</span> на <span class="dotted">другие заголовки </span>
         для упорядочивания таблицы по соответствующему рейтингу</li>
       <li><span class="click">Кликните</span> на <span class="dotted">кнопке "↑↓"</span>, чтобы поменять порядок таблиц</li>
       <li>Для Lichess отображаются несколько типов <span class="dotted">статусов игрока</span> слева от его имени в таблице:
