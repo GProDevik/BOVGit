@@ -98,6 +98,20 @@ const onlineSymbolPlaying = '&#9679;'	//filled circle
 // const onlineSymbolStreaming = '&#128250;' //📺
 const onlineSymbolStreaming = '&#127908;' //microphone
 
+const mapCountries = new Map([
+  ['RU', 'Russia'],
+  ['US', 'United States'],
+  ['AZ', 'Azerbaijan'],
+  ['PL', 'Poland'],
+  ['FR', 'France'],
+  ['HU', 'Hungary'],
+  ['NL', 'Netherlands'],
+  ['AM', 'Armenia'],
+  ['CN', 'China'],
+  ['IR', 'Iran'],
+  ['NO', 'Norway'],
+])
+
 const META_FIDE = '@FIDE@'
 const META_STATUS_TEXT = '@STATUS-TEXT@'
 const META_STATUS_SYMBOL = '@STATUS-SYMBOL@'
@@ -127,16 +141,16 @@ const mapChessComPlayersDescription = new Map([
 ])
 const startGroupObjs = [
   {
-    name: '! FIDE top',
-    // Azerichessss Sergey_Karjakin Colchonero64 Vladimirovich9000
-    lichessPlayerNames: 'DrNykterstein Alireza2003 Bombegranate AnishGiri AvalonGamemaster',
-    chessComPlayerNames: 'MagnusCarlsen Firouzja2003 ChefsHouse FabianoCaruana LevonAronian LachesisQ AnishGiri Grischuk gmwso LyonBeast'
-  },
-  {
     name: '! custom',
     lichessPlayerNames: 'Thibault Zhigalko_Sergei Benefactorr Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka',
-    // + BOVGIT_playerName,
     chessComPlayerNames: 'Erik Hikaru VladDobrov ChessQueen ChessNetwork ShahMatKanal'
+  },
+  {
+    name: '! FIDE top',
+    lichessPlayerNames: 'DrNykterstein Alireza2003 Bombegranate AnishGiri Azerichessss AvalonGamemaster BakukaDaku87'
+      + ' Sergey_Karjakin Colchonero64 Vladimirovich9000',
+    chessComPlayerNames: 'MagnusCarlsen Firouzja2003 ChefsHouse FabianoCaruana LachesisQ LevonAronian AnishGiri gmwso Azerichess Grischuk'
+      + ' Lordillidan LyonBeast Polish_fighter3000 TRadjabov Sebastian SergeyKarjakin hikaru Colchonero64'
   }
   // , {
   //   name: streamOnlineGroupName,
@@ -1463,6 +1477,14 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
       const bio = getJsonValue2(playerName, jsonObj, 'profile', 'bio')
       const links = getJsonValue2(playerName, jsonObj, 'profile', 'links')
 
+      //country
+      let country = ''
+      v = getJsonValue2(playerName, jsonObj, 'profile', 'country')
+      if (v) {
+        const v1 = mapCountries.get(v) //v: RU
+        country = v1 ? v1 : country
+      }
+
       let createdAt = '' //registration date
       v = getJsonValue1(playerName, jsonObj, 'createdAt')
       if (v) { createdAt = (new Date(v)).getFullYear() }
@@ -1476,9 +1498,11 @@ async function getProfilesAfterFetchFromLichess(arPlayerNames) {
           classLastOnline = 'lastOnlineBeforeToday'
         }
       }
+
       const firstPart = (firstName ? firstName + ' ' : '')
         + (lastName ? lastName : '')
         + (location ? ((firstName || lastName) ? ', ' : '') + location : '')
+        + (country ? ((firstName || lastName || location) ? ', ' : '') + country : '')
         + (fideRating ? ', FIDE ' + fideRating : '')
         + (playerTitle && !playerMyDesccription ? ', ' + playerTitle : '')
       playerHint += firstPart
@@ -1572,10 +1596,6 @@ async function getStatusAfterFetchFromLichess(arPlayerNames) {
         const stStreaming = e ? 'streaming' : 'стримит'
         const stOnline = e ? 'online' : 'онлайн'
 
-        // s += online || streaming || playing ? 'Now: ' : ''
-        // s += playing ? 'playing, ' : ''
-        // s += streaming ? 'streaming, ' : ''
-        // s += online && !streaming && !playing ? 'online, ' : ''
         s += online || streaming || playing ? (stNow + ' ') : ''
         s += playing ? (stPlaying + ', ') : ''
         s += streaming ? (stStreaming + ', ') : ''
@@ -1788,13 +1808,14 @@ async function getProfileOrStatisticsFromChessCom(arPlayerNames, isProfile) {
   }
 
   const modeWord = isProfile ? 'profile' : 'statistics'
-  let milliSeconds = 200
-  const N = 6
+  let milliSeconds = 250 //300
+  const N = 7
   for (let i = 0; i < N; i++) {
     let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
-      milliSeconds += 100 //increase delay
+      // milliSeconds += 100 //increase delay
+      milliSeconds += 30 //increase delay
       out(`step ${i + 1} / ${N}, chess.com ${modeWord}, ${arPlayerNamesBuf.length} el. from ${beginLength}, delay ${milliSeconds}`)
       await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
     }
@@ -1884,8 +1905,18 @@ function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
     v = getJsonValue1(playerName, jsonObj, 'title')
     playerTitle = (v === undefined) ? '' : v + ' '
 
+    //country
+    let country = ''
+    v = getJsonValue1(playerName, jsonObj, 'country')
+    if (v) {
+      //v='https://api.chess.com/pub/country/RU'
+      const countryCode = v.slice(-2) //RU
+      const v1 = mapCountries.get(countryCode)
+      if (v1) { country = v1 }
+    }
+
     const name = getJsonValue1(playerName, jsonObj, 'name') //'firstName lastName'
-    const location = getJsonValue1(playerName, jsonObj, 'location')
+    let location = getJsonValue1(playerName, jsonObj, 'location')
 
     v = getJsonValue1(playerName, jsonObj, 'joined') //registration date
     if (v) { createdAt = (new Date(v * 1000)).getFullYear() }
@@ -1901,6 +1932,7 @@ function fillPlayerHTMLChessCom(jsonObj, playerName, arPlayerNames) {
 
     playerHint += (name ? name : '')
       + (location ? ', ' + location : '')
+      + (country ? ', ' + country : '')
     playerHint += META_FIDE
       + (playerTitle ? ', ' + playerTitle : '')
     playerHint += (playerHint && playerHint !== META_FIDE ? '\n' : '')
@@ -2413,12 +2445,19 @@ function getDateHHMM(milliseconds) {
 
   const dp = (new Date(milliseconds))
   let lastOnline = dp.toLocaleString() //14.11.2021, 11:25:17
-  lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
+  //lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
+  // if (dp >= beginOfToday) {
+  //   lastOnline = (isLangEn() ? 'today' : 'сегодня') + lastOnline.slice(10, 17) //today, 11:25
+  // } else if (dp >= beginOfYesterday) {
+  //   lastOnline = (isLangEn() ? 'yesterday' : 'вчера') + lastOnline.slice(10, 17) //yesterday, 11:25
+  // }
+  const tp = ', ' + [dp.getHours(), dp.getMinutes()].map(x => x < 10 ? "0" + x : x).join(":")
   if (dp >= beginOfToday) {
-    lastOnline = (isLangEn() ? 'today' : 'сегодня') + lastOnline.slice(10, 17) //today, 11:25
+    lastOnline = (isLangEn() ? 'today' : 'сегодня') + tp //today, 11:25
   } else if (dp >= beginOfYesterday) {
-    lastOnline = (isLangEn() ? 'yesterday' : 'вчера') + lastOnline.slice(10, 17) //yesterday, 11:25
+    lastOnline = (isLangEn() ? 'yesterday' : 'вчера') + tp //yesterday, 11:25
   }
+
   return lastOnline
 }
 
@@ -2605,13 +2644,13 @@ function vueTemplateTips() {
     <ul>
       <li><span class="click">Кликните</span> на <span class="dotted">кнопке "Рейтинги / счет игрока" </span>
         для обновления всех таблиц</li>
-      <li><span class="click">Кликните</span> на <span class="dotted">заголовке "♞ Lichess" </span>
+      <li><span class="click">Нажмите</span> на <span class="dotted">заголовок "♞ Lichess" </span>
         для обновления таблицы Lichess и упорядочивания ее по списку игроков</li>
-      <li><span class="click">Кликните</span> на <span class="dotted">заголовке "♟ Chess.com" </span>
+      <li><span class="click">Нажмите</span> на <span class="dotted">заголовок "♟ Chess.com" </span>
         для обновления таблицы Chess.com и упорядочивания ее по списку игроков</li>
-      <li><span class="click">Кликните</span> на <span class="dotted">другие заголовки </span>
+      <li><span class="click">Нажмите</span> на <span class="dotted">другие заголовки </span>
         для упорядочивания таблицы по соответствующему рейтингу</li>
-      <li><span class="click">Кликните</span> на <span class="dotted">кнопке "↑↓"</span>, чтобы поменять порядок таблиц</li>
+      <li><span class="click">Нажмите</span> на <span class="dotted">кнопкe "↑↓"</span>, чтобы поменять порядок таблиц</li>
       <li>Для Lichess отображаются несколько типов <span class="dotted">статусов игрока</span> слева от его имени в таблице:
         <ul>
           <li><span class="statusOnline">&#10004;</span> - онлайн</li>
