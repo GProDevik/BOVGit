@@ -110,6 +110,7 @@ const mapCountries = new Map([
   ['CN', 'China'],
   ['IR', 'Iran'],
   ['NO', 'Norway'],
+  ['BY', 'Belarus'],
 ])
 
 const META_FIDE = '@FIDE@'
@@ -1341,6 +1342,7 @@ function getChessTableRef(thisIsLichess) {
 
 function getArPlayerNames(thisIsLichess) {
   let playerNames = getPlayerNames(thisIsLichess)
+  playerNames = myReplaceAll(playerNames, '\n', ' ')
   let arPlayerNames = playerNames.split(' ') //get array of Players names
   arPlayerNames = arPlayerNames.filter(item => item !== '') //leave not-empty values
 

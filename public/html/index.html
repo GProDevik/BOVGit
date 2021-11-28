@@ -54,8 +54,9 @@
         </div> -->
 
         <div @click="vueRefresh" id="projectName" class="projectName projectNameDifPC" title="Refresh all tables">
-          Rating, score: ↺ ♞♟
+          Rating, score
         </div>
+
       </header>
 
       <main>
@@ -79,7 +80,7 @@
           <label id="InputOrder1" class="oneLine" for="elemTextLichessOrgPlayerNames">
             <input @click="vueOnClickCheckLichess" v-model="vueCheckLichess" class="inputCheck" type="checkbox"
               id="elemCheckLichess" name="elemCheckLichess" title="Make visible/unvisible Lichess table">
-            <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺ ♞" id="buttonLichessRefresh"
+            <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
               title="Refresh Lichess table">
             <input @change="vueOnchangeLichessPlayerNames" v-model="vueLichessOrgPlayerNames" class="inputText"
               type="text" id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames" maxlength="250"
@@ -91,8 +92,8 @@
           <label id="InputOrder2" class="oneLine" for="elemTextChessComPlayerNames">
             <input @click="vueOnClickCheckChessCom" v-model="vueCheckChessCom" class="inputCheck" type="checkbox"
               id="elemCheckChessCom" name="elemCheckChessCom" title="Make visible/unvisible Chess.com table">
-            <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺ ♟"
-              id="buttonChessComRefresh" title="Refresh Chess.com table">
+            <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh"
+              title="Refresh Chess.com table">
             <input @change="vueOnchangeChessComPlayerNames" v-model="vueChessComPlayerNames" class="inputText"
               type="text" id="elemTextChessComPlayerNames" name="elemTextChessComPlayerNames" maxlength="250"
               title="Enter names of players on Chess.com, separated by spaces"
