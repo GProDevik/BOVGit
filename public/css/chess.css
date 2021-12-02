@@ -16,6 +16,11 @@ html {
   width: 40vw;
 }
 
+.sectionSettingsButtons{
+  /* text-align: right; */
+  text-align: left;
+}
+
 .projectNameDifMobile {
   font-size: small;
 }
@@ -42,14 +47,17 @@ html {
 }
 
 .buttonGroup {
-  font-size: small;
+  /* font-size: small; */
+  font-size: medium;
   /* font-style: italic; */
-  margin-left: 1vw;
+  /* margin-left: 1vw; */
+  margin-left: 8px;
+
 }
 
 .select {
   font-size: medium;
-  /* font-weight: bold; */
+  font-weight: bold;
 }
 
 /* -------- Form ----------- */
@@ -66,7 +74,8 @@ html {
 }
 
 .inputCheck {
-  margin-left: 2vw;
+  /* margin-left: 2vw; */
+  margin-left: 1vw;
   transform: scale(1.5);
   /* zoom */
 }
@@ -82,10 +91,11 @@ html {
 }
 
 .inputText {
-  font-size: medium;
+  /* font-size: medium; */
+  font-size: large;
   width: 100%;
   margin-left: 1vw;
-  margin-right: 2vw;
+  /* margin-right: 2vw; */
 }
 
 /* -------- Table ----------- */
@@ -176,8 +186,9 @@ td {
 
 .buttonSettings {
   font-size: medium;
-  width: 35%;
-  margin-left: 30%;
+  /* width: 35%; */
+  /* margin-left: 30%; */
+  /* margin-left: 8px; */
   margin-right: 8px;
 }
 

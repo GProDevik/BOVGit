@@ -6,6 +6,10 @@ let curLang = langEN
 
 const isMobileDevice = is_mobile_device()
 
+const modalDialog = document.getElementById('modalDialog');
+document.getElementById('modalDialogHide').onclick = () => modalDialog.close()
+
+
 // ------------------- V U E  (start) ------------------------
 
 const root = {
@@ -43,6 +47,7 @@ const root = {
     vueRefreshChessCom() { refreshChessCom() },
     vueOnchangeLichessPlayerNames() { onchangeLichessPlayerNames() },
     vueOnchangeChessComPlayerNames() { onchangeChessComPlayerNames() },
+    vueGoTables() { goTablesMode() },
     vueGoSetMode() { goSetMode() },
 
     vueSortBulletLichess() { sortBulletLichess() },
@@ -163,7 +168,7 @@ const startGroupNum = startGroupObjs.length
 let currentGroupName = startGroupObjs[0].name
 const MAX_GROUPS_NUM = 10
 const MAX_GROUPNAME_LEN = 30
-let groupObjs, groupNames
+let groupObjs = [], groupNames
 
 //milliseconds for refresh table after 'await fetch'
 // const lichessDelay = 500
@@ -184,14 +189,11 @@ tableNode2 = document.querySelector('#ChessComTables')
 //MobileStyle
 if (isMobileDevice) {
   document.querySelector('#bodyStyle').setAttribute("class", "mobileStyle")
-  document.querySelector('#projectName').setAttribute("class", "projectName projectNameDifMobile")
+  // document.querySelector('#projectName').setAttribute("class", "projectName projectNameDifMobile")
   document.querySelector('#modalDialog').setAttribute("class", "modalDialogMobileStyle")
 }
 
 // ------------- On-Click ---------------
-
-const modalDialog = document.getElementById('modalDialog');
-document.getElementById('modalDialogHide').onclick = () => modalDialog.close()
 
 document.querySelector('#group').onchange = () => onchangeSelectGroup()
 
@@ -204,8 +206,10 @@ document.querySelector('#buttonPostLogout').onclick = () => postLogout()
 
 //hot keys
 document.addEventListener('keydown', function (event) {
-  if (event.key === 'Enter'
-    || event.keyCode === 13 //for mobile device
+  if (event.ctrlKey &&
+    (event.key === 'Enter' ||
+      event.keyCode === 13 //for mobile device
+    )
   ) {
     refresh()
   }
@@ -217,6 +221,8 @@ getDataFromStorage()
 
 addAllOptionsToElementGroup(currentGroupName)
 setActiveInGroupElement(currentGroupName)
+
+//
 
 if (isFirstChessCom) {
   changeTablesOrder() //set first chess.com
@@ -238,6 +244,30 @@ if (needRefresh) {
   refresh()
 }
 
+setMsgVisibility()
+
+////////////////////////////////////////////
+
+function setMsgVisibility() {
+  //msgHintAddGroup
+  if (isExistUserGroup()) {
+    setElementNonVisible('#msgHintAddGroup')
+  }
+
+  //msgHintEdit, elemLichessPlayerNames
+  let el1 = document.querySelector('#elemLichessPlayerNames')
+  let el2 = document.querySelector('#elemChessComPlayerNames')
+  if (isCurrentGroupStart()) {
+    setElementNonVisible('#msgHintEdit')
+    el1.disabled = true
+    el2.disabled = true
+  } else {
+    setElementVisible('#msgHintEdit')
+    el1.disabled = false
+    el2.disabled = false
+  }
+}
+
 /////////////////// show score: player vs opponents (Lichess) /////////////////////////
 
 //click on rating cell
@@ -248,6 +278,10 @@ function scoreLichess(playerName) {
 }
 
 /////////////////// groups of players /////////////////////////
+
+function isExistUserGroup() {
+  return (groupObjs.length > startGroupNum)
+}
 
 function initGroupObjs() {
   groupObjs = []
@@ -282,7 +316,8 @@ function addOptionToSelectElement(selectElement, optionValue, currentOptionValue
 
 function fillOptionForSelectElement(option, optionValue, currentOptionValue) {
   option.value = optionValue
-  option.innerHTML = '<strong><em>' + optionValue + '</em></strong>'
+  // option.innerHTML = '<strong><em>' + optionValue + '</em></strong>'
+  option.innerHTML = optionValue
   if (option.value === currentOptionValue) {
     option.selected = true
   }
@@ -327,6 +362,9 @@ function onchangeSelectGroup() {
   if (currentGroupName === streamOnlineGroupName) {
     getStreamersOnlineAfterFetchFromLichess() //Lichess: streamers online
   }
+
+  setMsgVisibility()
+
   refresh()
 }
 
@@ -394,6 +432,9 @@ function groupAdd() {
   addOptionToSelectElement(groupElement, currentGroupName, currentGroupName)
 
   setDataToStorage()
+
+  setMsgVisibility()
+
   // alert(`It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !`)
   msg = isLangEn() ?
     `It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !` :
@@ -485,6 +526,11 @@ function groupRestore() {
 
 function isThisStartGroup(groupIndex) {
   return (groupIndex > -1 && groupIndex < startGroupNum)
+}
+
+function isCurrentGroupStart() {
+  const groupIndex = groupNames.indexOf(currentGroupName, 0)
+  return isThisStartGroup(groupIndex)
 }
 
 function clearUserOptionsForElementGroup() {
@@ -1374,6 +1420,8 @@ async function fillTableFromServer(thisIsLichess) {
   // setTimeout(function () { showTableContent(thisIsLichess, arPlayerNames) }, milliSeconds) //execute in N ms
   showTableContent(thisIsLichess, arPlayerNames)
 
+  setMsgVisibility()
+
   // } catch (err) {
   //   out(`error: ${err}`)
   // }
@@ -2052,6 +2100,13 @@ function goMainModeFromUser() {
   // setElementVisible('#buttonUser')
 }
 
+
+function goTablesMode() {
+  setElementNonVisible('.sectionSettingsArea')
+  setElementVisible('main')
+}
+
+
 function goSetMode() {
   // setElementNonVisible('#buttonUser')
   setElementNonVisible('main')
@@ -2284,22 +2339,22 @@ function changeTablesOrder() {
 ///////////////// Getters & Setters //////////////////////////////////////////
 
 function getLichessOrgPlayerNames() {
-  // return document.getElementById('elemTextLichessOrgPlayerNames').value.trim()
+  // return document.getElementById('elemLichessPlayerNames').value.trim()
   return vm.vueLichessOrgPlayerNames.trim()
 }
 
 function setLichessOrgPlayerNames(v) {
-  // document.getElementById('elemTextLichessOrgPlayerNames').value = v.trim()
+  // document.getElementById('elemLichessPlayerNames').value = v.trim()
   vm.vueLichessOrgPlayerNames = v.trim()
 }
 
 function getChessComPlayerNames() {
-  // return document.getElementById('elemTextChessComPlayerNames').value.trim()
+  // return document.getElementById('elemChessComPlayerNames').value.trim()
   return vm.vueChessComPlayerNames.trim()
 }
 
 function setChessComPlayerNames(v) {
-  // document.getElementById('elemTextChessComPlayerNames').value = v.trim()
+  // document.getElementById('elemChessComPlayerNames').value = v.trim()
   vm.vueChessComPlayerNames = v.trim()
 }
 
@@ -2308,12 +2363,12 @@ function getPlayerNames(thisIsLichess) {
 }
 
 function getAutoRefreshInterval() {
-  // return document.getElementById('elemTextLichessOrgPlayerNames').value.trim()
+  // return document.getElementById('elemLichessPlayerNames').value.trim()
   return vm.vueAutoRefreshInterval.trim()
 }
 
 function setAutoRefreshInterval(v) {
-  // document.getElementById('elemTextLichessOrgPlayerNames').value = v.trim()
+  // document.getElementById('elemLichessPlayerNames').value = v.trim()
   vm.vueAutoRefreshInterval = v ? v.trim() : ''
 }
 
@@ -2391,40 +2446,44 @@ function is_mobile_device() {
 function outMsgWait(thisIsLichess, showWait) {
   const defColor = 'white'
   const waitColor = '#ffe4b5' //light-yellow (or as "background-color: moccasin ;")
-  const symbolWaitID = thisIsLichess ? '#LichessWait' : '#ChessComWait'
+  // const symbolWaitID = thisIsLichess ? '#LichessWait' : '#ChessComWait'
 
   let buttonRefreshValueDef, buttonRefreshValueWait
 
   let el, elr
   if (thisIsLichess && isCheckLichess()) {
-    // document.querySelector('#elemTextLichessOrgPlayerNames').style.backgroundColor = (showWait ? waitColor : defColor)
-    el = document.querySelector('#elemTextLichessOrgPlayerNames')
+    // document.querySelector('#elemLichessPlayerNames').style.backgroundColor = (showWait ? waitColor : defColor)
+    el = document.querySelector('#elemLichessPlayerNames')
     elr = document.querySelector('#buttonLichessRefresh')
-    buttonRefreshValueDef = "↺ ♞"
-    buttonRefreshValueWait = "⌛ ♞"
+    // buttonRefreshValueDef = "↺ ♞"
+    // buttonRefreshValueWait = "⌛ ♞"
+    buttonRefreshValueDef = "♞ Enter"
+    buttonRefreshValueWait = "⌛ Enter"
   }
   if (!thisIsLichess && isCheckChessCom()) {
-    // document.querySelector('#elemTextChessComPlayerNames').style.backgroundColor = (showWait ? waitColor : defColor)
-    el = document.querySelector('#elemTextChessComPlayerNames')
+    // document.querySelector('#elemChessComPlayerNames').style.backgroundColor = (showWait ? waitColor : defColor)
+    el = document.querySelector('#elemChessComPlayerNames')
     elr = document.querySelector('#buttonChessComRefresh')
-    buttonRefreshValueDef = "↺ ♟"
-    buttonRefreshValueWait = "⌛ ♟"
+    // buttonRefreshValueDef = "↺ ♟"
+    // buttonRefreshValueWait = "⌛ ♟"
+    buttonRefreshValueDef = "♟ Enter"
+    buttonRefreshValueWait = "⌛ Enter"
   }
   if (el) {
     if (showWait) {
-      // document.querySelector(symbolWaitID).setAttribute("class", "showBlock")
-      el.style.backgroundColor = waitColor
-      el.setAttribute("class", "inputText waitAnimation")
+      // // document.querySelector(symbolWaitID).setAttribute("class", "showBlock")
+      // el.style.backgroundColor = waitColor
+      // el.setAttribute("class", "inputText waitAnimation")
       elr.value = buttonRefreshValueWait
     } else {
-      el.style.backgroundColor = defColor
-      el.setAttribute("class", "inputText waitAnimation2")
+      // el.style.backgroundColor = defColor
+      // el.setAttribute("class", "inputText waitAnimation2")
       // // el.setAttribute("class", "inputText")
       // document.querySelector(symbolWaitID).setAttribute("class", "hiddenBlock")
       elr.value = buttonRefreshValueDef
     }
-    document.querySelector('#msgHintEdit').setAttribute("class", "msgHint msgHintWaitAnimation")
-    document.querySelector('#msgHintScore').setAttribute("class", "msgHint msgHintWaitAnimation")
+    // document.querySelector('#msgHintEdit').setAttribute("class", "msgHint msgHintWaitAnimation")
+    // document.querySelector('#msgHintScore').setAttribute("class", "msgHint msgHintWaitAnimation")
   }
 }
 
@@ -2527,40 +2586,54 @@ function isLangRu() {
 }
 
 function changeLang() {
-  let el, v
+  let el
   setCurLang()
   localStorage.setItem('Lang', curLang)
 
   const e = !isLangRu()
 
-  document.querySelector('#projectName').textContent = e ? 'Rating, score: ↺ ♞♟' : 'Рейтинг, счет: ↺ ♞♟'
-  document.querySelector('#projectName').title = e ? 'Refresh all tables' : 'Обновить все таблицы'
+  //Tables
+  el = document.querySelector('#buttonTables')
+  el.value = el.title = e ? 'Tables' : 'Таблицы'
+
+  //Settings
+  el = document.querySelector('#buttonSettings')
+  el.value = e ? 'Settings' : 'Настройки'
+  el.title = e ? 'Settings' : 'Настройки и подсказки'
+
+  // document.querySelector('#projectName').textContent = e ? 'Rating, score: ↺ ♞♟' : 'Рейтинг, счет: ↺ ♞♟'
+  // document.querySelector('#projectName').title = e ? 'Refresh all tables' : 'Обновить все таблицы'
+  document.querySelector('#buttonRefreshAllTables').title = e ? 'Refresh all tables' : 'Обновить все таблицы'
+
+  document.querySelector('#buttonChangeTables').title = e ? 'Change tables order' : 'Поменять таблицы местами'
 
   //Groups
-  document.querySelector('#GroupText').textContent = e ? 'Group: ' : 'Группа: '
+  document.querySelector('#GroupText').textContent = e ? 'Players group: ' : 'Группа игроков: '
   document.querySelector('#buttonGroupAdd').title = e ? 'Add group' : 'Добавить группу'
   document.querySelector('#buttonGroupRestore').title = e ? 'Restore group' : 'Восстановить группу'
   document.querySelector('#buttonGroupDel').title = e ? 'Delete group' : 'Удалить группу'
+  document.querySelector('#msgHintAddGroup').textContent = e ?
+    'Create your own players group by click "+" .' : 'Создайте свою группу игроков, нажав "+" .'
 
   //Input text
   document.querySelector('#elemCheckLichess').title =
     e ? 'Make visible or unvisible Lichess table' : 'Сделать видимой или невидимой таблицу Lichess'
   document.querySelector('#buttonLichessRefresh').title = e ? 'Refresh Lichess table' : 'Обновить таблицу Lichess'
-  el = document.querySelector('#elemTextLichessOrgPlayerNames')
-  el.title = el.placeholder = e ? 'Enter names of players on Lichess, separated by spaces' :
-    'Введите имена игроков Lichess, разделенные пробелами'
+  el = document.querySelector('#elemLichessPlayerNames')
+  el.title = el.placeholder = e ? 'Enter names of players on Lichess, separated by spaces or Enter' :
+    'Введите имена игроков на Lichess, разделенных пробелами или Enter'
 
   document.querySelector('#elemCheckChessCom').title =
     e ? 'Make visible or unvisible Chess.com table' : 'Сделать видимой или невидимой таблицу Chess.com'
   document.querySelector('#buttonChessComRefresh').title = e ? 'Refresh Chess.com table' : 'Обновить таблицу Chess.com'
-  el = document.querySelector('#elemTextChessComPlayerNames')
-  el.title = el.placeholder = e ? 'Enter names of players on Chess.com, separated by spaces' :
-    'Введите имена игроков Chess.com, разделенные пробелами'
+  el = document.querySelector('#elemChessComPlayerNames')
+  el.title = el.placeholder = e ? 'Enter names of players on Chess.com, separated by spaces or Enter' :
+    'Введите имена игроков на Chess.com, разделенных пробелами или Enter'
 
   document.querySelector('#msgHintEdit').textContent =
-    e ? 'You can edit player lists !' : 'Вы можете редактировать списки игроков !'
-  document.querySelector('#msgHintScore').textContent =
-    e ? 'Click on the rating to see the score !' : 'Кликните по рейтингу для просмотра счета !'
+    e ? 'You can edit player lists ↑' : 'Вы можете редактировать списки игроков ↑'
+  // document.querySelector('#msgHintScore').textContent =
+  //   e ? 'Click on the rating to see the score !' : 'Кликните по рейтингу для просмотра счета !'
 
   //Table
   document.querySelector('.THeadbulletLichess').textContent = e ? 'bullet' : 'пуля'
@@ -2575,11 +2648,7 @@ function changeLang() {
   document.querySelector('.THeadpuzzleChessCom').textContent = e ? 'puzzle' : 'задачи'
   document.querySelector('.THeadrushChessCom').textContent = e ? 'rush' : 'штурм'
 
-  //Settings
-  document.querySelector('#buttonSettings').value = e ? 'Settings' : 'Настройки'
-  document.querySelector('#buttonSettings').title = e ? 'Settings' : 'Настройки и подсказки'
-  document.querySelector('#buttonChangeTables').title = e ? 'Change tables order' : 'Поменять порядок таблиц'
-
+  //Settings section
   document.querySelector('#legendSettings').textContent = e ? 'Settings' : 'Настройки'
   document.querySelector('#AutoRefresh').textContent =
     e ? 'AutoRefresh Interval in minutes (0 - no AutoRefresh): ' :
@@ -2590,11 +2659,11 @@ function changeLang() {
   el.value = el.title = e ? 'Clear all settings, non-start groups' :
     'Очистить все настройки, не-стартовые группы'
 
-  el = document.querySelector('#buttonRestoreStartGroups')
-  el.value = el.title = e ? 'Restore all start-groups' : 'Восстановить все стартовые группы'
+  // el = document.querySelector('#buttonRestoreStartGroups')
+  // el.value = el.title = e ? 'Restore all start-groups' : 'Восстановить все стартовые группы'
 
-  el = document.querySelector('#buttonReturnToMainFromSettings')
-  el.value = el.title = e ? 'Return' : 'Возврат'
+  // el = document.querySelector('#buttonReturnToMainFromSettings')
+  // el.value = el.title = e ? 'Return' : 'Возврат'
 
   //tips
   document.querySelector('#tipsEN').setAttribute("class", e ? 'showBlock' : 'hiddenBlock')
@@ -2611,18 +2680,21 @@ function vueTemplateTips() {
     <fieldset id="tipsEN" class="showBlock">
     <legend><em><strong>Tips</strong></em></legend>
     <ul>
-      <li><span class="click">Click</span> on the <span class="dotted">button "Player ratings/score"</span>
+      <li><span class="click">Click</span> on the <span class="dotted">button "↺"</span>
         to refresh all tables
       </li>
+      <li><span class="click">Click</span> on the <span class="dotted">"↑↓" button</span> to change the order of tables</li>
       <li><span class="click">Click</span> on the <span class="dotted">heading "♞ Lichess"</span> to refresh the
         Lichess table and sort by player list</li>
       <li><span class="click">Click</span> on the <span class="dotted">heading "♟ Chess.com"</span> to refresh the
         Chess.com table and sort by player list</li>
       <li><span class="click">Click</span> on <span class="dotted">any other heading</span> to sort by rating
       </li>
-      <li><span class="click">Click</span> on the <span class="dotted">"↑↓" button</span> to change the order of
-        tables</li>
-      <li>For Lichess there are several types of <span class="dotted">player status</span> to the left of his
+      <li>
+        If you <span class="click">hover the mouse over </span><span class="dotted">the player in table</span>,
+        a pop-up window will appear with an <span class="dotted">information about player</span>
+      </li>
+      <li>For Lichess: there are several types of <span class="dotted">player status</span> to the left of his
         name in table:
         <ul>
           <li><span class="statusOnline">&#10004;</span> - online</li>
@@ -2630,12 +2702,7 @@ function vueTemplateTips() {
           <li><span class="statusStreaming">&#127908;</span> - streaming</li>
         </ul>
       </li>
-      <li>
-        If you <span class="click">hover the mouse over </span><span class="dotted">the player in table</span>,
-        a pop-up window will appear with an <span class="dotted">information about player</span>
-      </li>
-      <li>
-      <span class="colorGreen">Green</span> and <span class="colorRed">red</span> values in the rating table - are a change in the <span class="dotted">rating of the last
+      <li>For Lichess: <span class="colorGreen">green</span> and <span class="colorRed">red</span> values in the rating table - are a change in the <span class="dotted">rating of the last
           game day</span> in comparison with the <span class="dotted">rating of the previous game day</span>.
       </li>
     </ul>
@@ -2644,15 +2711,19 @@ function vueTemplateTips() {
     <fieldset id="tipsRU" class="hiddenBlock">
     <legend><em><strong>Подсказки</strong></em></legend>
     <ul>
-      <li><span class="click">Кликните</span> на <span class="dotted">кнопке "Рейтинги / счет игрока" </span>
+      <li><span class="click">Нажмите</span> на <span class="dotted">кнопку "↺" </span>
         для обновления всех таблиц</li>
+        <li><span class="click">Нажмите</span> на <span class="dotted">кнопкe "↑↓"</span>, чтобы поменять порядок таблиц</li>
       <li><span class="click">Нажмите</span> на <span class="dotted">заголовок "♞ Lichess" </span>
         для обновления таблицы Lichess и упорядочивания ее по списку игроков</li>
       <li><span class="click">Нажмите</span> на <span class="dotted">заголовок "♟ Chess.com" </span>
         для обновления таблицы Chess.com и упорядочивания ее по списку игроков</li>
       <li><span class="click">Нажмите</span> на <span class="dotted">другие заголовки </span>
         для упорядочивания таблицы по соответствующему рейтингу</li>
-      <li><span class="click">Нажмите</span> на <span class="dotted">кнопкe "↑↓"</span>, чтобы поменять порядок таблиц</li>
+      <li>
+        <span class="click">При наведении</span> курсора мыши над <span class="dotted">именем игрока в таблице</span>:
+        появится подсказка с <span class="dotted">информацией об игроке из его профиля</span>
+      </li>
       <li>Для Lichess отображаются несколько типов <span class="dotted">статусов игрока</span> слева от его имени в таблице:
         <ul>
           <li><span class="statusOnline">&#10004;</span> - онлайн</li>
@@ -2660,12 +2731,7 @@ function vueTemplateTips() {
           <li><span class="statusStreaming">&#127908;</span> - сейчас стримит</li>
         </ul>
       </li>
-      <li>
-        <span class="click">При наведении</span> курсора мыши над <span class="dotted">именем игрока в таблице</span>,
-        появится подсказка с <span class="dotted">информацией об игроке из его профиля</span>
-      </li>
-      <li>
-      <span class="colorGreen">Зеленые</span> и <span class="colorRed">красные</span> значения в таблице рейтингов - это изменение <span class="dotted">
+      <li>Для Lichess: <span class="colorGreen">зеленые</span> и <span class="colorRed">красные</span> значения в таблице рейтингов - это изменение <span class="dotted">
           рейтинга последнего игрового дня</span> в сравнении с <span class="dotted">рейтингом предыдущего игрового дня</span>.
       </li>
     </ul>

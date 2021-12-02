@@ -53,8 +53,23 @@
           <span class="currentUsername">{{vueCurrentUsername}}</span>
         </div> -->
 
-        <div @click="vueRefresh" id="projectName" class="projectName projectNameDifPC" title="Refresh all tables">
+        <!-- <div @click="vueRefresh" id="projectName" class="projectName projectNameDifPC" title="Refresh all tables">
           Rating, score
+        </div> -->
+
+        <div class="sectionSettingsButtons">
+          <input @click="vueGoTables" class="buttonSettings" type="button" value="Tables" id="buttonTables"
+            title="Tables">
+          <input @click="vueGoSetMode" class="buttonSettings" type="button" value="Settings" id="buttonSettings"
+            title="Settings">
+          <input @click="vueRefresh" class="buttonSettings" type="button" value="↺" id="buttonRefreshAllTables"
+            title="Refresh all tables">
+          <input @click="vueButtonChangeTables" class="buttonChangeTables" type="button" value="↑↓"
+            id="buttonChangeTables" title="Change tables order">
+          <select class="Lang" id="langSelect" name="langSelect">
+            <option value="EN">EN</option>
+            <option value="RU">RU</option>
+          </select>
         </div>
 
       </header>
@@ -63,53 +78,74 @@
 
         <div id="groupLine">
           <p>
-            <center>
-              <span id="GroupText">Group: </span>
-              <select id="group" class="select"></select>
-              <input @click="vueGroupAdd" class="buttonGroup" type="button" value=" + " id="buttonGroupAdd"
-                title="Add group">
-              <input @click="vueGroupRestore" class="buttonGroup" type="button" value=" ↻ " id="buttonGroupRestore"
-                title="Restore group">
-              <input @click="vueGroupDel" class="buttonGroup" type="button" value=" - " id="buttonGroupDel"
-                title="Delete group">
-            </center>
+            <span id="GroupText">Players group: </span>
+            <select id="group" class="select"></select>
+            <input @click="vueGroupAdd" class="buttonGroup" type="button" value=" + " id="buttonGroupAdd"
+              title="Add group">
+            <input @click="vueGroupRestore" class="buttonGroup hiddenBlock" type="button" value=" ↻ "
+              id="buttonGroupRestore" title="Restore group">
+            <input @click="vueGroupDel" class="buttonGroup" type="button" value=" - " id="buttonGroupDel"
+              title="Delete group">
+          <div>
+            <div class="alignCenter">
+              <span id="msgHintAddGroup" class="msgHint">Create your own players group by click "+".</span>
+            </div>
+          </div>
           </p>
         </div>
 
         <form>
-          <label id="InputOrder1" class="oneLine" for="elemTextLichessOrgPlayerNames">
+          <label id="InputOrder1" class="oneLine" for="elemLichessPlayerNames">
             <input @click="vueOnClickCheckLichess" v-model="vueCheckLichess" class="inputCheck" type="checkbox"
               id="elemCheckLichess" name="elemCheckLichess" title="Make visible/unvisible Lichess table">
-            <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
+            <!-- Lichess: -->
+            <!-- <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="↺" id="buttonLichessRefresh"
               title="Refresh Lichess table">
             <input @change="vueOnchangeLichessPlayerNames" v-model="vueLichessOrgPlayerNames" class="inputText"
-              type="text" id="elemTextLichessOrgPlayerNames" name="elemTextLichessOrgPlayerNames" maxlength="250"
+              type="text" id="elemLichessPlayerNames" name="elemLichessPlayerNames" maxlength="250"
               title="Enter names of players on Lichess.org, separated by spaces"
-              placeholder="Player names on Lichess, separated by spaces">
-            <span id="LichessWait" class="hiddenBlock">&#8987;</span>
+              placeholder="Player names on Lichess, separated by spaces"> -->
+            <textarea @change="vueOnchangeLichessPlayerNames" v-model="vueLichessOrgPlayerNames" class="inputText"
+              type="text" id="elemLichessPlayerNames" name="elemLichessPlayerNames" maxlength="250"
+              title="Enter names of players on Lichess, separated by spaces or Enter"
+              placeholder="Player names on Lichess, separated by spaces" rows="2">
+            </textarea>
+            <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="♞ Enter"
+              id="buttonLichessRefresh" title="Refresh Lichess table">
+            <!-- <span id="LichessWait" class="hiddenBlock">&#8987;</span> -->
           </label>
 
-          <label id="InputOrder2" class="oneLine" for="elemTextChessComPlayerNames">
+          <label id="InputOrder2" class="oneLine" for="elemChessComPlayerNames">
             <input @click="vueOnClickCheckChessCom" v-model="vueCheckChessCom" class="inputCheck" type="checkbox"
               id="elemCheckChessCom" name="elemCheckChessCom" title="Make visible/unvisible Chess.com table">
-            <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh"
+            <!-- Chess.com: -->
+            <!-- <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="↺" id="buttonChessComRefresh"
               title="Refresh Chess.com table">
             <input @change="vueOnchangeChessComPlayerNames" v-model="vueChessComPlayerNames" class="inputText"
-              type="text" id="elemTextChessComPlayerNames" name="elemTextChessComPlayerNames" maxlength="250"
+              type="text" id="elemChessComPlayerNames" name="elemChessComPlayerNames" maxlength="250"
               title="Enter names of players on Chess.com, separated by spaces"
-              placeholder="Player names on Chess.com, separated by spaces">
-            <span id="ChessComWait" class="hiddenBlock">&#8987;</span>
+              placeholder="Player names on Chess.com, separated by spaces"> -->
+            <textarea @change="vueOnchangeChessComPlayerNames" v-model="vueChessComPlayerNames" class="inputText"
+              type="text" id="elemChessComPlayerNames" name="elemChessComPlayerNames" maxlength="250"
+              title="Enter names of players on Chess.com, separated by spaces or Enter"
+              placeholder="Player names on Chess.com, separated by spaces" rows="2">
+              </textarea>
+            <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="♟ Enter"
+              id="buttonChessComRefresh" title="Refresh Chess.com table">
+            <!-- <span id="ChessComWait" class="hiddenBlock">&#8987;</span> -->
           </label>
 
-          <div class="alignRight">
-            <span id="msgHintEdit" class="msgHint">You can edit player lists !</span>
+          <div>
+            <!-- </div> id="msgHintEdit" class="alignRight msgHint hiddenBlock"> -->
+            <span id="msgHintEdit" class="msgHint hiddenBlock">You can edit player lists ↑</span>
+            <br>
           </div>
 
         </form>
 
         <div id="Tables">
           <div id="LichessTables">
-            <span id="msgHintScore" class="msgHint">Click on the rating to see the score !</span>
+            <!-- <span id="msgHintScore" class="msgHint">Click on the rating to see the score !</span> -->
             <div id="LichessTableRating" class="TableLichessRatings showBlock">
               <table>
                 <thead class="THeadLichess">
@@ -173,7 +209,7 @@
 
         </div>
 
-        <section class="sectionSettingsButtons">
+        <!-- <section class="sectionSettingsButtons">
           <br>
           <input @click="vueGoSetMode" class="buttonSettings" type="button" value="⚙ Settings" id="buttonSettings"
             title="Settings">
@@ -183,11 +219,12 @@
             <option value="EN">EN</option>
             <option value="RU">RU</option>
           </select>
-        </section>
+        </section> -->
 
       </main>
 
       <section class="sectionSettingsArea hiddenBlock">
+        <br>
         <form>
           <fieldset>
             <legend><em><strong><span id="legendSettings">Settings</span></strong></em></legend>
@@ -211,17 +248,17 @@
               value="Clear all settings, non-start groups" id="buttonClearSettings"
               title="Clear all settings, non-start groups">
           </p>
-          <p>
+          <!-- <p>
             <input @click="vueRestoreStartGroups" class="buttonRestoreStartGroups" type="button"
               value="Restore all start-groups" id="buttonRestoreStartGroups" title="Restore all start-groups">
-          </p>
+          </p> -->
 
           <vue-component-tips></vue-component-tips>
 
         </form>
-        <br>
+        <!-- <br>
         <input @click="vueGoMainModeFromSettings" class="buttonSettings" type="button" value="Go to main page"
-          id="buttonReturnToMainFromSettings" title="Return to main page">
+          id="buttonReturnToMainFromSettings" title="Return to main page"> -->
       </section>
 
       <section class="sectionLoginArea hiddenBlock">
