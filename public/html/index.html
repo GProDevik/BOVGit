@@ -86,10 +86,8 @@
               id="buttonGroupRestore" title="Restore group">
             <input @click="vueGroupDel" class="buttonGroup" type="button" value=" - " id="buttonGroupDel"
               title="Delete group">
-          <div>
-            <div class="alignCenter">
-              <span id="msgHintAddGroup" class="msgHint">Create your own players group by click "+".</span>
-            </div>
+          <div class="alignLeft">
+            <span id="msgHintAddGroup" class="msgHint">Create your own players group by click "+".</span>
           </div>
           </p>
         </div>
@@ -107,8 +105,8 @@
               placeholder="Player names on Lichess, separated by spaces"> -->
             <textarea @change="vueOnchangeLichessPlayerNames" v-model="vueLichessOrgPlayerNames" class="inputText"
               type="text" id="elemLichessPlayerNames" name="elemLichessPlayerNames" maxlength="250"
-              title="Enter names of players on Lichess, separated by spaces or Enter"
-              placeholder="Player names on Lichess, separated by spaces" rows="2">
+              title="Enter players on Lichess, separated by spaces or newline"
+              placeholder="Enter players on Lichess, separated by spaces or newline" rows="3">
             </textarea>
             <input @click="vueRefreshLichess" class="buttonRefresh" type="button" value="♞ Enter"
               id="buttonLichessRefresh" title="Refresh Lichess table">
@@ -127,8 +125,8 @@
               placeholder="Player names on Chess.com, separated by spaces"> -->
             <textarea @change="vueOnchangeChessComPlayerNames" v-model="vueChessComPlayerNames" class="inputText"
               type="text" id="elemChessComPlayerNames" name="elemChessComPlayerNames" maxlength="250"
-              title="Enter names of players on Chess.com, separated by spaces or Enter"
-              placeholder="Player names on Chess.com, separated by spaces" rows="2">
+              title="Enter players on Chess.com, separated by spaces or newline"
+              placeholder="Enter players on Chess.com, separated by spaces or newline" rows="3">
               </textarea>
             <input @click="vueRefreshChessCom" class="buttonRefresh" type="button" value="♟ Enter"
               id="buttonChessComRefresh" title="Refresh Chess.com table">

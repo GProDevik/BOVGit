@@ -9,7 +9,6 @@ const isMobileDevice = is_mobile_device()
 const modalDialog = document.getElementById('modalDialog');
 document.getElementById('modalDialogHide').onclick = () => modalDialog.close()
 
-
 // ------------------- V U E  (start) ------------------------
 
 const root = {
@@ -72,7 +71,6 @@ const root = {
       setFirstChessComToStorage()
     },
     vueGoMainModeFromUser() { goMainModeFromUser() },
-
   },
 }
 const app = Vue.createApp(root)
@@ -130,6 +128,8 @@ const mapTimeControl = new Map([
   ['puzzle', 4],
   ['rush', 5]
 ])
+
+let PlayerLichessTitle = '', PlayerChessComTitle = ''
 
 const streamOnlineGroupName = '! streamers online'
 const BOVGIT_playerName = 'bovgit'
@@ -222,8 +222,6 @@ getDataFromStorage()
 addAllOptionsToElementGroup(currentGroupName)
 setActiveInGroupElement(currentGroupName)
 
-//
-
 if (isFirstChessCom) {
   changeTablesOrder() //set first chess.com
 }
@@ -253,18 +251,25 @@ function setMsgVisibility() {
   if (isExistUserGroup()) {
     setElementNonVisible('#msgHintAddGroup')
   }
+  else {
+    setElementVisible('#msgHintAddGroup')
+  }
 
-  //msgHintEdit, elemLichessPlayerNames
+  //msgHintEdit, elemLichessPlayerNames, elemChessComPlayerNames
   let el1 = document.querySelector('#elemLichessPlayerNames')
   let el2 = document.querySelector('#elemChessComPlayerNames')
   if (isCurrentGroupStart()) {
     setElementNonVisible('#msgHintEdit')
     el1.disabled = true
     el2.disabled = true
+    el1.title = ''
+    el2.title = ''
   } else {
     setElementVisible('#msgHintEdit')
     el1.disabled = false
     el2.disabled = false
+    el1.title = PlayerLichessTitle
+    el2.title = PlayerChessComTitle
   }
 }
 
@@ -278,6 +283,10 @@ function scoreLichess(playerName) {
 }
 
 /////////////////// groups of players /////////////////////////
+
+function getArGroupNames() {
+  return groupObjs.map(item => item.name)
+}
 
 function isExistUserGroup() {
   return (groupObjs.length > startGroupNum)
@@ -374,10 +383,6 @@ function updateGroupObj() {
   groupObj.chessComPlayerNames = vm.vueChessComPlayerNames
 }
 
-function getArGroupNames() {
-  return groupObjs.map(item => item.name)
-}
-
 function groupAdd() {
   let v, msg
 
@@ -427,6 +432,7 @@ function groupAdd() {
     chessComPlayerNames: vm.vueChessComPlayerNames
   })
   currentGroupName = groupName
+  groupNames = getArGroupNames()
 
   const groupElement = document.getElementById('group')
   addOptionToSelectElement(groupElement, currentGroupName, currentGroupName)
@@ -440,6 +446,8 @@ function groupAdd() {
     `It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !` :
     `Создана группа "${groupName}"\nс текущими списками игроков.\n\nВнесите свои изменения в списки созданной группы!`
   alert(msg)
+
+  document.querySelector('#elemLichessPlayerNames').focus()
 }
 
 //del current group
@@ -457,8 +465,8 @@ function groupDel() {
 
   // msg = `Delete group "${groupName}" ?`
   msg = isLangEn() ?
-    `Delete group "${groupName}" ?` :
-    `После удаления нельзя будет восстановить эту группу.\n\nУдалить группу "${groupName}" ?`
+    `Delete group "${groupName}" ?` : `Удалить группу "${groupName}" ?`
+  // `После удаления нельзя будет восстановить эту группу.\n\nУдалить группу "${groupName}" ?`
   if (!confirm(msg)) {
     return
   }
@@ -470,6 +478,8 @@ function groupDel() {
   groupObjs = groupObjs.filter((item, index, array) => index !== groupIndex) //del group from groupObjs
   groupNames = getArGroupNames()
   currentGroupName = groupNames[0] //go to group Start
+
+  setMsgVisibility()
 
   // onchangeSelectGroup()
   setLichessOrgPlayerNames(groupObjs[0].lichessPlayerNames)
@@ -2620,15 +2630,15 @@ function changeLang() {
     e ? 'Make visible or unvisible Lichess table' : 'Сделать видимой или невидимой таблицу Lichess'
   document.querySelector('#buttonLichessRefresh').title = e ? 'Refresh Lichess table' : 'Обновить таблицу Lichess'
   el = document.querySelector('#elemLichessPlayerNames')
-  el.title = el.placeholder = e ? 'Enter names of players on Lichess, separated by spaces or Enter' :
-    'Введите имена игроков на Lichess, разделенных пробелами или Enter'
+  PlayerLichessTitle = el.title = el.placeholder = e ? 'Enter players on Lichess, separated by spaces or newline' :
+    'Введите Lichess-игроков через пробел или с новой строки'
 
   document.querySelector('#elemCheckChessCom').title =
     e ? 'Make visible or unvisible Chess.com table' : 'Сделать видимой или невидимой таблицу Chess.com'
   document.querySelector('#buttonChessComRefresh').title = e ? 'Refresh Chess.com table' : 'Обновить таблицу Chess.com'
   el = document.querySelector('#elemChessComPlayerNames')
-  el.title = el.placeholder = e ? 'Enter names of players on Chess.com, separated by spaces or Enter' :
-    'Введите имена игроков на Chess.com, разделенных пробелами или Enter'
+  PlayerChessComTitle = el.title = el.placeholder = e ? 'Enter players on Chess.com, separated by spaces or newline' :
+    'Введите Chess.com-игроков через пробел или с новой строки'
 
   document.querySelector('#msgHintEdit').textContent =
     e ? 'You can edit player lists ↑' : 'Вы можете редактировать списки игроков ↑'
