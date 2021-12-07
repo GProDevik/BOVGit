@@ -111,7 +111,7 @@ html {
   margin-bottom: 0.3vw;
 }
 
-thead th:nth-child(1) {
+/* thead th:nth-child(1) {
   width: 32%;
 }
 
@@ -133,7 +133,36 @@ thead th:nth-child(5) {
 
 thead th:nth-child(6) {
   width: 12%;
+} */
+
+thead th:nth-child(1) {
+  width: 29%;
 }
+
+thead th:nth-child(2) {
+  width: 8%;
+}
+
+thead th:nth-child(3) {
+  width: 13%;
+}
+
+thead th:nth-child(4) {
+  width: 13%;
+}
+
+thead th:nth-child(5) {
+  width: 13%;
+}
+
+thead th:nth-child(5) {
+  width: 13%;
+}
+
+thead th:nth-child(7) {
+  width: 11%;
+}
+
 
 thead {
   cursor: url('NeonCursor04-Blue.cur'), pointer;

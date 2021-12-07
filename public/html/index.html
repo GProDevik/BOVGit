@@ -82,8 +82,8 @@
             <select id="group" class="select"></select>
             <input @click="vueGroupAdd" class="buttonGroup" type="button" value=" + " id="buttonGroupAdd"
               title="Add group">
-            <input @click="vueGroupRestore" class="buttonGroup hiddenBlock" type="button" value=" ↻ "
-              id="buttonGroupRestore" title="Restore group">
+            <!-- <input @click="vueGroupRestore" class="buttonGroup" type="button" value=" ↻ "
+              id="buttonGroupRestore" title="Restore group"> -->
             <input @click="vueGroupDel" class="buttonGroup" type="button" value=" - " id="buttonGroupDel"
               title="Delete group">
           <div class="alignLeft">
@@ -149,6 +149,7 @@
                 <thead class="THeadLichess">
                   <tr>
                     <th @click="vueRefreshLichess" class="THeadPlayerLichess leftTopOfTable">♞ Lichess</th>
+                    <th class="THeadScoreLichess" title="Score among players in the table">0:0</th>
                     <th @click="vueSortBulletLichess" class="THeadbulletLichess">bullet</th>
                     <th @click="vueSortBlitzLichess" class="THeadblitzLichess">blitz</th>
                     <th @click="vueSortRapidLichess" class="THeadrapidLichess">rapid</th>
@@ -159,6 +160,11 @@
                 <tbody class="TBodyLichess">
                   <tr v-for="(item, name, index) in vueArLichessPlayers" :key="index">
                     <td v-html="item.playerHTML"></td>
+                    <td @click="vueScoreLichess(item.playerName)">
+                      <a href="javascript:void(0)"><span class="tdScore">&#127386;</span></a>
+                      <!-- <a href="javascript:void(0)"><span class="tdScore">0:0</span></a> -->
+                      <!-- <a href="#"><span class="tdScore">0:0</span></a> -->
+                    </td>
                     <td v-html="item.bullet" @click="vueScoreLichess(item.playerName)"></td>
                     <td v-html="item.blitz" @click="vueScoreLichess(item.playerName)"></td>
                     <td v-html="item.rapid" @click="vueScoreLichess(item.playerName)"></td>
@@ -243,8 +249,8 @@
 
           <p>
             <input @click="vueClearSettings" class="buttonClearSettings" type="button"
-              value="Clear all settings, non-start groups" id="buttonClearSettings"
-              title="Clear all settings, non-start groups">
+              value="Clear all settings, user's groups" id="buttonClearSettings"
+              title="Clear all settings, user's groups">
           </p>
           <!-- <p>
             <input @click="vueRestoreStartGroups" class="buttonRestoreStartGroups" type="button"
@@ -257,39 +263,6 @@
         <!-- <br>
         <input @click="vueGoMainModeFromSettings" class="buttonSettings" type="button" value="Go to main page"
           id="buttonReturnToMainFromSettings" title="Return to main page"> -->
-      </section>
-
-      <section class="sectionLoginArea hiddenBlock">
-        <form action="/login" name="loginForm" method="post">
-          <fieldset>
-            <legend class="legend">User</legend>
-            <div class="inputTextLogin">
-              <label>Username:</label>
-              <input type="text" name="username" id="username" maxlength="40" placeholder="username" required>
-              <br>
-            </div>
-            <div class="inputTextLogin">
-              <label>Password:</label>
-              <input type="password" name="password" id="password" maxlength="40" placeholder="password" required>
-            </div>
-            <div class="inputTextLogin"> <input type="button" value="Log in" id="buttonPostLogin"> </div>
-            <div class="inputTextLogin"> <input type="button" value="Log out" id="buttonPostLogout"> </div>
-            <div class="inputTextLogin"> <input type="button" value="Registration" id="buttonPostRegistration"> </div>
-
-            <!-- <a class="referToGithub" href=auth/github>Log in with Github</a>
-          <br>
-          <a class="referToGoogle" href=auth/google>Log in with Google</a>
-          <br> -->
-            <!-- <a class="referToLichess" href=auth/lichess>Log in with Lichess</a> -->
-            <br>
-            <label class="okMessage" id="okMessage"></label>
-            <br>
-            <label class="errorMessage" id="errorMessage"></label>
-          </fieldset>
-        </form>
-        <br>
-        <input @click="vueGoMainModeFromUser" class="buttonSettings" type="button" value="Go to main page"
-          id="buttonReturnToMainFromUser" title="Return to main page">
       </section>
 
       <footer>
@@ -312,11 +285,9 @@
   <noscript><em>You need to enable JavaScript to run this app !!!</em></noscript>
 
   <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.prod.js"></script>
-  <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.js"></script> -->
-  <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.runtime.global.js"></script> -->
 
-  <script src="js/chess.js"></script>
-  <!-- <script src="js/chessb.js"></script> -->
+  <!-- <script src="js/chess.js"></script> -->
+  <script src="js/chessb.js"></script>
 
 </body>
 
