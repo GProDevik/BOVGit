@@ -91,8 +91,8 @@ html {
 }
 
 .inputText {
-  /* font-size: medium; */
-  font-size: large;
+  font-size: medium;
+  /* font-size: large; */
   width: 100%;
   margin-left: 1vw;
   /* margin-right: 2vw; */
@@ -111,12 +111,12 @@ html {
   margin-bottom: 0.3vw;
 }
 
-/* thead th:nth-child(1) {
-  width: 32%;
+thead th:nth-child(1) {
+  width: 29%;
 }
 
 thead th:nth-child(2) {
-  width: 14%;
+  width: 3%;
 }
 
 thead th:nth-child(3) {
@@ -132,35 +132,11 @@ thead th:nth-child(5) {
 }
 
 thead th:nth-child(6) {
-  width: 12%;
-} */
-
-thead th:nth-child(1) {
-  width: 29%;
-}
-
-thead th:nth-child(2) {
-  width: 8%;
-}
-
-thead th:nth-child(3) {
-  width: 13%;
-}
-
-thead th:nth-child(4) {
-  width: 13%;
-}
-
-thead th:nth-child(5) {
-  width: 13%;
-}
-
-thead th:nth-child(5) {
-  width: 13%;
+  width: 14%;
 }
 
 thead th:nth-child(7) {
-  width: 11%;
+  width: 12%;
 }
 
 
@@ -461,4 +437,9 @@ fieldset {
     font-style: italic;
     /* text-align: left; */
   }
+}
+
+#buttonChessComRefresh{
+  color: green;
+/*   font-weight: 600; */
 }

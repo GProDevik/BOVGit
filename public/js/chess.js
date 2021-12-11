@@ -2105,7 +2105,7 @@ function changeLang() {
 
   //Table
   document.querySelector('.THeadScoreLichess').title =
-    e ? 'Score among players in the table' : 'Счет между игроками в этой таблице'
+    e ? 'The score among players from this table' : 'Счет между игроками из этой таблицы'
 
   document.querySelector('.THeadbulletLichess').textContent = e ? 'bullet' : 'пуля'
   document.querySelector('.THeadblitzLichess').textContent = e ? 'blitz' : 'блиц'
@@ -2141,8 +2141,9 @@ function changeLang() {
   document.querySelector('#tipsRU').setAttribute("class", e ? 'hiddenBlock' : 'showBlock')
 
   //e-mail
-  document.querySelector('#hrefEMail').textContent = e ? '(e-mail)' : '(эл.почта)'
-  document.querySelector('#hrefVideo').textContent = ' ' + (e ? '(Video-Help)' : '(Видео-Демо)')
+  document.querySelector('#hrefEMail').title = e ? 'send email to bovgit@gmail.com' : 'отправить письмо на bovgit@gmail.com'
+  // document.querySelector('#hrefVideo').textContent = ' ' + (e ? '(Video-Help)' : '(Видео-Демо)')
+  document.querySelector('#hrefVideo').title = e ? 'Video-demonstration' : 'Видео-демонстрация'
 }
 
 // EN / RU templates for 'Tips'

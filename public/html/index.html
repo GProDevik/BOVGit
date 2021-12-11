@@ -149,7 +149,7 @@
                 <thead class="THeadLichess">
                   <tr>
                     <th @click="vueRefreshLichess" class="THeadPlayerLichess leftTopOfTable">♞ Lichess</th>
-                    <th class="THeadScoreLichess" title="Score among players in the table">0:0</th>
+                    <th class="THeadScoreLichess" title="The score among players from this table">vs</th>
                     <th @click="vueSortBulletLichess" class="THeadbulletLichess">bullet</th>
                     <th @click="vueSortBlitzLichess" class="THeadblitzLichess">blitz</th>
                     <th @click="vueSortRapidLichess" class="THeadrapidLichess">rapid</th>
@@ -190,6 +190,7 @@
                 <thead class="THeadChessCom">
                   <tr>
                     <th @click="vueRefreshChessCom" class="THeadPlayerChessCom leftTopOfTable">♟ Chess.com</th>
+                    <th class="THeadScoreChessCom"></th>
                     <th @click="vueSortBulletChessCom" class="THeadbulletChessCom">bullet</th>
                     <th @click="vueSortBlitzChessCom" class="THeadblitzChessCom">blitz</th>
                     <th @click="vueSortRapidChessCom" class="THeadrapidChessCom">rapid</th>
@@ -200,6 +201,7 @@
                 <tbody class="TBodyChessCom">
                   <tr v-for="(item, name, index) in vueArChessComPlayers" :key="index">
                     <td v-html="item.playerHTML"></td>
+                    <td></td>
                     <td>{{item.bullet}}</td>
                     <td>{{item.blitz}}</td>
                     <td>{{item.rapid}}</td>
@@ -268,11 +270,11 @@
       <footer>
         <br>
         bovgit © 2021 |
-        <a href="mailto:bovgit@gmail.com?subject=Player ratings/score on chess sites">
-          <span id="hrefEMail">(e-mail)</span> |
+        <a href="mailto:bovgit@gmail.com?subject=Player ratings/score on chess sites" title="send email to bovgit">
+          <span id="hrefEMail">&#128233;</span> |
         </a>
-        <a href="https://archive.org/details/demo-PlayerRatings1" target="_blank">
-          <span id="hrefVideo"> (Video-Help)</span> |
+        <a href="https://archive.org/details/demo-PlayerRatings1" title="send email to bovgit" target="_blank">
+          <span id="hrefVideo">&#127910; Demo</span> |
         </a>
         <a href="https://lichess.org/" target="_blank"> ♞ Lichess.org | </a>
         <a href="https://www.chess.com/" target="_blank"> ♟ Chess.com </a>
@@ -285,9 +287,11 @@
   <noscript><em>You need to enable JavaScript to run this app !!!</em></noscript>
 
   <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.prod.js"></script>
+  <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.js"></script> -->
+  <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.runtime.global.js"></script> -->
 
-  <!-- <script src="js/chess.js"></script> -->
-  <script src="js/chessb.js"></script>
+  <script src="js/chess.js"></script>
+  <!-- <script src="js/chessb.js"></script> -->
 
 </body>
 
