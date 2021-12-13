@@ -6,8 +6,8 @@ let curLang = langEN
 
 const isMobileDevice = is_mobile_device()
 
-const modalDialog = document.getElementById('modalDialog');
-document.getElementById('modalDialogHide').onclick = () => modalDialog.close()
+// const modalDialog = document.getElementById('modalDialog')
+// document.getElementById('modalDialogHide').onclick = () => modalDialog.close()
 
 // ------------------- V U E  (start) ------------------------
 
@@ -237,6 +237,8 @@ if (needRefresh) {
 }
 
 setMsgVisibility()
+
+// showPrompt(`2 Введите что-нибудь текстово-численное и многажды повторенное<br>...умное :)`, 'header')
 
 ////////////////////////////////////////////
 
@@ -1229,7 +1231,7 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   const thisIsLichess = true
   outMsgWait(thisIsLichess, true)
 
-  const isFirefox = isBrowserFirefox()
+  const isFirefox = false //isBrowserFirefox()
   let isError = false
   let allScore = ''
   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
@@ -1275,11 +1277,12 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 
             const delimiter = '_'
             const addSpaces = delimiter.repeat(maxNameLength - oppoName.length + 2)
-            if (isFirefox) {
-              allScore += `X - ${oppoName} ${addSpaces} ${myScore} : ${oppoScore} = ${diffTag}\n`
-            } else {
-              allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}\n`
-            }
+            // if (isFirefox) {
+            //   allScore += `X - ${oppoName} ${addSpaces} ${myScore} : ${oppoScore} = ${diffTag}\n`
+            // } else {
+            //   allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}\n`
+            // }
+            allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}\n`
           }
         } else {
           isError = true
@@ -2010,26 +2013,6 @@ function out(msg) {
   // }
 }
 
-//on mobile device in native alert() is too large head of msg
-function myAlert(msg = '', head = '') {
-
-  //Firefox not support Dialog: 'Dialog.showModal is not a function'
-  if (true || //временно, т.к. не работает во всех браузерах
-    isBrowserFirefox()) {
-    const myMsg = (head ? head + '\n\n' : '') + msg
-    alert(myMsg)
-    return
-  }
-
-  const modalDialogHead = document.getElementById('modalDialogHead')
-  modalDialogHead.innerHTML = myReplaceAll(head, '\n', '<br>')
-
-  const modalDialogText = document.getElementById('modalDialogText')
-  modalDialogText.innerHTML = myReplaceAll(msg, '\n', '<br>')
-
-  modalDialog.showModal()
-}
-
 function isBrowserFirefox() {
   const userAgent = navigator.userAgent.toLowerCase()
   return (userAgent.indexOf("firefox") > -1)
@@ -2038,6 +2021,121 @@ function isBrowserFirefox() {
 function myReplaceAll(s, s1, s2) {
   return s.replace(new RegExp(s1, 'g'), s2)
 }
+
+//////////////////////////////////////////////////////////////////
+
+//on mobile device in native alert() is too large head of msg
+function myAlert(msg = '', head = '') {
+
+  // //Firefox not support Dialog: 'Dialog.showModal is not a function'
+  // if (true || //временно, т.к. не работает во всех браузерах
+  //   isBrowserFirefox()) {
+  //   const myMsg = (head ? head + '\n\n' : '') + msg
+  //   alert(myMsg)
+  //   return
+  // }
+
+  // // const modalDialogHead = document.getElementById('modalDialogHead')
+  // const modalDialogHead = document.getElementById('dialog-message')
+  // modalDialogHead.innerHTML = myReplaceAll(head, '\n', '<br>')
+
+  // // const modalDialogText = document.getElementById('modalDialogText')
+  // const modalDialogText = document.getElementById('dialog-head')
+  // modalDialogText.innerHTML = myReplaceAll(msg, '\n', '<br>')
+
+  // modalDialog.showModal()
+
+  // showMsg(msg, head,
+  //   function (value) { alert("Вы ввели: " + value) }
+  // )
+
+  const head1 = myReplaceAll(head, '\n', '<br>')
+  const msg1 = myReplaceAll(msg, '\n', '<br>')
+
+  showPrompt(msg1, head1)
+}
+
+/////////////////////////////////////////// ModalDialog /////////////////////////////////////
+
+// Показать полупрозрачный DIV, чтобы затенить страницу
+// (форма располагается не внутри него, а рядом, потому что она не должна быть полупрозрачной)
+function showCover() {
+  let coverDiv = document.createElement('div')
+  coverDiv.id = 'cover-div'
+
+  // убираем возможность прокрутки страницы во время показа модального окна с формой
+  document.body.style.overflowY = 'hidden'
+
+  document.body.append(coverDiv)
+}
+
+function hideCover() {
+  document.getElementById('cover-div').remove()
+  document.body.style.overflowY = ''
+}
+
+function showPrompt(text = '', head = '') { //, callback) {
+  showCover()
+  let form = document.getElementById('prompt-form')
+  let container = document.getElementById('prompt-form-container')
+  document.getElementById('prompt-message').innerHTML = text
+  // form.text.value = ''
+  document.getElementById('prompt-head').innerHTML = head
+  // form.head.value = ''
+
+  function complete(value) {
+    hideCover()
+    container.style.display = 'none'
+    document.onkeydown = null
+    // callback(value)
+  }
+
+  // form.onsubmit = function () {
+  //   let value = form.text.value
+  //   if (value == '') return false // игнорируем отправку пустой формы
+
+  //   complete(value)
+  //   return false
+  // }
+
+  form.cancel.onclick = function () {
+    complete(null)
+  }
+
+  document.onkeydown = function (e) {
+    if (e.key == 'Escape') {
+      complete(null)
+    }
+  }
+
+  let lastElem = form.elements[form.elements.length - 1]
+  let firstElem = form.elements[0]
+
+  lastElem.onkeydown = function (e) {
+    if (e.key == 'Tab' && !e.shiftKey) {
+      firstElem.focus()
+      return false
+    }
+  }
+
+  firstElem.onkeydown = function (e) {
+    if (e.key == 'Tab' && e.shiftKey) {
+      lastElem.focus()
+      return false
+    }
+  }
+
+  container.style.display = 'block'
+  // form.elements.text.focus()
+  form.elements.cancel.focus()
+}
+
+// document.getElementById('show-button').onclick = function () {
+//   // showPrompt("Введите что-нибудь<br>...умное :)", function (value) {
+//   //   alert("Вы ввели: " + value)
+//   // })
+//   showPrompt(`Введите что-нибудь<br>...умное :)`, 'header')
+// }
 
 //////////////////////// L A N G U A G E ///////////////////////////////////////////////////
 

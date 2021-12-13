@@ -354,20 +354,6 @@ fieldset {
 
 /* ------------------------ */
 
-#modalDialog {
-  font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
-  border-collapse: collapse;
-  /* border: 1px solid black; */
-  /* border: 1px dotted black; */
-  border: 1px dotted white;
-  background-color: lightgray;
-}
-  /* background-color: gainsboro; */
-
-.modalDialogMobileStyle {
-  font-size: x-small;
-}
-
 .alignLeft{
   text-align: left;
 }
@@ -442,4 +428,82 @@ fieldset {
 #buttonChessComRefresh{
   color: green;
 /*   font-weight: 600; */
+}
+
+
+/* ---------------------------------------- */
+
+#modalDialog {
+  font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
+  border-collapse: collapse;
+  /* border: 1px solid black; */
+  /* border: 1px dotted black; */
+  border: 1px dotted white;
+  background-color: lightgray;
+}
+  /* background-color: gainsboro; */
+
+.modalDialogMobileStyle {
+  font-size: x-small;
+}
+
+/* /////////////////////////////////////////////////////////////////////// */
+/* html,
+body {
+margin: 0;
+padding: 0;
+width: 100%;
+height: 100%;
+} */
+
+#prompt-form {
+display: inline-block;
+/* padding: 5px 5px 5px 70px; */
+padding: 5px 5px 5px 5px;
+/* width: 200px; */
+border: 1px solid black;
+/* background: white url(https://en.js.cx/clipart/prompt.png) no-repeat left 5px; */
+background: white;
+vertical-align: middle;
+text-align: left;
+
+font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
+/* border-collapse: collapse; */
+/* border: 1px dotted white; */
+/* background-color: lightgray; */
+}
+
+#prompt-form-container {
+position: fixed;
+top: 0;
+left: 0;
+z-index: 9999;
+display: none;
+width: 100%;
+height: 100%;
+text-align: center;
+}
+
+#prompt-form-container:before {
+display: inline-block;
+height: 100%;
+content: '';
+vertical-align: middle;
+}
+
+#cover-div {
+position: fixed;
+top: 0;
+left: 0;
+z-index: 9000;
+width: 100%;
+height: 100%;
+background-color: gray;
+opacity: 0.3;
+}
+
+#prompt-form input[name="text"] {
+display: block;
+margin: 5px;
+width: 180px;
 }
