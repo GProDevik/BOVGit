@@ -460,6 +460,8 @@ height: 100%;
 display: inline-block;
 /* padding: 5px 5px 5px 70px; */
 padding: 5px 5px 5px 5px;
+margin: 0px 5px 0px 5px;
+
 /* width: 200px; */
 border: 1px solid black;
 /* background: white url(https://en.js.cx/clipart/prompt.png) no-repeat left 5px; */
