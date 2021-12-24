@@ -44,28 +44,12 @@
       </div>
     </dialog> -->
 
-    <!-- <h2>Кликните на кнопку ниже</h2>
-    <input type="button" value="Кликните, чтобы увидеть форму" id="show-button">
     <div id="prompt-form-container">
       <form id="prompt-form">
-        <div id="prompt-message"></div>
-        <input name="text" type="text">
-        <input type="submit" value="Ok">
-        <input type="button" name="cancel" value="Отмена">
-      </form>
-    </div> -->
-
-    <!-- <h2>Кликните на кнопку ниже</h2>
-    <input type="button" value="Кликните, чтобы увидеть форму" id="show-button"> -->
-    <div id="prompt-form-container">
-      <form id="prompt-form">
-        <div id="prompt-head"></div>
+        <div id="prompt-head" class="alignCenter"></div>
         <br>
-        <div id="prompt-message"></div>
+        <div id="prompt-message" class="alignLeft"></div>
         <br>
-        <!-- <input name="text" type="text"> -->
-        <!-- <input type="submit" value="Ok"> -->
-        <!-- <input type="button" name="cancel" value="Отмена"> -->
         <input type="button" name="cancel" class="alignCenter" value="ОК">
       </form>
     </div>
@@ -188,8 +172,6 @@
                     <td v-html="item.playerHTML"></td>
                     <td @click="vueScoreLichess(item.playerName)">
                       <a href="javascript:void(0)"><span class="tdScore">&#127386;</span></a>
-                      <!-- <a href="javascript:void(0)"><span class="tdScore">0:0</span></a> -->
-                      <!-- <a href="#"><span class="tdScore">0:0</span></a> -->
                     </td>
                     <td v-html="item.bullet" @click="vueScoreLichess(item.playerName)"></td>
                     <td v-html="item.blitz" @click="vueScoreLichess(item.playerName)"></td>

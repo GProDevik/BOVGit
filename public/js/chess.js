@@ -32,7 +32,7 @@ const root = {
     vueGroupAdd() { groupAdd() },
     vueGroupDel() { groupDel() },
     // vueGroupRestore() { groupRestore() },
-    vueGoUserMode() { goUserMode() },
+    // vueGoUserMode() { goUserMode() },
     vueRefresh() { refresh() },
     vueOnClickCheckLichess() {
       setCheckLichess(!isCheckLichess()) //inversion checkbox
@@ -64,7 +64,7 @@ const root = {
     vueOnchangeAutoRefreshInterval() { onchangeAutoRefreshInterval() },
     vueOnClickSetTheme() { onClickSetTheme() },
     vueClearSettings() { clearSettings() },
-    vueRestoreStartGroups() { restoreStartGroups() },
+    // vueRestoreStartGroups() { restoreStartGroups() },
     vueGoMainModeFromSettings() { goMainModeFromSettings() },
     vueButtonChangeTables() {
       changeTablesOrder()
@@ -190,7 +190,7 @@ tableNode2 = document.querySelector('#ChessComTables')
 if (isMobileDevice) {
   document.querySelector('#bodyStyle').setAttribute("class", "mobileStyle")
   // document.querySelector('#projectName').setAttribute("class", "projectName projectNameDifMobile")
-  document.querySelector('#modalDialog').setAttribute("class", "modalDialogMobileStyle")
+  // document.querySelector('#modalDialog').setAttribute("class", "modalDialogMobileStyle")
 }
 
 // ------------- On-Click ---------------
@@ -374,7 +374,6 @@ function groupAdd() {
   let v, msg
 
   if (getArGroupNames().length === MAX_GROUPS_NUM) {
-    // alert(`${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !`)
     const msg = isLangEn() ?
       `${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !` :
       `${MAX_GROUPS_NUM} групп уже создано.\n\nЭто максимум !`
@@ -388,7 +387,6 @@ function groupAdd() {
     return
   }
   if (groupName.length > MAX_GROUPNAME_LEN) {
-    // alert(`The name must not exceed ${MAX_GROUPNAME_LEN} symbols !`)
     msg = isLangEn() ?
       `The name must not exceed ${MAX_GROUPNAME_LEN} symbols !` :
       `Длина имени не должна превышать ${MAX_GROUPNAME_LEN} символов !`
@@ -398,7 +396,6 @@ function groupAdd() {
   v = groupName.toUpperCase()
   const groupObj = groupObjs.find(item => item.name.toUpperCase() === v)
   if (groupObj !== undefined) {
-    // alert(`Group "${groupName}" already exists.\n\nPlease enter an another name !`)
     msg = isLangEn() ?
       `Group "${groupName}" already exists.\n\nPlease enter an another name !` :
       `Группа "${groupName}" уже есть.\n\nПожалуйста, введите другое имя !`
@@ -406,9 +403,8 @@ function groupAdd() {
     return
   }
   if (groupName.includes('!')) {
-    // alert(`The name must not include symbol "!".`)
     msg = isLangEn() ? `The name must not include symbol "!".` : `Имя не должно содержать символ  "!".`
-    alert(msg)
+    myAlert(msg) //alert(msg)
     return
   }
 
@@ -428,7 +424,6 @@ function groupAdd() {
 
   setMsgVisibility()
 
-  // alert(`It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !`)
   msg = isLangEn() ?
     `It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !` :
     `Создана группа "${groupName}"\nс текущими списками игроков.\n\nВнесите свои изменения в списки созданной группы!`
@@ -445,16 +440,13 @@ function groupDel() {
 
   const groupIndex = groupNames.indexOf(groupName, 0)
   if (isThisStartGroup(groupIndex)) {
-    // alert(`Group "${groupName}" cannot be deleted !`)
     msg = isLangEn() ? `Group "${groupName}" cannot be deleted !` : `Группу "${groupName}" нельзя удалять !`
     alert(msg)
     return
   }
 
-  // msg = `Delete group "${groupName}" ?`
   msg = isLangEn() ?
     `Delete group "${groupName}" ?` : `Удалить группу "${groupName}" ?`
-  // `После удаления нельзя будет восстановить эту группу.\n\nУдалить группу "${groupName}" ?`
   if (!confirm(msg)) {
     return
   }
@@ -474,7 +466,6 @@ function groupDel() {
   setChessComPlayerNames(groupObjs[0].chessComPlayerNames)
   refresh()
 
-  // alert(`Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}" !`)
   msg = isLangEn() ?
     `Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}".` :
     `Группа "${groupName}" удалена.\n\nТекущая группа теперь: "${currentGroupName}".`
@@ -717,7 +708,8 @@ function sortTable(thisIsLichess, timeControl) {
 
   //sort array in column <timeControl>
   a.sort(function (x, y) {
-    let i = mapTimeControl.get(timeControl) //i=1: bullet, i=2: blitz, ...
+    // let i = mapTimeControl.get(timeControl) //i=1: bullet, i=2: blitz, ...
+    let i = mapTimeControl.get(timeControl) + 1 //i=1: score, i=2: bullet, i=3: blitz, ...
     // return x[i] - y[i] //asc
     return y[i] - x[i] //desc
   })
@@ -1231,7 +1223,6 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
   const thisIsLichess = true
   outMsgWait(thisIsLichess, true)
 
-  const isFirefox = false //isBrowserFirefox()
   let isError = false
   let allScore = ''
   const maxNameLength = Math.max.apply(null, arPlayerNames.map(w => w.length))
@@ -1270,19 +1261,22 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 
             const diff = myScore - oppoScore
             let diffTag = (diff > 0 ? '+' : '') + `${diff}`
-            if (diff !== 0 && !isFirefox) {
+            if (diff !== 0) { // && !isAlert(?) {
               const classScore = diff > 0 ? 'scorePlus' : 'scoreMinus'
               diffTag = `<span class="${classScore}">${diffTag}</span>`
             }
 
-            const delimiter = '_'
-            const addSpaces = delimiter.repeat(maxNameLength - oppoName.length + 2)
-            // if (isFirefox) {
-            //   allScore += `X - ${oppoName} ${addSpaces} ${myScore} : ${oppoScore} = ${diffTag}\n`
+            const delimiter = '\u00A0' //No-Break Space
+            const spaces0 = delimiter.repeat(maxNameLength - oppoName.length)// + 2)
+            const spaces1 = delimiter.repeat(5 - String(myScore).length)
+            const spaces2 = delimiter.repeat(5 - String(oppoScore).length)
+            // if (isMobileDevice) {
+            //   allScore += `X - ${oppoName} ${spaces0} ${myScore} : ${oppoScore} = ${diffTag}\n`
             // } else {
-            //   allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}\n`
+            //   allScore += `${myGetName} - ${oppoName} ${spaces0}${spaces1} ${myScore} : ${oppoScore}${spaces2} = ${diffTag}\n`
             // }
-            allScore += `${myGetName} - ${oppoName} ${addSpaces}   ${myScore} : ${oppoScore} = ${diffTag}\n`
+            allScore += isMobileDevice ? `X` : `${myGetName}`
+            allScore += ` - ${oppoName} ${spaces0}${spaces1} ${myScore} : ${oppoScore}${spaces2} = ${diffTag}\n`
           }
         } else {
           isError = true
@@ -1298,12 +1292,11 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
 
   let head
   if (isLangEn()) {
-    // // allScore += isError ? '\nCannot get some data from Lichess.\nTry again later (Too Many Requests).' : ''
     allScore += isError ? '\nLichess says: "Too many requests from your ip-address."\nTry again later.' : ''
-    head = isFirefox ? `Score (X is ${myName} ):` : `Score between players:`
+    head = isMobileDevice ? `Score (X is ${myName} ):` : `Score between players:`
   } else {
     allScore += isError ? '\nLichess сообщает: "Слишком много запросов с вашего ip-адреса."\nПовторите запрос немного позже.' : ''
-    head = isFirefox ? `Счет (X это ${myName}):` : `Счет между игроками:`
+    head = isMobileDevice ? `Счет (X это ${myName}):` : `Счет между игроками:`
   }
   myAlert(allScore, head)
 }
@@ -1325,13 +1318,12 @@ async function getProfileOrStatisticsFromChessCom(arPlayerNames, isProfile) {
   }
 
   const modeWord = isProfile ? 'profile' : 'statistics'
-  let milliSeconds = 250 //300
+  let milliSeconds = 250
   const N = 7
   for (let i = 0; i < N; i++) {
     let arPlayerNamesBufIndex = [...arPlayerNamesBuf]
     arPlayerNamesBufIndex = arPlayerNamesBufIndex.map(item => false)
     if (i > 0) {
-      // milliSeconds += 100 //increase delay
       milliSeconds += 30 //increase delay
       out(`step ${i + 1} / ${N}, chess.com ${modeWord}, ${arPlayerNamesBuf.length} el. from ${beginLength}, delay ${milliSeconds}`)
       await new Promise((resolve, reject) => setTimeout(resolve, milliSeconds)) //delay
@@ -1523,42 +1515,42 @@ function getJsonValue3(playerName, jsonObj, field1, field2, field3) {
 
 function goUserMode() {
 
-  clearMessages()
+  // clearMessages()
 
-  setElementNonVisible('main')
-  // setElementNonVisible('#buttonUser')
-  setElementVisible('.sectionLoginArea')
+  // setElementNonVisible('main')
+  // // setElementNonVisible('#buttonUser')
+  // setElementVisible('.sectionLoginArea')
 
-  let regtypeLocal = localStorage.getItem('regtype')
-  regtypeLocal = regtypeLocal ? regtypeLocal : ''
-  if (regtype === 'github' || regtype === 'google' || regtype === 'lichess'
-    || regtypeLocal === 'github' || regtypeLocal === 'google' || regtypeLocal === 'lichess') {
-    document.getElementById('username').value = ''
-    document.getElementById('password').value = ''
-  } else {
-    const v = localStorage.getItem('username')
-    document.getElementById('username').value = v ? v : ''
-  }
+  // let regtypeLocal = localStorage.getItem('regtype')
+  // regtypeLocal = regtypeLocal ? regtypeLocal : ''
+  // if (regtype === 'github' || regtype === 'google' || regtype === 'lichess'
+  //   || regtypeLocal === 'github' || regtypeLocal === 'google' || regtypeLocal === 'lichess') {
+  //   document.getElementById('username').value = ''
+  //   document.getElementById('password').value = ''
+  // } else {
+  //   const v = localStorage.getItem('username')
+  //   document.getElementById('username').value = v ? v : ''
+  // }
 
-  if (isUserLogged()) {
-    document.getElementById('username').setAttribute("disabled", true)
-    document.getElementById('password').setAttribute("disabled", true)
-    setElementVisible('#buttonPostLogout')
-    setElementNonVisible('#buttonPostLogin')
-    setElementNonVisible('#buttonPostRegistration')
-    // setElementNonVisible('.referToGithub')
-    // setElementNonVisible('.referToGoogle')
-    setElementNonVisible('.referToLichess')
-  } else {
-    document.getElementById('username').removeAttribute("disabled")
-    document.getElementById('password').removeAttribute("disabled")
-    setElementNonVisible('#buttonPostLogout')
-    setElementVisible('#buttonPostLogin')
-    setElementVisible('#buttonPostRegistration')
-    // setElementVisible('.referToGithub')
-    // setElementVisible('.referToGoogle')
-    setElementVisible('.referToLichess')
-  }
+  // if (isUserLogged()) {
+  //   document.getElementById('username').setAttribute("disabled", true)
+  //   document.getElementById('password').setAttribute("disabled", true)
+  //   setElementVisible('#buttonPostLogout')
+  //   setElementNonVisible('#buttonPostLogin')
+  //   setElementNonVisible('#buttonPostRegistration')
+  //   // setElementNonVisible('.referToGithub')
+  //   // setElementNonVisible('.referToGoogle')
+  //   setElementNonVisible('.referToLichess')
+  // } else {
+  //   document.getElementById('username').removeAttribute("disabled")
+  //   document.getElementById('password').removeAttribute("disabled")
+  //   setElementNonVisible('#buttonPostLogout')
+  //   setElementVisible('#buttonPostLogin')
+  //   setElementVisible('#buttonPostRegistration')
+  //   // setElementVisible('.referToGithub')
+  //   // setElementVisible('.referToGoogle')
+  //   setElementVisible('.referToLichess')
+  // }
 }
 
 function goMainModeFromUser() {
@@ -1754,22 +1746,22 @@ function clearSettings() {
 }
 
 function restoreStartGroups() {
-  let msg
+  // let msg
 
-  msg = isLangEn() ? 'All Start-groups will be restored.\n\nAre you sure ?' :
-    'Во всех стартовых группах\nбудут восстановлены начальные значения.\n\nВы уверены ?'
-  if (!confirm(msg)) {
-    return
-  }
+  // msg = isLangEn() ? 'All Start-groups will be restored.\n\nAre you sure ?' :
+  //   'Во всех стартовых группах\nбудут восстановлены начальные значения.\n\nВы уверены ?'
+  // if (!confirm(msg)) {
+  //   return
+  // }
 
-  initStartGroups()
-  fillStartGroups()
+  // initStartGroups()
+  // fillStartGroups()
 
-  refresh()
+  // refresh()
 
-  msg = isLangEn() ? 'All Start-groups are restored.' : 'Все стартовые группы восстановлены.'
-  alert(msg)
-  goMainModeFromSettings()
+  // msg = isLangEn() ? 'All Start-groups are restored.' : 'Все стартовые группы восстановлены.'
+  // alert(msg)
+  // goMainModeFromSettings()
 }
 
 ///////////////////////////////////////////////////////////
@@ -1903,8 +1895,6 @@ function setTheme() {
 
   const v = isDarkTheme ? '1' : '0'
   localStorage.setItem('DarkThemeChecked', v)
-
-  // goMainModeFromSettings()
 }
 
 function is_mobile_device() {
@@ -1959,14 +1949,6 @@ function outMsgWait(thisIsLichess, showWait) {
   }
 }
 
-// //delete seconds from date: "14.11.2021, 11:25:17" --> "14.11.2021, 11:25"
-// function getDateHHMM(milliseconds) {
-//   let lastOnline = (new Date(milliseconds)).toLocaleString() //14.11.2021, 11:25:17
-//   // lastOnline = lastOnline.replace(',', '') //del comma
-//   lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
-//   return lastOnline
-// }
-
 //getTodayHHMM: delete seconds from date & add 'today': "14.11.2021, 11:25:17" --> "today 11:25"
 function getDateHHMM(milliseconds) {
 
@@ -1978,12 +1960,6 @@ function getDateHHMM(milliseconds) {
 
   const dp = (new Date(milliseconds))
   let lastOnline = dp.toLocaleString() //14.11.2021, 11:25:17
-  //lastOnline = lastOnline.slice(0, -3) //14.11.2021, 11:25 //del seconds
-  // if (dp >= beginOfToday) {
-  //   lastOnline = (isLangEn() ? 'today' : 'сегодня') + lastOnline.slice(10, 17) //today, 11:25
-  // } else if (dp >= beginOfYesterday) {
-  //   lastOnline = (isLangEn() ? 'yesterday' : 'вчера') + lastOnline.slice(10, 17) //yesterday, 11:25
-  // }
   const tp = ', ' + [dp.getHours(), dp.getMinutes()].map(x => x < 10 ? "0" + x : x).join(":")
   if (dp >= beginOfToday) {
     lastOnline = (isLangEn() ? 'today' : 'сегодня') + tp //today, 11:25
@@ -2129,13 +2105,6 @@ function showPrompt(text = '', head = '') { //, callback) {
   // form.elements.text.focus()
   form.elements.cancel.focus()
 }
-
-// document.getElementById('show-button').onclick = function () {
-//   // showPrompt("Введите что-нибудь<br>...умное :)", function (value) {
-//   //   alert("Вы ввели: " + value)
-//   // })
-//   showPrompt(`Введите что-нибудь<br>...умное :)`, 'header')
-// }
 
 //////////////////////// L A N G U A G E ///////////////////////////////////////////////////
 
