@@ -119,7 +119,6 @@ const mapCountries = new Map([
 const META_FIDE = '@FIDE@'
 const META_STATUS_TEXT = '@STATUS-TEXT@'
 const META_STATUS_SYMBOL = '@STATUS-SYMBOL@'
-// const META_SCORE = '@SCORE-TEXT@'
 const mapTimeControl = new Map([
   ['player', 0],
   ['bullet', 1],
@@ -186,7 +185,6 @@ inputNode2 = document.querySelector('#InputOrder2')
 tableNode1 = document.querySelector('#LichessTables')
 tableNode2 = document.querySelector('#ChessComTables')
 
-//MobileStyle
 if (isMobileDevice) {
   document.querySelector('#bodyStyle').setAttribute("class", "mobileStyle")
   // document.querySelector('#projectName').setAttribute("class", "projectName projectNameDifMobile")
@@ -197,6 +195,7 @@ if (isMobileDevice) {
 
 document.querySelector('#group').onchange = () => onchangeSelectGroup()
 document.querySelector('#langSelect').onchange = () => changeLang()
+document.querySelector('#elemAutoRefreshInterval').onblur = () => blurAutoRefreshInterval() //validation
 
 //hot keys
 document.addEventListener('keydown', function (event) {
@@ -217,7 +216,7 @@ addAllOptionsToElementGroup(currentGroupName)
 setActiveInGroupElement(currentGroupName)
 
 if (isFirstChessCom) {
-  changeTablesOrder() //set first chess.com
+  changeTablesOrder()
 }
 
 setAutoRefresh()
@@ -237,8 +236,6 @@ if (needRefresh) {
 }
 
 setMsgVisibility()
-
-// showPrompt(`2 Введите что-нибудь текстово-численное и многажды повторенное<br>...умное :)`, 'header')
 
 ////////////////////////////////////////////
 
@@ -377,7 +374,7 @@ function groupAdd() {
     const msg = isLangEn() ?
       `${MAX_GROUPS_NUM} groups have already been created.\n\nThis is maximum !` :
       `${MAX_GROUPS_NUM} групп уже создано.\n\nЭто максимум !`
-    alert(msg)
+    myAlert(msg) //alert(msg)
     return
   }
 
@@ -390,7 +387,7 @@ function groupAdd() {
     msg = isLangEn() ?
       `The name must not exceed ${MAX_GROUPNAME_LEN} symbols !` :
       `Длина имени не должна превышать ${MAX_GROUPNAME_LEN} символов !`
-    alert(msg)
+    myAlert(msg) //alert(msg)
     return
   }
   v = groupName.toUpperCase()
@@ -399,14 +396,14 @@ function groupAdd() {
     msg = isLangEn() ?
       `Group "${groupName}" already exists.\n\nPlease enter an another name !` :
       `Группа "${groupName}" уже есть.\n\nПожалуйста, введите другое имя !`
-    alert(msg)
-    return
-  }
-  if (groupName.includes('!')) {
-    msg = isLangEn() ? `The name must not include symbol "!".` : `Имя не должно содержать символ  "!".`
     myAlert(msg) //alert(msg)
     return
   }
+  // if (groupName.includes('!')) {
+  //   msg = isLangEn() ? `The name must not include symbol "!".` : `Имя не должно содержать символ  "!".`
+  //   myAlert(msg) //alert(msg)
+  //   return
+  // }
 
   //add new group
   groupObjs.push({
@@ -427,7 +424,7 @@ function groupAdd() {
   msg = isLangEn() ?
     `It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !` :
     `Создана группа "${groupName}"\nс текущими списками игроков.\n\nВнесите свои изменения в списки созданной группы!`
-  alert(msg)
+  myAlert(msg) //alert(msg)
 
   setLichessOrgPlayerNamesWithoutTrim(getLichessOrgPlayerNames() + '\n') //add Enter
   document.querySelector('#elemLichessPlayerNames').focus()
@@ -441,7 +438,7 @@ function groupDel() {
   const groupIndex = groupNames.indexOf(groupName, 0)
   if (isThisStartGroup(groupIndex)) {
     msg = isLangEn() ? `Group "${groupName}" cannot be deleted !` : `Группу "${groupName}" нельзя удалять !`
-    alert(msg)
+    myAlert(msg) //alert(msg)
     return
   }
 
@@ -469,7 +466,7 @@ function groupDel() {
   msg = isLangEn() ?
     `Group "${groupName}" is deleted.\n\nCurrent group is "${currentGroupName}".` :
     `Группа "${groupName}" удалена.\n\nТекущая группа теперь: "${currentGroupName}".`
-  alert(msg)
+  myAlert(msg) //alert(msg)
 }
 
 //restore current group
@@ -929,7 +926,6 @@ function clearMetaText(arPlayerNames) {
   arPlayerNames.forEach((item, index) => {
     let playerHTML = vm.vueArLichessPlayersBuf[index].playerHTML.replace(META_STATUS_TEXT, '')
     playerHTML = playerHTML.replace(META_STATUS_SYMBOL, '')
-    // playerHTML = playerHTML.replace(META_SCORE, '')
     vm.vueArLichessPlayersBuf[index].playerHTML = playerHTML
   })
 }
@@ -1270,11 +1266,6 @@ async function getScoreAfterFetchFromLichess(arPlayerNames, myName) {
             const spaces0 = delimiter.repeat(maxNameLength - oppoName.length)// + 2)
             const spaces1 = delimiter.repeat(5 - String(myScore).length)
             const spaces2 = delimiter.repeat(5 - String(oppoScore).length)
-            // if (isMobileDevice) {
-            //   allScore += `X - ${oppoName} ${spaces0} ${myScore} : ${oppoScore} = ${diffTag}\n`
-            // } else {
-            //   allScore += `${myGetName} - ${oppoName} ${spaces0}${spaces1} ${myScore} : ${oppoScore}${spaces2} = ${diffTag}\n`
-            // }
             allScore += isMobileDevice ? `X` : `${myGetName}`
             allScore += ` - ${oppoName} ${spaces0}${spaces1} ${myScore} : ${oppoScore}${spaces2} = ${diffTag}\n`
           }
@@ -1565,30 +1556,49 @@ function goTablesMode() {
   setElementVisible('main')
 }
 
-
 function goSetMode() {
   // setElementNonVisible('#buttonUser')
   setElementNonVisible('main')
   setElementVisible('.sectionSettingsArea')
 }
 
-function goMainModeFromSettings() {
-
-  //AutoRefreshInterval is correct ?
+//AutoRefreshInterval is correct ?
+function blurAutoRefreshInterval() {
   let s = getAutoRefreshInterval()
   if (s !== '') {
     let n = parseInt(s, 10)
     if (isNaN(n) || !(Number.isInteger(n) && n >= 0 && n <= 9999)) {
-      alert('Interval must be between 0 and 9999 !')
+      const msg = isLangEn() ? 'Interval must be between 0 and 9999 !' : 'Интервал должен быть между 0 и 9999 !'
+      // alert(msg)
+      myAlert(msg)
+      setAutoRefreshInterval('')
       return
     }
     s = n.toString(10)
   }
 
   setAutoRefreshInterval(s) //yes, it's correct
-
   localStorage.setItem('AutoRefreshInterval', s)
   setAutoRefresh()
+}
+
+function goMainModeFromSettings() {
+
+  // //AutoRefreshInterval is correct ?
+  // let s = getAutoRefreshInterval()
+  // if (s !== '') {
+  //   let n = parseInt(s, 10)
+  //   if (isNaN(n) || !(Number.isInteger(n) && n >= 0 && n <= 9999)) {
+  //     // alert('Interval must be between 0 and 9999 !')
+  //     myAlert('Interval must be between 0 and 9999 !')
+  //     return
+  //   }
+  //   s = n.toString(10)
+  // }
+  // setAutoRefreshInterval(s) //yes, it's correct
+
+  // localStorage.setItem('AutoRefreshInterval', s)
+  // setAutoRefresh()
 
   setElementNonVisible('.sectionSettingsArea')
   setElementVisible('main')
@@ -1615,12 +1625,8 @@ function getDataFromStorage() {
   changeLang()
 
   v = localStorage.getItem('currentGroupName')
-  if (!v) {
-    v = currentGroupName
-  }
-  if (v !== '') {
-    currentGroupName = v
-  }
+  if (!v) { v = currentGroupName }
+  if (v !== '') { currentGroupName = v }
 
   v = localStorage.getItem('groupObjs')
   if (v && (v !== '') && (v !== 'undefined')) {
@@ -1738,7 +1744,7 @@ function clearSettings() {
   setTheme()
 
   msg = isLangEn() ? 'All settings are cleared.' : 'Все настройки сброшены.'
-  alert(msg)
+  myAlert(msg) //alert(msg)
 
   curLang = langEN
   document.getElementById('langSelect').value = curLang
@@ -2059,6 +2065,10 @@ function showPrompt(text = '', head = '') { //, callback) {
   document.getElementById('prompt-head').innerHTML = head
   // form.head.value = ''
 
+  if (isMobileDevice) {
+    form.setAttribute('class', 'prompt-formMobileStyle')
+  }
+
   function complete(value) {
     hideCover()
     container.style.display = 'none'
@@ -2127,7 +2137,7 @@ function changeLang() {
   setCurLang()
   localStorage.setItem('Lang', curLang)
 
-  const e = !isLangRu()
+  const e = isLangEn()
 
   //Tables
   el = document.querySelector('#buttonTables')

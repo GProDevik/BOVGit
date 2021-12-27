@@ -433,19 +433,15 @@ fieldset {
 
 /* ---------------------------------------- */
 
-#modalDialog {
+/* #modalDialog {
   font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
   border-collapse: collapse;
-  /* border: 1px solid black; */
-  /* border: 1px dotted black; */
   border: 1px dotted white;
   background-color: lightgray;
 }
-  /* background-color: gainsboro; */
-
 .modalDialogMobileStyle {
   font-size: x-small;
-}
+} */
 
 /* /////////////////////////////////////////////////////////////////////// */
 /* html,
@@ -455,6 +451,10 @@ padding: 0;
 width: 100%;
 height: 100%;
 } */
+
+.prompt-formMobileStyle {
+  font-size: x-small;
+}
 
 #prompt-form {
 display: inline-block;
@@ -468,9 +468,6 @@ vertical-align: middle;
 /* text-align: left; */
 
 font-family: monospace, 'Lucida Console', 'Monaco', 'Courier';
-/* border-collapse: collapse; */
-/* border: 1px dotted white; */
-/* background-color: lightgray; */
 }
 
 #prompt-form-container {
