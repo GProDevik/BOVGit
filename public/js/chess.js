@@ -149,8 +149,8 @@ const startGroupObjs = [
     name: 'mix',
     lichessPlayerNames: 'Thibault Zhigalko_Sergei Benefactorr Chess-Network Crest64 Challenger_Spy ShahMatKanal Shuvalov Pandochka',
     chessComPlayerNames: 'Erik Hikaru VladDobrov ChessQueen ChessNetwork ShahMatKanal'
-  },
-  {
+  }
+  , {
     name: 'FIDE top',
     lichessPlayerNames: 'DrNykterstein Alireza2003 Bombegranate AnishGiri Azerichessss AvalonGamemaster BakukaDaku87'
       + ' Sergey_Karjakin Colchonero64 Vladimirovich9000',
@@ -853,6 +853,17 @@ function getArPlayerNames(thisIsLichess) {
 async function fillTableFromServer(thisIsLichess) {
   let arPlayerNames = getArPlayerNames(thisIsLichess)
   if (arPlayerNames.length === 0) {
+
+    //clear tables
+    if (thisIsLichess) {
+      vm.vueArLichessPlayersBuf.length = 0
+      vm.vueArLichessPlayers.length = 0
+    }
+    else {
+      vm.vueArChessComPlayersBuf.length = 0
+      vm.vueArChessComPlayers.length = 0
+    }
+
     return
   }
 
@@ -1624,36 +1635,42 @@ function getDataFromStorage() {
   document.getElementById('langSelect').value = curLang
   changeLang()
 
+  //currentGroupName
   v = localStorage.getItem('currentGroupName')
   if (!v) { v = currentGroupName }
   if (v !== '') { currentGroupName = v }
 
+  //groupObjs, groupNames
   v = localStorage.getItem('groupObjs')
   if (v && (v !== '') && (v !== 'undefined')) {
     groupObjs = JSON.parse(v)
-    groupNames = getArGroupNames()
-    v = localStorage.getItem('LichessOrgPlayerNames')
-    setLichessOrgPlayerNames(v)
-    v = localStorage.getItem('ChessComPlayerNames')
-    setChessComPlayerNames(v)
+    // groupNames = getArGroupNames()
+    // v = localStorage.getItem('LichessOrgPlayerNames')
+    // setLichessOrgPlayerNames(v)
+    // v = localStorage.getItem('ChessComPlayerNames')
+    // setChessComPlayerNames(v)
+    // let u=['u1', 'u2', 'u3'], ar=['a1', 'a2'];  u.unshift(...ar)
 
+    groupObjs.unshift(...startGroupObjs) //add start groups to begin of groupObjs
+    groupNames = getArGroupNames()
+    const groupIndex = groupNames.indexOf(currentGroupName, 0)
+    if (groupIndex < 0) { //groupObjs is not correct in localStorage
+      initGroupObjs()
+    } else {
+      setLichessOrgPlayerNames(groupObjs[groupIndex].lichessPlayerNames)
+      setChessComPlayerNames(groupObjs[groupIndex].chessComPlayerNames)
+    }
   } else {
 
-    v = localStorage.getItem('LichessOrgPlayerNames')
-    if (!v) {
-      v = startGroupObjs[0].lichessPlayerNames
-    }
-    if (v !== '') {
-      setLichessOrgPlayerNames(v)
-    }
+    // v = localStorage.getItem('LichessOrgPlayerNames')
+    // if (!v) { v = startGroupObjs[0].lichessPlayerNames }
+    // if (v !== '') { setLichessOrgPlayerNames(v) }
 
-    v = localStorage.getItem('ChessComPlayerNames')
-    if (!v) {
-      v = startGroupObjs[0].chessComPlayerNames
-    }
-    if (v !== '') {
-      setChessComPlayerNames(v)
-    }
+    // v = localStorage.getItem('ChessComPlayerNames')
+    // if (!v) { v = startGroupObjs[0].chessComPlayerNames }
+    // if (v !== '') { setChessComPlayerNames(v) }
+
+    initGroupObjs() //groupObjs is not in localStorage
   }
 
   v = localStorage.getItem('LichessChecked')
@@ -1675,22 +1692,28 @@ function getDataFromStorage() {
 }
 
 function setDataToStorage() {
-  let v, isDiff, vs
+  let v, isDiff //, vs
 
-  localStorage.setItem('groupObjs', JSON.stringify(groupObjs))
   localStorage.setItem('currentGroupName', currentGroupName)
 
-  v = getLichessOrgPlayerNames()
-  vs = localStorage.getItem('LichessOrgPlayerNames')
-  vs = (vs === null ? "" : vs)
-  isDiff = (v.trim() !== vs.trim())
-  localStorage.setItem('LichessOrgPlayerNames', v)
+  // localStorage.setItem('groupObjs', JSON.stringify(groupObjs))
+  let userGroupObjs = [...groupObjs]
+  for (let i = 0; i < startGroupNum; i++) {
+    userGroupObjs.shift()
+  }
+  localStorage.setItem('groupObjs', JSON.stringify(userGroupObjs))
 
-  v = getChessComPlayerNames()
-  vs = localStorage.getItem('ChessComPlayerNames')
-  vs = (vs === null ? "" : vs)
-  isDiff = isDiff || (v.trim() !== vs.trim())
-  localStorage.setItem('ChessComPlayerNames', v)
+  // v = getLichessOrgPlayerNames()
+  // vs = localStorage.getItem('LichessOrgPlayerNames')
+  // vs = (vs === null ? "" : vs)
+  // isDiff = (v.trim() !== vs.trim())
+  // localStorage.setItem('LichessOrgPlayerNames', v)
+
+  // v = getChessComPlayerNames()
+  // vs = localStorage.getItem('ChessComPlayerNames')
+  // vs = (vs === null ? "" : vs)
+  // isDiff = isDiff || (v.trim() !== vs.trim())
+  // localStorage.setItem('ChessComPlayerNames', v)
 
   v = isCheckLichess() ? '1' : '0'
   isDiff = isDiff || (v !== localStorage.getItem('LichessChecked'))
