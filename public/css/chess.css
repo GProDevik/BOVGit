@@ -19,6 +19,7 @@ html {
 .sectionSettingsButtons{
   /* text-align: right; */
   text-align: left;
+  display: flex;
 }
 
 .projectNameDifMobile {
