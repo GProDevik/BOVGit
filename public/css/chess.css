@@ -16,12 +16,6 @@ html {
   width: 40vw;
 }
 
-.sectionSettingsButtons{
-  /* text-align: right; */
-  text-align: left;
-  display: flex;
-}
-
 .projectNameDifMobile {
   font-size: small;
 }
@@ -190,14 +184,35 @@ td {
   letter-spacing: 0px;
 }
 
+.sectionSettingsButtons{
+  /* text-align: right; */
+  text-align: left;
+  display: flex;
+}
+
 .buttonSettings {
   font-size: medium;
   /* width: 35%; */
   /* margin-left: 30%; */
-  /* margin-left: 8px; */
-  margin-right: 8px;
+  margin-left: 8px;
+  /* margin-right: 8px; */
   /* margin-right: 0px; */
   /* border-radius: 4px 4px 0 0; */
+}
+
+.tabSettings {
+  font-size: medium;
+  margin-left: 0px;
+  border-radius: 6px 6px 0 0;
+}
+
+.tabActive {
+  /* text-decoration: underline; */
+  text-decoration: overline;
+}
+
+.tabPassive {
+  text-decoration: none;
 }
 
 .Lang {

@@ -68,14 +68,14 @@
         </div> -->
 
         <div class="sectionSettingsButtons">
-          <input @click="vueGoTables" class="buttonSettings" type="button" value="Tables" id="buttonTables"
+          <input @click="vueGoTables" class="tabSettings tabActive" type="button" value="Tables" id="buttonTables"
             title="Tables">
-          <input @click="vueGoSetMode" class="buttonSettings" type="button" value="Settings" id="buttonSettings"
+          <input @click="vueGoSetMode" class="tabSettings" type="button" value="Settings" id="buttonSettings"
             title="Settings">
           <input @click="vueRefresh" class="buttonSettings" type="button" value="↺" id="buttonRefreshAllTables"
             title="Refresh all tables">
-          <input @click="vueButtonChangeTables" class="buttonChangeTables" type="button" value="↑↓"
-            id="buttonChangeTables" title="Change tables order">
+          <input @click="vueButtonChangeTables" class="buttonSettings" type="button" value="↑↓" id="buttonChangeTables"
+            title="Change tables order">
           <select class="Lang" id="langSelect" name="langSelect">
             <option value="EN">EN</option>
             <option value="RU">RU</option>
@@ -298,8 +298,8 @@
   <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.global.js"></script> -->
   <!-- <script src="https://unpkg.com/vue@3.2.20/dist/vue.runtime.global.js"></script> -->
 
-  <script src="js/chess.js"></script>
-  <!-- <script src="js/chessb.js"></script> -->
+  <!-- <script src="js/chess.js"></script> -->
+  <script src="js/chessb.js"></script>
 
 </body>
 

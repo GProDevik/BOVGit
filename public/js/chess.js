@@ -1563,11 +1563,17 @@ function goMainModeFromUser() {
 
 
 function goTablesMode() {
+  document.querySelector('#buttonTables').setAttribute('class', 'tabSettings tabActive')
+  document.querySelector('#buttonSettings').setAttribute('class', 'tabSettings tabPassive')
+
   setElementNonVisible('.sectionSettingsArea')
   setElementVisible('main')
 }
 
 function goSetMode() {
+  document.querySelector('#buttonSettings').setAttribute('class', 'tabSettings tabActive')
+  document.querySelector('#buttonTables').setAttribute('class', 'tabSettings tabPassive')
+
   // setElementNonVisible('#buttonUser')
   setElementNonVisible('main')
   setElementVisible('.sectionSettingsArea')
