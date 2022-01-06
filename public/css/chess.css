@@ -209,10 +209,14 @@ td {
 .tabActive {
   /* text-decoration: underline; */
   text-decoration: overline;
+  /* border-right-width: medium;
+  border-bottom-width: medium; */
 }
 
 .tabPassive {
   text-decoration: none;
+  /* border-right-width: large;
+  border-bottom-width: large; */
 }
 
 .Lang {
