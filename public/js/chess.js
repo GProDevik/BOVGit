@@ -421,13 +421,13 @@ function groupAdd() {
 
   setMsgVisibility()
 
+  // setLichessOrgPlayerNamesWithoutTrim(getLichessOrgPlayerNames() + '\n') //add Enter
+  // document.querySelector('#elemLichessPlayerNames').focus()
+
   msg = isLangEn() ?
     `It's created group "${groupName}"\nwith the current lists of players.\n\nChange player lists !` :
     `Создана группа "${groupName}"\nс текущими списками игроков.\n\nВнесите свои изменения в списки созданной группы!`
   myAlert(msg) //alert(msg)
-
-  setLichessOrgPlayerNamesWithoutTrim(getLichessOrgPlayerNames() + '\n') //add Enter
-  document.querySelector('#elemLichessPlayerNames').focus()
 }
 
 //del current group
@@ -2123,22 +2123,22 @@ function showPrompt(text = '', head = '') { //, callback) {
     }
   }
 
-  let lastElem = form.elements[form.elements.length - 1]
-  let firstElem = form.elements[0]
+  // let lastElem = form.elements[form.elements.length - 1]
+  // let firstElem = form.elements[0]
 
-  lastElem.onkeydown = function (e) {
-    if (e.key == 'Tab' && !e.shiftKey) {
-      firstElem.focus()
-      return false
-    }
-  }
+  // lastElem.onkeydown = function (e) {
+  //   if (e.key == 'Tab' && !e.shiftKey) {
+  //     firstElem.focus()
+  //     return false
+  //   }
+  // }
 
-  firstElem.onkeydown = function (e) {
-    if (e.key == 'Tab' && e.shiftKey) {
-      lastElem.focus()
-      return false
-    }
-  }
+  // firstElem.onkeydown = function (e) {
+  //   if (e.key == 'Tab' && e.shiftKey) {
+  //     lastElem.focus()
+  //     return false
+  //   }
+  // }
 
   container.style.display = 'block'
   // form.elements.text.focus()
